@@ -4,6 +4,12 @@ import { WealthProjectionChart } from "../components/charts/WealthProjectionChar
 import { ProjectionTable } from "../components/ProjectionTable"
 
 export default function Projection() {
+  return (
+    <div>
+      Projection
+    </div>
+  );
+}
   // 1️⃣ INPUTS (later from UI / Firebase)
   const input = {
     startYear: new Date().getFullYear(),
@@ -50,3 +56,4 @@ export default function Projection() {
     </div>
   )
 }
+
