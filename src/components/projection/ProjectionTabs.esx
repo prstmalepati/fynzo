@@ -1,0 +1,56 @@
+import { useState } from "react"
+import { NetWorthChart } from "../charts/NetWorthChart"
+import { IncomeChart } from "../charts/IncomeChart"
+import { SavingsChart } from "../charts/SavingsChart"
+import { ProjectionTable } from "../ProjectionTable"
+
+const TABS = [
+  { id: "networth", label: "Net Worth" },
+  { id: "income", label: "Income" },
+  { id: "savings", label: "Savings" },
+  { id: "table", label: "Table" }
+]
+
+export function ProjectionTabs({ projections }: any) {
+  const [activeTab, setActiveTab] = useState("networth")
+
+  return (
+    <div className="rounded-xl bg-white p-4 shadow">
+      {/* Tabs */}
+      <div className="mb-4 flex gap-2 border-b">
+        {TABS.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`pb-2 text-sm font-medium ${
+              activeTab === tab.id
+                ? "border-b-2 border-teal-600 text-teal-600"
+                : "text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Content */}
+      <div>
+        {activeTab === "networth" && (
+          <NetWorthChart projections={projections} />
+        )}
+
+        {activeTab === "income" && (
+          <IncomeChart projections={projections} />
+        )}
+
+        {activeTab === "savings" && (
+          <SavingsChart projections={projections} />
+        )}
+
+        {activeTab === "table" && (
+          <ProjectionTable projections={projections} />
+        )}
+      </div>
+    </div>
+  )
+}
