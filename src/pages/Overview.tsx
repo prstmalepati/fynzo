@@ -1,9 +1,9 @@
 export default function Overview() {
   return (
-    <div className="space-y-6">
-      <WealthSnapshot />
-      <ProjectionPreview />
-      <FireStatus />
+    <div style={{ padding: 32 }}>
+      <h1>fynzo</h1>
+      <p>Wealth. Projection. Clarity.</p>
     </div>
-  )
+  );
 }
+
