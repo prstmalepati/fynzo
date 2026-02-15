@@ -1,6 +1,6 @@
 import { calculateScenarios } from "../calculations/scenarios"
 import { calculateFireStats } from "../calculations/fire"
-import { WealthProjectionChart } from "../components/charts/WealthProjectionChart"
+import WealthProjectionChart from "../components/charts/WealthProjectionChart";
 import { ProjectionTable } from "../components/ProjectionTable"
 
 export default function Projection() {
