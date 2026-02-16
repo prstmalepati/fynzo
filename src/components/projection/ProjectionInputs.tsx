@@ -150,4 +150,53 @@ export default function ProjectionInputs({ onCalculate }: Props) {
       </Section>
 
       {/* CTA */}
-      <butt
+      <button
+        onClick={handleCalculate}
+        className="w-full bg-black text-white py-3 rounded-xl font-semibold"
+      >
+        Calculate Projection
+      </button>
+    </div>
+  )
+}
+
+/* ------------------ Helpers ------------------ */
+
+function Section({ title, children }: { title: string; children: any }) {
+  return (
+    <div>
+      <h3 className="font-semibold mb-3">{title}</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {children}
+      </div>
+    </div>
+  )
+}
+
+function Input({
+  label,
+  value,
+  onChange,
+}: {
+  label: string
+  value: number
+  onChange: (v: number) => void
+}) {
+  return (
+    <label className="flex flex-col text-sm gap-1">
+      <span className="text-gray-600">{label}</span>
+      <input
+        type="number"
+        value={value}
+        onChange={e => onChange(Number(e.target.value))}
+        className="border rounded-lg px-3 py-2"
+      />
+    </label>
+  )
+}
+
+const activeBtn =
+  "px-4 py-2 rounded-lg bg-black text-white font-medium"
+
+const inactiveBtn =
+  "px-4 py-2 rounded-lg border text-gray-600"
