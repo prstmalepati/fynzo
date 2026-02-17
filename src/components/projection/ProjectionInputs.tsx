@@ -19,8 +19,8 @@ export default function ProjectionInputs({ onCalculate }: Props) {
     income1: 60000,
     income2: 50000,
 
-    bonusIncome: 0,
-    otherIncome: 0,
+    bonusIncome: undefined as any,
+    otherIncome: undefined as any,
 
     initialInvestment: 20000,
     monthlyInvestment: 1000,
@@ -29,8 +29,8 @@ export default function ProjectionInputs({ onCalculate }: Props) {
     monthlyExpenses: 2500,
     expenseGrowth: 0.02,
 
-    currentDebt: 0,
-    monthlyDebtPayment: 0,
+    currentDebt: undefined as any,
+    monthlyDebtPayment: undefined as any,
   })
 
   function update<K extends keyof ProjectionInput>(key: K, value: ProjectionInput[K]) {
@@ -40,135 +40,223 @@ export default function ProjectionInputs({ onCalculate }: Props) {
   function handleCalculate() {
     const result = calculateProjection({
       ...form,
-      isCouple
+      isCouple,
+      bonusIncome: form.bonusIncome || 0,
+      otherIncome: form.otherIncome || 0,
+      currentDebt: form.currentDebt || 0,
+      monthlyDebtPayment: form.monthlyDebtPayment || 0,
     })
     onCalculate(result)
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
 
-      {/* Mode */}
-      <div className="flex items-center gap-4">
-        <label className="font-medium">Mode:</label>
-        <button
-          onClick={() => setIsCouple(false)}
-          className={!isCouple ? activeBtn : inactiveBtn}
-        >
-          Single
-        </button>
-        <button
-          onClick={() => setIsCouple(true)}
-          className={isCouple ? activeBtn : inactiveBtn}
-        >
-          Couple
-        </button>
+      {/* Mode Toggle */}
+      <div className="bg-gradient-to-br from-slate-50 to-white p-6 rounded-xl border border-slate-200">
+        <label className="text-sm font-semibold text-slate-700 mb-3 block">Planning Mode</label>
+        <div className="flex gap-3">
+          <button
+            onClick={() => setIsCouple(false)}
+            className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
+              !isCouple 
+                ? 'bg-primary text-white shadow-lg shadow-primary/30' 
+                : 'bg-white border-2 border-slate-200 text-slate-600 hover:border-slate-300'
+            }`}
+          >
+            <span className="text-lg">👤</span> Individual
+          </button>
+          <button
+            onClick={() => setIsCouple(true)}
+            className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
+              isCouple 
+                ? 'bg-primary text-white shadow-lg shadow-primary/30' 
+                : 'bg-white border-2 border-slate-200 text-slate-600 hover:border-slate-300'
+            }`}
+          >
+            <span className="text-lg">👥</span> Couple
+          </button>
+        </div>
       </div>
 
-      {/* Ages */}
-      <Section title="Profile">
-        <Input
-          label="Your Age"
-          value={form.age1}
-          onChange={v => update("age1", v)}
-        />
-        {isCouple && (
+      {/* Profile Section */}
+      <FormSection 
+        title="📋 Profile" 
+        description="Your current age and planning timeline"
+      >
+        <div className="grid grid-cols-2 gap-4">
           <Input
-            label="Partner Age"
-            value={form.age2 || 0}
-            onChange={v => update("age2", v)}
+            label="Your Age"
+            value={form.age1}
+            onChange={v => update("age1", v)}
+            icon="🎂"
           />
-        )}
-      </Section>
-
-      {/* Income */}
-      <Section title="Income (Annual)">
-        <Input
-          label="Your Income (€)"
-          value={form.income1}
-          onChange={v => update("income1", v)}
-        />
-        {isCouple && (
+          {isCouple && (
+            <Input
+              label="Partner Age"
+              value={form.age2 || 30}
+              onChange={v => update("age2", v)}
+              icon="🎂"
+            />
+          )}
           <Input
-            label="Partner Income (€)"
-            value={form.income2 || 0}
-            onChange={v => update("income2", v)}
+            label="Years to Project"
+            value={form.years}
+            onChange={v => update("years", v)}
+            icon="📅"
+            className={isCouple ? "" : "col-span-2"}
           />
-        )}
-        <Input
-          label="Bonus Income (€)"
-          value={form.bonusIncome}
-          onChange={v => update("bonusIncome", v)}
-        />
-      </Section>
+        </div>
+      </FormSection>
 
-      {/* Investments */}
-      <Section title="Investments">
-        <Input
-          label="Initial Investment (€)"
-          value={form.initialInvestment}
-          onChange={v => update("initialInvestment", v)}
-        />
-        <Input
-          label="Monthly Investment (€)"
-          value={form.monthlyInvestment}
-          onChange={v => update("monthlyInvestment", v)}
-        />
-        <Input
-          label="Expected Return (%)"
-          value={form.investmentReturn * 100}
-          onChange={v => update("investmentReturn", v / 100)}
-        />
-      </Section>
+      {/* Income Section */}
+      <FormSection 
+        title="💰 Annual Income" 
+        description="Your salary and additional income sources"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Input
+            label="Your Income"
+            value={form.income1}
+            onChange={v => update("income1", v)}
+            icon="💵"
+            suffix="€"
+          />
+          {isCouple && (
+            <Input
+              label="Partner Income"
+              value={form.income2 || 50000}
+              onChange={v => update("income2", v)}
+              icon="💵"
+              suffix="€"
+            />
+          )}
+          <Input
+            label="Bonus Income (Optional)"
+            value={form.bonusIncome}
+            onChange={v => update("bonusIncome", v)}
+            icon="🎁"
+            suffix="€"
+            placeholder="0"
+          />
+          <Input
+            label="Other Income (Optional)"
+            value={form.otherIncome}
+            onChange={v => update("otherIncome", v)}
+            icon="📊"
+            suffix="€"
+            placeholder="0"
+          />
+        </div>
+      </FormSection>
 
-      {/* Expenses */}
-      <Section title="Expenses">
-        <Input
-          label="Monthly Expenses (€)"
-          value={form.monthlyExpenses}
-          onChange={v => update("monthlyExpenses", v)}
-        />
-        <Input
-          label="Expense Growth (%)"
-          value={form.expenseGrowth * 100}
-          onChange={v => update("expenseGrowth", v / 100)}
-        />
-      </Section>
+      {/* Investments Section */}
+      <FormSection 
+        title="📈 Investments" 
+        description="Your current portfolio and contribution strategy"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Input
+            label="Starting Portfolio"
+            value={form.initialInvestment}
+            onChange={v => update("initialInvestment", v)}
+            icon="💼"
+            suffix="€"
+          />
+          <Input
+            label="Monthly Contribution"
+            value={form.monthlyInvestment}
+            onChange={v => update("monthlyInvestment", v)}
+            icon="➕"
+            suffix="€"
+          />
+          <Input
+            label="Expected Annual Return"
+            value={form.investmentReturn * 100}
+            onChange={v => update("investmentReturn", v / 100)}
+            icon="📊"
+            suffix="%"
+            step={0.1}
+            className="col-span-full"
+          />
+        </div>
+      </FormSection>
 
-      {/* Debt */}
-      <Section title="Debt">
-        <Input
-          label="Current Debt (€)"
-          value={form.currentDebt}
-          onChange={v => update("currentDebt", v)}
-        />
-        <Input
-          label="Monthly Debt Payment (€)"
-          value={form.monthlyDebtPayment}
-          onChange={v => update("monthlyDebtPayment", v)}
-        />
-      </Section>
+      {/* Expenses Section */}
+      <FormSection 
+        title="🏠 Living Expenses" 
+        description="Your monthly costs and inflation assumptions"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Input
+            label="Monthly Expenses"
+            value={form.monthlyExpenses}
+            onChange={v => update("monthlyExpenses", v)}
+            icon="💳"
+            suffix="€"
+          />
+          <Input
+            label="Annual Expense Growth"
+            value={form.expenseGrowth * 100}
+            onChange={v => update("expenseGrowth", v / 100)}
+            icon="📈"
+            suffix="%"
+            step={0.1}
+          />
+        </div>
+      </FormSection>
 
-      {/* CTA */}
+      {/* Debt Section */}
+      <FormSection 
+        title="💳 Debt (Optional)" 
+        description="Outstanding loans and your payoff plan"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Input
+            label="Total Debt"
+            value={form.currentDebt}
+            onChange={v => update("currentDebt", v)}
+            icon="⚠️"
+            suffix="€"
+            placeholder="0"
+          />
+          <Input
+            label="Monthly Payment"
+            value={form.monthlyDebtPayment}
+            onChange={v => update("monthlyDebtPayment", v)}
+            icon="💸"
+            suffix="€"
+            placeholder="0"
+          />
+        </div>
+      </FormSection>
+
+      {/* Calculate Button */}
       <button
         onClick={handleCalculate}
-        className="w-full bg-black text-white py-3 rounded-xl font-semibold"
+        className="w-full bg-gradient-to-r from-primary to-teal-600 text-white py-4 rounded-xl font-bold text-lg shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/40 hover:scale-[1.02] transition-all duration-200 flex items-center justify-center gap-3"
       >
-        Calculate Projection
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+        Calculate My Projection
       </button>
     </div>
   )
 }
 
-/* ------------------ Helpers ------------------ */
+/* ------------------ Enhanced Components ------------------ */
 
-function Section({ title, children }: { title: string; children: any }) {
+function FormSection({ title, description, children }: { title: string; description: string; children: any }) {
   return (
-    <div>
-      <h3 className="font-semibold mb-3">{title}</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {children}
+    <div className="bg-gradient-to-br from-white to-slate-50 rounded-xl p-6 border border-slate-200 shadow-sm">
+      <div className="mb-4">
+        <h3 className="text-lg font-bold text-secondary mb-1" style={{ fontFamily: "'Crimson Pro', serif" }}>
+          {title}
+        </h3>
+        <p className="text-sm text-slate-600">{description}</p>
       </div>
+      {children}
     </div>
   )
 }
@@ -177,26 +265,42 @@ function Input({
   label,
   value,
   onChange,
+  icon,
+  suffix,
+  placeholder,
+  step = 1,
+  className = ""
 }: {
   label: string
-  value: number
+  value: number | undefined
   onChange: (v: number) => void
+  icon?: string
+  suffix?: string
+  placeholder?: string
+  step?: number
+  className?: string
 }) {
   return (
-    <label className="flex flex-col text-sm gap-1">
-      <span className="text-gray-600">{label}</span>
-      <input
-        type="number"
-        value={value}
-        onChange={e => onChange(Number(e.target.value))}
-        className="border rounded-lg px-3 py-2"
-      />
+    <label className={`flex flex-col gap-2 ${className}`}>
+      <span className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+        {icon && <span className="text-base">{icon}</span>}
+        {label}
+      </span>
+      <div className="relative">
+        <input
+          type="number"
+          value={value ?? ''}
+          onChange={e => onChange(e.target.value === '' ? undefined as any : Number(e.target.value))}
+          placeholder={placeholder}
+          step={step}
+          className="w-full px-4 py-3 pr-12 border-2 border-slate-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all bg-white font-medium"
+        />
+        {suffix && (
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 font-semibold">
+            {suffix}
+          </span>
+        )}
+      </div>
     </label>
   )
 }
-
-const activeBtn =
-  "px-4 py-2 rounded-lg bg-black text-white font-medium"
-
-const inactiveBtn =
-  "px-4 py-2 rounded-lg border text-gray-600"
