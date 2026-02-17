@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ProjectionInputs from "../components/projection/ProjectionInputs";
 import WealthProjectionChart from "../components/charts/WealthProjectionChart";
 import { calculateProjection } from "../calculations/projection";
 
 export default function ProjectionPage() {
+  const navigate = useNavigate();
   const [result, setResult] = useState<any>(null);
   const [showResults, setShowResults] = useState(false);
 
@@ -17,21 +19,24 @@ export default function ProjectionPage() {
       {/* Header */}
       <div className="bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-teal-600 rounded-xl flex items-center justify-center">
+          <button 
+            onClick={() => navigate('/')}
+            className="flex items-center gap-3 mb-4 group"
+          >
+            <div className="w-10 h-10 bg-gradient-to-br from-primary to-teal-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
               <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
               </svg>
             </div>
-            <div>
-              <h1 className="text-4xl font-bold text-secondary" style={{ fontFamily: "'Crimson Pro', serif" }}>
+            <div className="text-left">
+              <h1 className="text-4xl font-bold text-secondary group-hover:text-primary transition-colors" style={{ fontFamily: "'Crimson Pro', serif" }}>
                 Wealth Projection Calculator
               </h1>
               <p className="text-slate-600 mt-1" style={{ fontFamily: "'Manrope', sans-serif" }}>
                 Model your path to financial independence with precision
               </p>
             </div>
-          </div>
+          </button>
         </div>
       </div>
 

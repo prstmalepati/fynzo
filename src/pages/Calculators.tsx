@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Calculators() {
+  const navigate = useNavigate();
   const [activeCalculator, setActiveCalculator] = useState<string | null>(null);
 
   return (
@@ -8,21 +10,24 @@ export default function Calculators() {
       {/* Header */}
       <div className="bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-teal-600 rounded-xl flex items-center justify-center">
+          <button 
+            onClick={() => navigate('/')}
+            className="flex items-center gap-3 group cursor-pointer"
+          >
+            <div className="w-10 h-10 bg-gradient-to-br from-primary to-teal-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
               <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
               </svg>
             </div>
-            <div>
-              <h1 className="text-4xl font-bold text-secondary" style={{ fontFamily: "'Crimson Pro', serif" }}>
+            <div className="text-left">
+              <h1 className="text-4xl font-bold text-secondary group-hover:text-primary transition-colors" style={{ fontFamily: "'Crimson Pro', serif" }}>
                 Financial Calculators
               </h1>
               <p className="text-slate-600 mt-1" style={{ fontFamily: "'Manrope', sans-serif" }}>
                 Quick tools for everyday financial decisions
               </p>
             </div>
-          </div>
+          </button>
         </div>
       </div>
 
@@ -163,26 +168,49 @@ function CompoundInterestCalculator() {
 
   return (
     <CalculatorCard title="Compound Interest Calculator">
-      <div className="grid md:grid-cols-2 gap-8">
-        <div className="space-y-6">
-          <Input label="Initial Investment (€)" value={initial} onChange={setInitial} />
-          <Input label="Monthly Contribution (€)" value={monthly} onChange={setMonthly} />
-          <Input label="Annual Return (%)" value={rate} onChange={setRate} step={0.1} />
-          <Input label="Years" value={years} onChange={setYears} />
-        </div>
-        <div className="bg-gradient-to-br from-primary to-teal-700 rounded-2xl p-8 text-white">
-          <div className="text-sm opacity-90 mb-2">Future Value</div>
-          <div className="text-5xl font-bold mb-6" style={{ fontFamily: "'Crimson Pro', serif" }}>
-            €{finalAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-          </div>
-          <div className="space-y-3 text-sm">
-            <div className="flex justify-between">
-              <span className="opacity-90">Total Contributions:</span>
-              <span className="font-semibold">€{(initial + monthly * 12 * years).toLocaleString()}</span>
+      <div className="grid lg:grid-cols-5 gap-8">
+        {/* Input Column - Takes 2 columns */}
+        <div className="lg:col-span-2 space-y-5">
+          <div className="bg-gradient-to-br from-slate-50 to-white p-6 rounded-xl border-2 border-slate-200">
+            <h4 className="font-bold text-secondary mb-4 flex items-center gap-2">
+              <span className="text-xl">💰</span> Investment Details
+            </h4>
+            <div className="space-y-4">
+              <Input label="Initial Investment (€)" value={initial} onChange={setInitial} />
+              <Input label="Monthly Contribution (€)" value={monthly} onChange={setMonthly} />
+              <Input label="Annual Return (%)" value={rate} onChange={setRate} step={0.1} />
+              <Input label="Years" value={years} onChange={setYears} />
             </div>
-            <div className="flex justify-between">
-              <span className="opacity-90">Investment Gains:</span>
-              <span className="font-semibold">€{(finalAmount - initial - monthly * 12 * years).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+          </div>
+        </div>
+
+        {/* Results Column - Takes 3 columns */}
+        <div className="lg:col-span-3 space-y-4">
+          <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl p-8 text-white shadow-2xl">
+            <div className="text-sm opacity-90 mb-2 font-semibold">Future Value</div>
+            <div className="text-6xl font-bold mb-6" style={{ fontFamily: "'Crimson Pro', serif" }}>
+              €{finalAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+            </div>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center p-3 bg-white/10 rounded-lg backdrop-blur">
+                <span className="opacity-90">Total Contributions:</span>
+                <span className="font-bold text-lg">€{(initial + monthly * 12 * years).toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-white/10 rounded-lg backdrop-blur">
+                <span className="opacity-90">Investment Gains:</span>
+                <span className="font-bold text-lg">€{(finalAmount - initial - monthly * 12 * years).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-white rounded-xl p-5 border-2 border-blue-200">
+              <div className="text-xs text-slate-600 mb-1 font-semibold">Effective Rate</div>
+              <div className="text-2xl font-bold text-blue-600">{((finalAmount / (initial + monthly * 12 * years) - 1) * 100).toFixed(1)}%</div>
+            </div>
+            <div className="bg-white rounded-xl p-5 border-2 border-blue-200">
+              <div className="text-xs text-slate-600 mb-1 font-semibold">Gain Multiple</div>
+              <div className="text-2xl font-bold text-blue-600">{(finalAmount / (initial + monthly * 12 * years)).toFixed(2)}x</div>
             </div>
           </div>
         </div>
@@ -204,27 +232,51 @@ function RetirementCalculator() {
 
   return (
     <CalculatorCard title="Retirement Savings Calculator">
-      <div className="grid md:grid-cols-2 gap-8">
-        <div className="space-y-6">
-          <Input label="Current Age" value={currentAge} onChange={setCurrentAge} />
-          <Input label="Retirement Age" value={retirementAge} onChange={setRetirementAge} />
-          <Input label="Target Retirement Amount (€)" value={targetAmount} onChange={setTargetAmount} />
-          <Input label="Current Savings (€)" value={currentSavings} onChange={setCurrentSavings} />
-          <Input label="Expected Return (%)" value={returnRate} onChange={setReturnRate} step={0.1} />
-        </div>
-        <div className="bg-gradient-to-br from-emerald-600 to-emerald-800 rounded-2xl p-8 text-white">
-          <div className="text-sm opacity-90 mb-2">Monthly Savings Needed</div>
-          <div className="text-5xl font-bold mb-6" style={{ fontFamily: "'Crimson Pro', serif" }}>
-            €{monthlyNeeded > 0 ? monthlyNeeded.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '0'}
-          </div>
-          <div className="space-y-3 text-sm">
-            <div className="flex justify-between">
-              <span className="opacity-90">Years to Retirement:</span>
-              <span className="font-semibold">{years} years</span>
+      <div className="grid lg:grid-cols-5 gap-8">
+        {/* Input Column */}
+        <div className="lg:col-span-2 space-y-5">
+          <div className="bg-gradient-to-br from-emerald-50 to-white p-6 rounded-xl border-2 border-emerald-200">
+            <h4 className="font-bold text-secondary mb-4 flex items-center gap-2">
+              <span className="text-xl">🎯</span> Retirement Goals
+            </h4>
+            <div className="space-y-4">
+              <Input label="Current Age" value={currentAge} onChange={setCurrentAge} />
+              <Input label="Retirement Age" value={retirementAge} onChange={setRetirementAge} />
+              <Input label="Target Amount (€)" value={targetAmount} onChange={setTargetAmount} />
+              <Input label="Current Savings (€)" value={currentSavings} onChange={setCurrentSavings} />
+              <Input label="Expected Return (%)" value={returnRate} onChange={setReturnRate} step={0.1} />
             </div>
-            <div className="flex justify-between">
-              <span className="opacity-90">Annual Savings:</span>
-              <span className="font-semibold">€{(monthlyNeeded * 12).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+          </div>
+        </div>
+
+        {/* Results Column */}
+        <div className="lg:col-span-3 space-y-4">
+          <div className="bg-gradient-to-br from-emerald-600 to-emerald-800 rounded-2xl p-8 text-white shadow-2xl">
+            <div className="text-sm opacity-90 mb-2 font-semibold">Monthly Savings Needed</div>
+            <div className="text-6xl font-bold mb-6" style={{ fontFamily: "'Crimson Pro', serif" }}>
+              €{monthlyNeeded > 0 ? monthlyNeeded.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '0'}
+            </div>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center p-3 bg-white/10 rounded-lg backdrop-blur">
+                <span className="opacity-90">Years to Retirement:</span>
+                <span className="font-bold text-lg">{years} years</span>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-white/10 rounded-lg backdrop-blur">
+                <span className="opacity-90">Annual Savings:</span>
+                <span className="font-bold text-lg">€{(monthlyNeeded * 12).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-white rounded-xl p-5 border-2 border-emerald-200">
+              <div className="text-xs text-slate-600 mb-1 font-semibold">Total to Save</div>
+              <div className="text-2xl font-bold text-emerald-600">€{(monthlyNeeded * 12 * years).toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
+            </div>
+            <div className="bg-white rounded-xl p-5 border-2 border-emerald-200">
+              <div className="text-xs text-slate-600 mb-1 font-semibold">Savings Rate</div>
+              <div className="text-2xl font-bold text-emerald-600">{((monthlyNeeded * 12 / 60000) * 100).toFixed(0)}%</div>
+              <div className="text-xs text-slate-500 mt-1">of €60K income</div>
             </div>
           </div>
         </div>
@@ -411,14 +463,24 @@ function CalculatorCard({ title, children }: { title: string; children: React.Re
 function Input({ label, value, onChange, step = 1 }: { label: string; value: number; onChange: (v: number) => void; step?: number }) {
   return (
     <label className="flex flex-col gap-2">
-      <span className="text-sm font-medium text-slate-700">{label}</span>
-      <input
-        type="number"
-        value={value}
-        onChange={e => onChange(Number(e.target.value))}
-        step={step}
-        className="px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-      />
+      <span className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+        <span className="text-primary">●</span>
+        {label}
+      </span>
+      <div className="relative">
+        <input
+          type="number"
+          value={value}
+          onChange={e => onChange(Number(e.target.value))}
+          step={step}
+          className="w-full px-4 py-3.5 pr-10 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all bg-white font-medium text-secondary hover:border-slate-300"
+        />
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+          </svg>
+        </div>
+      </div>
     </label>
   );
 }
