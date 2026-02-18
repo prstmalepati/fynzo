@@ -75,7 +75,7 @@ export default function Login() {
             <span className="text-white font-bold text-3xl">f</span>
           </div>
           <h1 className="text-4xl font-bold text-secondary mb-2" style={{ fontFamily: "'Crimson Pro', serif" }}>
-            Welcome to Fynzo
+            Welcome to myfynzo
           </h1>
           <p className="text-slate-600" style={{ fontFamily: "'Manrope', sans-serif" }}>
             Sign in to start planning your financial future

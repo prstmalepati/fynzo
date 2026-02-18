@@ -143,7 +143,7 @@ export default function ProjectionPage() {
               </h1>
             </button>
             <p className="text-slate-600" style={{ fontFamily: "'Manrope', sans-serif" }}>
-              Model your path to financial independence with precision - FREE
+              Model your path to financial independence with precision
             </p>
           </div>
           <button

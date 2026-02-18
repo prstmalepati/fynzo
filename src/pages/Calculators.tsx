@@ -10,7 +10,7 @@ export default function Calculators() {
       <div className="p-8">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-secondary mb-2" style={{ fontFamily: "'Crimson Pro', serif" }}>
-            Expert Financial Calculators
+            Financial Calculators
           </h1>
           <p className="text-slate-600" style={{ fontFamily: "'Manrope', sans-serif" }}>
             Advanced tools for comprehensive financial planning

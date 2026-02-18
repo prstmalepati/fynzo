@@ -35,7 +35,7 @@ export default function Overview() {
             <div className="w-8 h-8 bg-gradient-to-br from-primary to-teal-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">f</span>
             </div>
-            <span className="text-2xl font-bold text-secondary" style={{ fontFamily: "'Crimson Pro', serif" }}>fynzo</span>
+            <span className="text-2xl font-bold text-secondary" style={{ fontFamily: "'Crimson Pro', serif" }}>myfynzo</span>
           </div>
           <div className="flex items-center gap-3">
             {user ? (
@@ -87,13 +87,13 @@ export default function Overview() {
                 onClick={() => navigate('/projection')}
                 className="px-8 py-4 bg-primary text-white rounded-xl hover:bg-teal-800 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl hover:scale-105 transform"
               >
-                Calculate Your FIRE Number - FREE
+                Calculate Your FIRE Number
               </button>
               <button
                 onClick={() => user ? navigate('/calculators') : navigate('/login')}
                 className="px-8 py-4 bg-white text-primary border-2 border-primary rounded-xl hover:bg-teal-50 transition-all duration-300 font-semibold"
               >
-                Expert Tools {!user && '(Login Required)'}
+                {user ? 'Calculators' : 'Calculators (Login Required)'}
               </button>
             </div>
             <div className="flex gap-8 pt-4">
@@ -254,9 +254,9 @@ export default function Overview() {
             onClick={() => navigate('/projection')}
             className="px-10 py-5 bg-white text-primary rounded-xl hover:bg-teal-50 transition-all duration-300 font-bold text-lg shadow-2xl hover:shadow-xl hover:scale-105 transform"
           >
-            Calculate Your FIRE Number - FREE →
+            Calculate Your FIRE Number →
           </button>
-          <p className="text-sm text-teal-200 mt-6">Free forever. No credit card required. Expert tools available with login.</p>
+          <p className="text-sm text-teal-200 mt-6">No credit card required. Advanced calculators available with login.</p>
         </div>
       </section>
 
