@@ -1,9 +1,13 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import SidebarLayout from "../components/SidebarLayout";
 import ProjectionInputs from "../components/projection/ProjectionInputs";
 import WealthProjectionChart from "../components/charts/WealthProjectionChart";
 
 export default function ProjectionPage() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [result, setResult] = useState<any>(null);
   const [showResults, setShowResults] = useState(false);
 
@@ -12,9 +16,37 @@ export default function ProjectionPage() {
     setShowResults(true);
   };
 
-  return (
-    <SidebarLayout>
-      <div className="p-8">
+  const content = (
+    <div className="p-8">
+      {/* Header */}
+      {!user && (
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <button
+              onClick={() => navigate('/')}
+              className="flex items-center gap-3 mb-4 group"
+            >
+              <div className="w-10 h-10 bg-gradient-to-br from-primary to-teal-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <span className="text-white font-bold text-xl">f</span>
+              </div>
+              <h1 className="text-4xl font-bold text-secondary group-hover:text-primary transition-colors" style={{ fontFamily: "'Crimson Pro', serif" }}>
+                Wealth Projection Calculator
+              </h1>
+            </button>
+            <p className="text-slate-600" style={{ fontFamily: "'Manrope', sans-serif" }}>
+              Model your path to financial independence with precision
+            </p>
+          </div>
+          <button
+            onClick={() => navigate('/login')}
+            className="px-6 py-3 bg-primary text-white rounded-xl hover:bg-teal-700 transition-all font-semibold shadow-lg"
+          >
+            Save Results (Login)
+          </button>
+        </div>
+      )}
+
+      {user && (
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-secondary mb-2" style={{ fontFamily: "'Crimson Pro', serif" }}>
             Wealth Projection Calculator
@@ -23,6 +55,7 @@ export default function ProjectionPage() {
             Model your path to financial independence with precision
           </p>
         </div>
+      )}
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Left Column: Inputs */}
@@ -213,6 +246,13 @@ export default function ProjectionPage() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap');
       `}</style>
-    </SidebarLayout>
+    </div>
+  );
+
+  // Wrap with sidebar if user is logged in, otherwise show standalone
+  return user ? <SidebarLayout>{content}</SidebarLayout> : (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-teal-50">
+      {content}
+    </div>
   );
 }
