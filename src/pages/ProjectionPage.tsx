@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import SidebarLayout from "../components/SidebarLayout";
 import ProjectionInputs from "../components/projection/ProjectionInputs";
 import WealthProjectionChart from "../components/charts/WealthProjectionChart";
 import { calculateProjection } from "../calculations/projection";
@@ -15,32 +16,17 @@ export default function ProjectionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-teal-50">
-      {/* Header */}
-      <div className="bg-white border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <button 
-            onClick={() => navigate('/')}
-            className="flex items-center gap-3 mb-4 group"
-          >
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-teal-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-              </svg>
-            </div>
-            <div className="text-left">
-              <h1 className="text-4xl font-bold text-secondary group-hover:text-primary transition-colors" style={{ fontFamily: "'Crimson Pro', serif" }}>
-                Wealth Projection Calculator
-              </h1>
-              <p className="text-slate-600 mt-1" style={{ fontFamily: "'Manrope', sans-serif" }}>
-                Model your path to financial independence with precision
-              </p>
-            </div>
-          </button>
+    <SidebarLayout>
+      <div className="p-8">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-secondary mb-2" style={{ fontFamily: "'Crimson Pro', serif" }}>
+            Wealth Projection Calculator
+          </h1>
+          <p className="text-slate-600" style={{ fontFamily: "'Manrope', sans-serif" }}>
+            Model your path to financial independence with precision
+          </p>
         </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Left Column: Inputs */}
           <div className="lg:col-span-1">
@@ -230,6 +216,6 @@ export default function ProjectionPage() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap');
       `}</style>
-    </div>
+    </SidebarLayout>
   );
 }

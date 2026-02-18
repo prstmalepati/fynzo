@@ -1,37 +1,23 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import SidebarLayout from '../components/SidebarLayout';
+import { calculateGermanTax, getMonthlyBreakdown } from '../calculations/germanTax';
 
 export default function Calculators() {
   const navigate = useNavigate();
   const [activeCalculator, setActiveCalculator] = useState<string | null>(null);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-teal-50">
-      {/* Header */}
-      <div className="bg-white border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <button 
-            onClick={() => navigate('/')}
-            className="flex items-center gap-3 group cursor-pointer"
-          >
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-teal-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <div className="text-left">
-              <h1 className="text-4xl font-bold text-secondary group-hover:text-primary transition-colors" style={{ fontFamily: "'Crimson Pro', serif" }}>
-                Financial Calculators
-              </h1>
-              <p className="text-slate-600 mt-1" style={{ fontFamily: "'Manrope', sans-serif" }}>
-                Quick tools for everyday financial decisions
-              </p>
-            </div>
-          </button>
+    <SidebarLayout>
+      <div className="p-8">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-secondary mb-2" style={{ fontFamily: "'Crimson Pro', serif" }}>
+            Financial Calculators
+          </h1>
+          <p className="text-slate-600" style={{ fontFamily: "'Manrope', sans-serif" }}>
+            Quick tools for everyday financial decisions
+          </p>
         </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Calculator Grid */}
         {!activeCalculator && (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -72,7 +58,8 @@ export default function Calculators() {
             {activeCalculator === 'retirement' && <RetirementCalculator />}
             {activeCalculator === 'savings-rate' && <SavingsRateCalculator />}
             {activeCalculator === 'rule-72' && <Rule72Calculator />}
-            {activeCalculator === 'tax-germany' && <GermanTaxCalculator />}
+            {activeCalculator === 'tax-capital-gains' && <GermanCapitalGainsTaxCalculator />}
+            {activeCalculator === 'tax-income-germany' && <GermanIncomeTaxCalculator />}
             {activeCalculator === 'debt-payoff' && <DebtPayoffCalculator />}
           </div>
         )}
@@ -82,7 +69,7 @@ export default function Calculators() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap');
       `}</style>
-    </div>
+    </SidebarLayout>
   );
 }
 
@@ -133,13 +120,24 @@ const calculators = [
     )
   },
   {
-    id: 'tax-germany',
+    id: 'tax-capital-gains',
     title: 'German Capital Gains',
     description: 'Calculate your after-tax returns on investments in Germany (26.375% Abgeltungsteuer).',
+    color: 'bg-orange-100',
+    icon: (
+      <svg className="w-7 h-7 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
+      </svg>
+    )
+  },
+  {
+    id: 'tax-income-germany',
+    title: 'German Income Tax',
+    description: 'Comprehensive German income tax calculator with Grundfreibetrag, Kindergeld, progressive zones, and social security.',
     color: 'bg-red-100',
     icon: (
       <svg className="w-7 h-7 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
       </svg>
     )
   },
@@ -358,7 +356,7 @@ function Rule72Calculator() {
   );
 }
 
-function GermanTaxCalculator() {
+function GermanCapitalGainsTaxCalculator() {
   const [capitalGain, setCapitalGain] = useState(10000);
   const TAX_RATE = 0.26375; // German Abgeltungsteuer
 
@@ -394,6 +392,261 @@ function GermanTaxCalculator() {
             <div className="text-sm text-slate-600 mb-1">After-Tax Gain</div>
             <div className="text-3xl font-bold text-secondary" style={{ fontFamily: "'Crimson Pro', serif" }}>
               €{afterTax.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+            </div>
+          </div>
+        </div>
+      </div>
+    </CalculatorCard>
+  );
+}
+
+function GermanIncomeTaxCalculator() {
+  const currentYear = new Date().getFullYear();
+  const [grossIncome, setGrossIncome] = useState(60000);
+  const [filingStatus, setFilingStatus] = useState<'single' | 'married'>('single');
+  const [numberOfChildren, setNumberOfChildren] = useState(0);
+  const [includeChurchTax, setIncludeChurchTax] = useState(false);
+  const [age, setAge] = useState(30);
+  const [viewMode, setViewMode] = useState<'annual' | 'monthly'>('annual');
+
+  const taxResult = calculateGermanTax({
+    grossIncome,
+    filingStatus,
+    numberOfChildren,
+    includeChurchTax,
+    age
+  });
+
+  const monthly = getMonthlyBreakdown(taxResult);
+  const isMonthly = viewMode === 'monthly';
+  const display = isMonthly ? monthly : taxResult;
+
+  return (
+    <CalculatorCard title={`German Income Tax Calculator ${currentYear}`}>
+      <div className="grid lg:grid-cols-5 gap-8">
+        {/* Input Column */}
+        <div className="lg:col-span-2 space-y-5">
+          {/* Filing Status & Children */}
+          <div className="bg-gradient-to-br from-red-50 to-white p-6 rounded-xl border-2 border-red-200">
+            <h4 className="font-bold text-secondary mb-4 flex items-center gap-2">
+              <span className="text-xl">👥</span> Tax Profile
+            </h4>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-semibold text-slate-700 mb-2 block">Filing Status</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => setFilingStatus('single')}
+                    className={`px-4 py-3 rounded-lg font-semibold transition-all ${
+                      filingStatus === 'single'
+                        ? 'bg-red-600 text-white shadow-lg'
+                        : 'bg-white border-2 border-slate-200 text-slate-600 hover:border-slate-300'
+                    }`}
+                  >
+                    👤 Single
+                  </button>
+                  <button
+                    onClick={() => setFilingStatus('married')}
+                    className={`px-4 py-3 rounded-lg font-semibold transition-all ${
+                      filingStatus === 'married'
+                        ? 'bg-red-600 text-white shadow-lg'
+                        : 'bg-white border-2 border-slate-200 text-slate-600 hover:border-slate-300'
+                    }`}
+                  >
+                    💑 Married
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm font-semibold text-slate-700 mb-2 block">Number of Children</label>
+                <div className="grid grid-cols-4 gap-2">
+                  {[0, 1, 2, 3].map(num => (
+                    <button
+                      key={num}
+                      onClick={() => setNumberOfChildren(num)}
+                      className={`px-3 py-2 rounded-lg font-semibold transition-all ${
+                        numberOfChildren === num
+                          ? 'bg-red-600 text-white shadow-lg'
+                          : 'bg-white border-2 border-slate-200 text-slate-600 hover:border-slate-300'
+                      }`}
+                    >
+                      {num}
+                    </button>
+                  ))}
+                </div>
+                {numberOfChildren > 3 && (
+                  <input
+                    type="number"
+                    value={numberOfChildren}
+                    onChange={e => setNumberOfChildren(Number(e.target.value))}
+                    className="mt-2 w-full px-4 py-2 border-2 border-slate-200 rounded-lg"
+                  />
+                )}
+              </div>
+
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-semibold text-slate-700">Church Tax (8%)</label>
+                <button
+                  onClick={() => setIncludeChurchTax(!includeChurchTax)}
+                  className={`w-14 h-7 rounded-full transition-all ${
+                    includeChurchTax ? 'bg-red-600' : 'bg-slate-300'
+                  } relative`}
+                >
+                  <div className={`w-5 h-5 bg-white rounded-full absolute top-1 transition-all ${
+                    includeChurchTax ? 'right-1' : 'left-1'
+                  }`} />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Income & Age */}
+          <div className="bg-gradient-to-br from-slate-50 to-white p-6 rounded-xl border-2 border-slate-200">
+            <h4 className="font-bold text-secondary mb-4 flex items-center gap-2">
+              <span className="text-xl">💰</span> Income & Details
+            </h4>
+            <div className="space-y-4">
+              <Input label="Annual Gross Income (€)" value={grossIncome} onChange={setGrossIncome} />
+              <Input label="Your Age" value={age} onChange={setAge} />
+            </div>
+          </div>
+
+          {/* View Mode Toggle */}
+          <div className="bg-gradient-to-br from-slate-50 to-white p-6 rounded-xl border-2 border-slate-200">
+            <label className="text-sm font-semibold text-slate-700 mb-3 block">View Mode</label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => setViewMode('annual')}
+                className={`px-4 py-3 rounded-lg font-semibold transition-all ${
+                  viewMode === 'annual'
+                    ? 'bg-primary text-white shadow-lg'
+                    : 'bg-white border-2 border-slate-200 text-slate-600 hover:border-slate-300'
+                }`}
+              >
+                📅 Annual
+              </button>
+              <button
+                onClick={() => setViewMode('monthly')}
+                className={`px-4 py-3 rounded-lg font-semibold transition-all ${
+                  viewMode === 'monthly'
+                    ? 'bg-primary text-white shadow-lg'
+                    : 'bg-white border-2 border-slate-200 text-slate-600 hover:border-slate-300'
+                }`}
+              >
+                📆 Monthly
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Results Column */}
+        <div className="lg:col-span-3 space-y-4">
+          {/* Main Result Card */}
+          <div className="bg-gradient-to-br from-red-600 to-red-800 rounded-2xl p-8 text-white shadow-2xl">
+            <div className="text-sm opacity-90 mb-2 font-semibold">{isMonthly ? 'Monthly' : 'Annual'} Net Income</div>
+            <div className="text-6xl font-bold mb-6" style={{ fontFamily: "'Crimson Pro', serif" }}>
+              €{(isMonthly ? monthly.netIncome : taxResult.netIncome).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-3 bg-white/10 rounded-lg backdrop-blur">
+                <div className="text-xs opacity-90 mb-1">Effective Tax Rate</div>
+                <div className="text-2xl font-bold">{taxResult.effectiveTaxRate.toFixed(1)}%</div>
+              </div>
+              <div className="p-3 bg-white/10 rounded-lg backdrop-blur">
+                <div className="text-xs opacity-90 mb-1">Marginal Tax Rate</div>
+                <div className="text-2xl font-bold">{taxResult.marginalTaxRate.toFixed(0)}%</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Tax Breakdown */}
+          <div className="bg-white rounded-xl p-6 border-2 border-slate-200">
+            <h4 className="font-bold text-secondary mb-4">💶 Tax Breakdown</h4>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between py-2 border-b border-slate-100">
+                <span className="text-slate-600">Gross Income:</span>
+                <span className="font-bold text-secondary">€{(isMonthly ? monthly.grossIncome : taxResult.grossIncome).toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-slate-100">
+                <span className="text-slate-600">- Income Tax:</span>
+                <span className="font-semibold text-red-600">€{(isMonthly ? monthly.incomeTax : taxResult.incomeTax).toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-slate-100">
+                <span className="text-slate-600">- Solidarity Tax:</span>
+                <span className="font-semibold text-red-600">€{(isMonthly ? monthly.solidarityTax : taxResult.solidarityTax).toLocaleString()}</span>
+              </div>
+              {includeChurchTax && (
+                <div className="flex justify-between py-2 border-b border-slate-100">
+                  <span className="text-slate-600">- Church Tax:</span>
+                  <span className="font-semibold text-red-600">€{(isMonthly ? monthly.churchTax : taxResult.churchTax).toLocaleString()}</span>
+                </div>
+              )}
+              <div className="flex justify-between py-2 border-b border-slate-100 font-bold">
+                <span className="text-slate-700">Total Tax:</span>
+                <span className="text-red-600">€{(isMonthly ? monthly.totalTax : taxResult.totalTax).toLocaleString()}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Social Security Breakdown */}
+          <div className="bg-white rounded-xl p-6 border-2 border-slate-200">
+            <h4 className="font-bold text-secondary mb-4">🏥 Social Security Contributions</h4>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between py-2">
+                <span className="text-slate-600">Pension Insurance (9.3%):</span>
+                <span className="font-semibold">€{(isMonthly ? monthly.pensionInsurance : taxResult.pensionInsurance).toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between py-2">
+                <span className="text-slate-600">Health Insurance (~9%):</span>
+                <span className="font-semibold">€{(isMonthly ? monthly.healthInsurance : taxResult.healthInsurance).toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between py-2">
+                <span className="text-slate-600">Unemployment (1.3%):</span>
+                <span className="font-semibold">€{(isMonthly ? monthly.unemploymentInsurance : taxResult.unemploymentInsurance).toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between py-2">
+                <span className="text-slate-600">Long-term Care (~{numberOfChildren === 0 && age >= 23 ? '2.0' : '1.8'}%):</span>
+                <span className="font-semibold">€{(isMonthly ? monthly.longTermCare : taxResult.longTermCare).toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between py-2 border-t border-slate-200 font-bold pt-3">
+                <span className="text-slate-700">Total Social Security:</span>
+                <span className="text-secondary">€{(isMonthly ? monthly.totalSocialSecurity : taxResult.totalSocialSecurity).toLocaleString()}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Tax Allowances & Benefits */}
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="bg-emerald-50 rounded-xl p-5 border-2 border-emerald-200">
+              <div className="text-xs text-emerald-800 mb-1 font-semibold">Grundfreibetrag</div>
+              <div className="text-2xl font-bold text-emerald-700">€{taxResult.grundfreibetrag.toLocaleString()}</div>
+              <div className="text-xs text-emerald-600 mt-1">Tax-free allowance</div>
+            </div>
+            {numberOfChildren > 0 && (
+              <div className="bg-blue-50 rounded-xl p-5 border-2 border-blue-200">
+                <div className="text-xs text-blue-800 mb-1 font-semibold">Kindergeld ({numberOfChildren} {numberOfChildren === 1 ? 'child' : 'children'})</div>
+                <div className="text-2xl font-bold text-blue-700">€{(isMonthly ? monthly.kindergeld : taxResult.kindergeld).toLocaleString()}</div>
+                <div className="text-xs text-blue-600 mt-1">{isMonthly ? 'Monthly' : 'Annual'} child benefit</div>
+              </div>
+            )}
+          </div>
+
+          {/* Tax Zones Breakdown */}
+          <div className="bg-white rounded-xl p-6 border-2 border-slate-200">
+            <h4 className="font-bold text-secondary mb-4">📊 Progressive Tax Zones</h4>
+            <div className="space-y-3">
+              {taxResult.taxZones.map((zone) => (
+                <div key={zone.zone} className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                  <div>
+                    <div className="font-semibold text-sm text-secondary">{zone.name}</div>
+                    <div className="text-xs text-slate-600">{zone.range} • {zone.rate}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-secondary">€{zone.taxAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

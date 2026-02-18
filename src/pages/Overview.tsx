@@ -1,8 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useRef } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 export default function Overview() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const heroRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -24,6 +26,14 @@ export default function Overview() {
     return () => observer.disconnect();
   }, []);
 
+  const handleGetStarted = () => {
+    if (user) {
+      navigate('/dashboard');
+    } else {
+      navigate('/login');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-teal-50">
       {/* Navigation */}
@@ -36,10 +46,10 @@ export default function Overview() {
             <span className="text-2xl font-bold text-secondary" style={{ fontFamily: "'Crimson Pro', serif" }}>fynzo</span>
           </div>
           <button
-            onClick={() => navigate('/projection')}
+            onClick={handleGetStarted}
             className="px-6 py-2.5 bg-primary text-white rounded-lg hover:bg-teal-800 transition-all duration-300 font-medium shadow-sm hover:shadow-md"
           >
-            Start Planning
+            {user ? 'Go to Dashboard' : 'Get Started'}
           </button>
         </div>
       </nav>
@@ -63,10 +73,10 @@ export default function Overview() {
             </p>
             <div className="flex gap-4">
               <button
-                onClick={() => navigate('/projection')}
+                onClick={handleGetStarted}
                 className="px-8 py-4 bg-primary text-white rounded-xl hover:bg-teal-800 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl hover:scale-105 transform"
               >
-                Calculate Your FIRE Number
+                {user ? 'Go to Dashboard' : 'Calculate Your FIRE Number'}
               </button>
               <button
                 onClick={() => navigate('/calculators')}
@@ -230,10 +240,10 @@ export default function Overview() {
             Join ambitious Europeans building wealth with clarity. Your financial future deserves better than spreadsheets.
           </p>
           <button
-            onClick={() => navigate('/projection')}
+            onClick={handleGetStarted}
             className="px-10 py-5 bg-white text-primary rounded-xl hover:bg-teal-50 transition-all duration-300 font-bold text-lg shadow-2xl hover:shadow-xl hover:scale-105 transform"
           >
-            Calculate Your FIRE Number →
+            {user ? 'Go to Dashboard →' : 'Calculate Your FIRE Number →'}
           </button>
           <p className="text-sm text-teal-200 mt-6">Free forever. No credit card required.</p>
         </div>
