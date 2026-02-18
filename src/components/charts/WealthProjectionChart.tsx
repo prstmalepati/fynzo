@@ -66,7 +66,7 @@ export default function WealthProjectionChart({ data }: Props) {
             displayColors: false,
             callbacks: {
               label: function(context) {
-                return '€' + context.parsed.y.toLocaleString(undefined, { maximumFractionDigits: 0 });
+                return '€' + (context.parsed.y || 0).toLocaleString(undefined, { maximumFractionDigits: 0 });
               }
             }
           }
