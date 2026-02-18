@@ -30,23 +30,31 @@ export function calculateProjection(inputs: ProjectionInput) {
     incomeGrowth
   });
 
+  // Add calendar years to timeline based on current year
+  const currentYear = new Date().getFullYear();
+  const timelineWithYears = timeline.map((row, index) => ({
+    ...row,
+    calendarYear: currentYear + index + 1 // Year 1 is next year
+  }));
+
   // Calculate start and end metrics
-  const netWorthStart = timeline[0]?.netWorth || 0;
-  const netWorthEnd = timeline[timeline.length - 1]?.netWorth || 0;
+  const netWorthStart = timelineWithYears[0]?.netWorth || 0;
+  const netWorthEnd = timelineWithYears[timelineWithYears.length - 1]?.netWorth || 0;
   
   // Calculate total savings across all years
-  const totalSavings = timeline.reduce((sum, row) => sum + row.annualSavings, 0);
+  const totalSavings = timelineWithYears.reduce((sum, row) => sum + row.annualSavings, 0);
 
   // FIRE calculation: Assume 4% safe withdrawal rate
   const safeWithdrawalRate = 0.04;
   const annualExpenses = inputs.monthlyExpenses * 12;
   const fireNumber = annualExpenses / safeWithdrawalRate;
   
-  // Mark which year FIRE is reached
-  const timelineWithFire = timeline.map(row => ({
+  // Mark which year FIRE is reached and add calendar year
+  const timelineWithFire = timelineWithYears.map(row => ({
     ...row,
     fireReached: row.netWorth >= fireNumber,
-    fireNumber
+    fireNumber,
+    year: row.calendarYear // Use calendar year for FIRE stats
   }));
 
   // Calculate FIRE stats

@@ -6,7 +6,8 @@ export function calculateFireStats(
 
   if (!fireRow) return null
 
-  const yearsToFire = fireRow.year - new Date().getFullYear()
+  const currentYear = new Date().getFullYear()
+  const yearsToFire = fireRow.year - currentYear
 
   return {
     fireYear: fireRow.year,
