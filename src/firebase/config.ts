@@ -5,12 +5,13 @@ import { getFirestore } from 'firebase/firestore';
 // Firebase configuration
 // IMPORTANT: Replace these with your actual Firebase config from Firebase Console
 const firebaseConfig = {
-  apiKey: "AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",  // Your real API key
-  authDomain: "fynzo-xxxxx.firebaseapp.com",        // Your real domain
-  projectId: "fynzo-xxxxx",                         // Your real project ID
-  storageBucket: "fynzo-xxxxx.appspot.com",        // Your real bucket
-  messagingSenderId: "123456789012",               // Your real sender ID
-  appId: "1:123456789012:web:abcdefghijklmnop"    // Your real app ID
+  apiKey: "AIzaSyBIXXj5B2bvmwIwbFOQIAgkxJGpwqCDwrY",
+  authDomain: "myfynzo.firebaseapp.com",
+  projectId: "myfynzo",
+  storageBucket: "myfynzo.firebasestorage.app",
+  messagingSenderId: "722972966832",
+  appId: "1:722972966832:web:f31a649d8d75fee2f32075",
+  measurementId: "G-HXZKYF3EEX"
 };
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
