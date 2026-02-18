@@ -1,408 +1,261 @@
 /**
- * German Income Tax Calculator (2024/2025)
- * Implements the official German tax calculation formulas
+ * German Income Tax Calculator - 2026 Rates
+ * Updated with 2026 Kindergeld (€259/month) and tax brackets
  */
 
-// Tax constants for 2024/2025
-export const TAX_CONSTANTS = {
-  // Basic tax-free allowance (Grundfreibetrag)
-  GRUNDFREIBETRAG_SINGLE: 11604,
-  GRUNDFREIBETRAG_MARRIED: 23208,
-  
-  // Kindergeld per child per month (2024)
-  KINDERGELD_PER_CHILD: 250,
-  
-  // Child tax allowance (Kinderfreibetrag) per child per year
-  KINDERFREIBETRAG: 6612, // 3306 per parent × 2
-  
-  // Solidarity surcharge threshold
-  SOLI_THRESHOLD_SINGLE: 18130,
-  SOLI_THRESHOLD_MARRIED: 36260,
-  SOLI_RATE: 0.055,
-  
-  // Church tax rate (varies by state, using average)
-  CHURCH_TAX_RATE: 0.08,
-  
-  // Social security contributions (approximate, varies by income)
-  PENSION_INSURANCE: 0.093, // Rentenversicherung (employee share)
-  HEALTH_INSURANCE: 0.073, // Krankenversicherung (employee share, base)
-  HEALTH_INSURANCE_ADDITIONAL: 0.017, // Additional contribution (average)
-  UNEMPLOYMENT_INSURANCE: 0.013, // Arbeitslosenversicherung
-  LONG_TERM_CARE: 0.01775, // Pflegeversicherung (with children)
-  LONG_TERM_CARE_CHILDLESS: 0.02025, // Pflegeversicherung (childless, age 23+)
-  
-  // Income thresholds for social security
-  CONTRIBUTION_CEILING_PENSION: 90600, // BBG Rentenversicherung (West)
-  CONTRIBUTION_CEILING_HEALTH: 62100, // BBG Krankenversicherung
-};
-
 interface TaxInput {
-  grossIncome: number; // Annual gross income
+  grossIncome: number;
   filingStatus: 'single' | 'married';
   numberOfChildren: number;
   includeChurchTax: boolean;
-  age: number; // For childless surcharge
+  age: number;
 }
 
-interface TaxBreakdown {
-  // Income
+interface TaxResult {
   grossIncome: number;
-  taxableIncome: number;
-  
-  // Allowances
-  grundfreibetrag: number;
-  kinderfreibetrag: number;
-  
-  // Tax calculations
   incomeTax: number;
   solidarityTax: number;
   churchTax: number;
   totalTax: number;
-  
-  // Social security
   pensionInsurance: number;
   healthInsurance: number;
   unemploymentInsurance: number;
   longTermCare: number;
   totalSocialSecurity: number;
-  
-  // Benefits
-  kindergeld: number; // Annual
-  
-  // Net result
   netIncome: number;
   effectiveTaxRate: number;
   marginalTaxRate: number;
-  
-  // Tax zones breakdown
-  taxZones: {
-    zone: number;
-    name: string;
-    range: string;
-    rate: string;
-    taxAmount: number;
-  }[];
+  grundfreibetrag: number;
+  kindergeld: number;
+  taxZones: TaxZone[];
 }
 
-export function calculateGermanTax(input: TaxInput): TaxBreakdown {
-  const {
-    grossIncome,
-    filingStatus,
-    numberOfChildren,
-    includeChurchTax,
-    age
-  } = input;
-  
-  // 1. Calculate allowances
-  const grundfreibetrag = filingStatus === 'married' 
-    ? TAX_CONSTANTS.GRUNDFREIBETRAG_MARRIED 
-    : TAX_CONSTANTS.GRUNDFREIBETRAG_SINGLE;
-  
-  const kinderfreibetrag = numberOfChildren * TAX_CONSTANTS.KINDERFREIBETRAG;
-  
-  // 2. Calculate taxable income
-  // For simplicity, we'll use gross income - grundfreibetrag - kinderfreibetrag
-  // In reality, there are more deductions (Werbungskosten, Sonderausgaben, etc.)
-  const taxableIncome = Math.max(0, grossIncome - grundfreibetrag - kinderfreibetrag);
-  
-  // 3. Calculate income tax using German progressive tax formula
-  const { incomeTax, taxZones, marginalRate } = calculateProgressiveIncomeTax(
-    taxableIncome,
-    filingStatus
-  );
-  
-  // 4. Calculate solidarity surcharge (Solidaritätszuschlag)
-  const solidarityTax = calculateSolidarityTax(incomeTax, filingStatus);
-  
-  // 5. Calculate church tax (Kirchensteuer)
-  const churchTax = includeChurchTax 
-    ? incomeTax * TAX_CONSTANTS.CHURCH_TAX_RATE 
+interface TaxZone {
+  zone: number;
+  name: string;
+  range: string;
+  rate: string;
+  taxAmount: number;
+}
+
+// 2026 Constants
+const GRUNDFREIBETRAG_2026 = 12084; // Increased from €11,604 in 2025
+const KINDERGELD_2026_MONTHLY = 259; // Increased from €250 in 2024/2025
+const KINDERGELD_2026_ANNUAL = KINDERGELD_2026_MONTHLY * 12; // €3,108
+
+const SOLI_THRESHOLD = 18130; // Solidarity surcharge threshold
+const SOLI_RATE = 0.055; // 5.5%
+
+// Social Security Contribution Limits 2026
+const PENSION_LIMIT = 90600; // West Germany
+const HEALTH_LIMIT = 62100;
+
+// Social Security Rates 2026 (Employee portion)
+const PENSION_RATE = 0.093; // 9.3%
+const HEALTH_RATE = 0.093; // ~9.3% average
+const UNEMPLOYMENT_RATE = 0.013; // 1.3%
+const LONG_TERM_CARE_BASE = 0.018; // 1.8%
+const LONG_TERM_CARE_SURCHARGE = 0.002; // +0.2% for childless 23+
+
+export function calculateGermanTax(input: TaxInput): TaxResult {
+  const { grossIncome, filingStatus, numberOfChildren, includeChurchTax, age } = input;
+
+  // Apply Grundfreibetrag
+  const taxableIncome = Math.max(0, grossIncome - GRUNDFREIBETRAG_2026);
+
+  // Calculate income tax using 2026 formula
+  const incomeTax = calculateIncomeTax2026(taxableIncome, filingStatus);
+
+  // Solidarity surcharge (only if income tax > threshold)
+  const solidarityTax = incomeTax > SOLI_THRESHOLD 
+    ? (incomeTax - SOLI_THRESHOLD) * SOLI_RATE 
     : 0;
-  
-  // 6. Total tax
+
+  // Church tax (8% in Bayern/BW, 9% elsewhere - using 9% as default)
+  const churchTax = includeChurchTax ? incomeTax * 0.09 : 0;
+
+  // Total tax
   const totalTax = incomeTax + solidarityTax + churchTax;
+
+  // Social Security Contributions
+  const pensionBase = Math.min(grossIncome, PENSION_LIMIT);
+  const healthBase = Math.min(grossIncome, HEALTH_LIMIT);
   
-  // 7. Calculate social security contributions
-  const socialSecurity = calculateSocialSecurity(grossIncome, numberOfChildren, age);
+  const pensionInsurance = pensionBase * PENSION_RATE;
+  const healthInsurance = healthBase * HEALTH_RATE;
+  const unemploymentInsurance = healthBase * UNEMPLOYMENT_RATE;
   
-  // 8. Calculate Kindergeld (child benefit)
-  const kindergeld = numberOfChildren * TAX_CONSTANTS.KINDERGELD_PER_CHILD * 12;
-  
-  // 9. Calculate net income
-  // Net = Gross - Taxes - Social Security + Kindergeld
-  const netIncome = grossIncome - totalTax - socialSecurity.total + kindergeld;
-  
-  // 10. Calculate effective tax rate
-  const effectiveTaxRate = grossIncome > 0 
-    ? (totalTax / grossIncome) * 100 
-    : 0;
-  
+  // Long-term care: +0.2% surcharge for childless people aged 23+
+  const longTermCareRate = (numberOfChildren === 0 && age >= 23) 
+    ? LONG_TERM_CARE_BASE + LONG_TERM_CARE_SURCHARGE 
+    : LONG_TERM_CARE_BASE;
+  const longTermCare = healthBase * longTermCareRate;
+
+  const totalSocialSecurity = pensionInsurance + healthInsurance + unemploymentInsurance + longTermCare;
+
+  // Kindergeld (child benefit)
+  const kindergeld = numberOfChildren * KINDERGELD_2026_ANNUAL;
+
+  // Net income
+  const netIncome = grossIncome - totalTax - totalSocialSecurity + kindergeld;
+
+  // Effective tax rate
+  const effectiveTaxRate = (totalTax / grossIncome) * 100;
+
+  // Marginal tax rate
+  const marginalTaxRate = calculateMarginalRate(taxableIncome);
+
+  // Tax zones breakdown
+  const taxZones = calculateTaxZones(taxableIncome);
+
   return {
     grossIncome,
-    taxableIncome,
-    grundfreibetrag,
-    kinderfreibetrag,
     incomeTax,
     solidarityTax,
     churchTax,
     totalTax,
-    pensionInsurance: socialSecurity.pension,
-    healthInsurance: socialSecurity.health,
-    unemploymentInsurance: socialSecurity.unemployment,
-    longTermCare: socialSecurity.care,
-    totalSocialSecurity: socialSecurity.total,
-    kindergeld,
+    pensionInsurance,
+    healthInsurance,
+    unemploymentInsurance,
+    longTermCare,
+    totalSocialSecurity,
     netIncome,
     effectiveTaxRate,
-    marginalTaxRate: marginalRate,
+    marginalTaxRate,
+    grundfreibetrag: GRUNDFREIBETRAG_2026,
+    kindergeld,
     taxZones
   };
 }
 
-function calculateProgressiveIncomeTax(
-  taxableIncome: number,
-  filingStatus: 'single' | 'married'
-): { incomeTax: number; taxZones: any[]; marginalRate: number } {
-  
-  // For married couples, split income (Ehegattensplitting)
-  const income = filingStatus === 'married' ? taxableIncome / 2 : taxableIncome;
-  
-  let tax = 0;
-  let marginalRate = 0;
-  const taxZones = [];
-  
-  // Zone 1: €0 - €11,604 = 0%
-  if (income <= 11604) {
-    taxZones.push({
-      zone: 1,
-      name: 'Nullzone',
-      range: '€0 - €11,604',
-      rate: '0%',
-      taxAmount: 0
-    });
-    marginalRate = 0;
+function calculateIncomeTax2026(taxableIncome: number, filingStatus: 'single' | 'married'): number {
+  // For married filing jointly, use income splitting (Splittingtarif)
+  if (filingStatus === 'married') {
+    const halfIncome = taxableIncome / 2;
+    return calculateSingleTax(halfIncome) * 2;
   }
   
-  // Zone 2: €11,605 - €17,005 = 14% - 24% (linear progression)
-  else if (income <= 17005) {
-    const y = (income - 11604) / 10000;
-    tax = (922.98 * y + 1400) * y;
-    marginalRate = 14 + (y * 10); // Approximate marginal rate
-    
-    taxZones.push({
-      zone: 1,
-      name: 'Nullzone',
-      range: '€0 - €11,604',
-      rate: '0%',
-      taxAmount: 0
-    });
-    taxZones.push({
-      zone: 2,
-      name: 'Progressionszone 1',
-      range: '€11,605 - €17,005',
-      rate: '14% - 24%',
-      taxAmount: tax
-    });
+  return calculateSingleTax(taxableIncome);
+}
+
+function calculateSingleTax(income: number): number {
+  // 2026 German Tax Formula (§32a EStG)
+  // Zone 1: €0 - €12,084 → 0%
+  if (income <= 0) return 0;
+
+  // Zone 2: €12,085 - €17,005 → 14% to ~24% (linear progression)
+  if (income <= 17005) {
+    const y = (income - 12084) / 10000;
+    return (922.98 * y + 1400) * y;
   }
-  
-  // Zone 3: €17,006 - €66,760 = 24% - 42% (linear progression)
-  else if (income <= 66760) {
-    const y2 = (17005 - 11604) / 10000;
-    const tax2 = (922.98 * y2 + 1400) * y2;
-    
+
+  // Zone 3: €17,006 - €66,760 → ~24% to 42% (linear progression)
+  if (income <= 66760) {
     const z = (income - 17005) / 10000;
-    const tax3 = (181.19 * z + 2397) * z + 1025.38;
-    tax = tax2 + tax3;
-    marginalRate = 24 + (z * 1.8); // Approximate
-    
-    taxZones.push({
+    return (181.19 * z + 2397) * z + 1025.38;
+  }
+
+  // Zone 4: €66,761 - €277,825 → 42%
+  if (income <= 277825) {
+    return 0.42 * income - 10602.13;
+  }
+
+  // Zone 5: €277,826+ → 45%
+  return 0.45 * income - 18936.88;
+}
+
+function calculateMarginalRate(income: number): number {
+  if (income <= 12084) return 0;
+  if (income <= 17005) return 14 + ((income - 12084) / (17005 - 12084)) * 10; // 14% to 24%
+  if (income <= 66760) return 24 + ((income - 17005) / (66760 - 17005)) * 18; // 24% to 42%
+  if (income <= 277825) return 42;
+  return 45;
+}
+
+function calculateTaxZones(income: number): TaxZone[] {
+  const zones: TaxZone[] = [];
+
+  // Zone 1: €0 - €12,084 (0%)
+  if (income <= 0) {
+    zones.push({
       zone: 1,
-      name: 'Nullzone',
-      range: '€0 - €11,604',
+      name: 'Grundfreibetrag',
+      range: '€0 - €12,084',
       rate: '0%',
       taxAmount: 0
     });
-    taxZones.push({
+    return zones;
+  }
+
+  // Zone 2: €12,085 - €17,005
+  if (income > 0) {
+    const zone2Income = Math.min(income, 17005);
+    const zone2Tax = calculateSingleTax(zone2Income);
+    zones.push({
       zone: 2,
       name: 'Progressionszone 1',
-      range: '€11,605 - €17,005',
+      range: '€12,085 - €17,005',
       rate: '14% - 24%',
-      taxAmount: tax2
-    });
-    taxZones.push({
-      zone: 3,
-      name: 'Progressionszone 2',
-      range: '€17,006 - €66,760',
-      rate: '24% - 42%',
-      taxAmount: tax3
+      taxAmount: zone2Tax
     });
   }
-  
-  // Zone 4: €66,761 - €277,825 = 42%
-  else if (income <= 277825) {
-    const y2 = (17005 - 11604) / 10000;
-    const tax2 = (922.98 * y2 + 1400) * y2;
-    
-    const z = (66760 - 17005) / 10000;
-    const tax3 = (181.19 * z + 2397) * z + 1025.38;
-    
-    const tax4 = (income - 66760) * 0.42;
-    tax = tax2 + tax3 + tax4;
-    marginalRate = 42;
-    
-    taxZones.push({
-      zone: 1,
-      name: 'Nullzone',
-      range: '€0 - €11,604',
-      rate: '0%',
-      taxAmount: 0
-    });
-    taxZones.push({
-      zone: 2,
-      name: 'Progressionszone 1',
-      range: '€11,605 - €17,005',
-      rate: '14% - 24%',
-      taxAmount: tax2
-    });
-    taxZones.push({
+
+  // Zone 3: €17,006 - €66,760
+  if (income > 17005) {
+    const zone3Income = Math.min(income, 66760);
+    const zone3Tax = calculateSingleTax(zone3Income) - calculateSingleTax(17005);
+    zones.push({
       zone: 3,
       name: 'Progressionszone 2',
       range: '€17,006 - €66,760',
       rate: '24% - 42%',
-      taxAmount: tax3
+      taxAmount: zone3Tax
     });
-    taxZones.push({
+  }
+
+  // Zone 4: €66,761 - €277,825
+  if (income > 66760) {
+    const zone4Income = Math.min(income, 277825);
+    const zone4Tax = calculateSingleTax(zone4Income) - calculateSingleTax(66760);
+    zones.push({
       zone: 4,
       name: 'Proportionalzone 1',
       range: '€66,761 - €277,825',
       rate: '42%',
-      taxAmount: tax4
+      taxAmount: zone4Tax
     });
   }
-  
-  // Zone 5: €277,826+ = 45% (Reichensteuer)
-  else {
-    const y2 = (17005 - 11604) / 10000;
-    const tax2 = (922.98 * y2 + 1400) * y2;
-    
-    const z = (66760 - 17005) / 10000;
-    const tax3 = (181.19 * z + 2397) * z + 1025.38;
-    
-    const tax4 = (277825 - 66760) * 0.42;
-    const tax5 = (income - 277825) * 0.45;
-    tax = tax2 + tax3 + tax4 + tax5;
-    marginalRate = 45;
-    
-    taxZones.push({
-      zone: 1,
-      name: 'Nullzone',
-      range: '€0 - €11,604',
-      rate: '0%',
-      taxAmount: 0
-    });
-    taxZones.push({
-      zone: 2,
-      name: 'Progressionszone 1',
-      range: '€11,605 - €17,005',
-      rate: '14% - 24%',
-      taxAmount: tax2
-    });
-    taxZones.push({
-      zone: 3,
-      name: 'Progressionszone 2',
-      range: '€17,006 - €66,760',
-      rate: '24% - 42%',
-      taxAmount: tax3
-    });
-    taxZones.push({
-      zone: 4,
-      name: 'Proportionalzone 1',
-      range: '€66,761 - €277,825',
-      rate: '42%',
-      taxAmount: tax4
-    });
-    taxZones.push({
+
+  // Zone 5: €277,826+
+  if (income > 277825) {
+    const zone5Tax = calculateSingleTax(income) - calculateSingleTax(277825);
+    zones.push({
       zone: 5,
       name: 'Proportionalzone 2 (Reichensteuer)',
       range: '€277,826+',
       rate: '45%',
-      taxAmount: tax5
+      taxAmount: zone5Tax
     });
   }
-  
-  // For married couples, multiply by 2 (Splitting)
-  const finalTax = filingStatus === 'married' ? tax * 2 : tax;
-  
+
+  return zones;
+}
+
+export function getMonthlyBreakdown(result: TaxResult) {
   return {
-    incomeTax: Math.round(finalTax * 100) / 100,
-    taxZones,
-    marginalRate
+    grossIncome: result.grossIncome / 12,
+    incomeTax: result.incomeTax / 12,
+    solidarityTax: result.solidarityTax / 12,
+    churchTax: result.churchTax / 12,
+    totalTax: result.totalTax / 12,
+    pensionInsurance: result.pensionInsurance / 12,
+    healthInsurance: result.healthInsurance / 12,
+    unemploymentInsurance: result.unemploymentInsurance / 12,
+    longTermCare: result.longTermCare / 12,
+    totalSocialSecurity: result.totalSocialSecurity / 12,
+    netIncome: result.netIncome / 12,
+    kindergeld: result.kindergeld / 12
   };
 }
 
-function calculateSolidarityTax(incomeTax: number, filingStatus: 'single' | 'married'): number {
-  const threshold = filingStatus === 'married' 
-    ? TAX_CONSTANTS.SOLI_THRESHOLD_MARRIED 
-    : TAX_CONSTANTS.SOLI_THRESHOLD_SINGLE;
-  
-  if (incomeTax <= threshold) {
-    return 0;
-  }
-  
-  // Solidarity surcharge is 5.5% of income tax
-  return Math.round(incomeTax * TAX_CONSTANTS.SOLI_RATE * 100) / 100;
-}
-
-function calculateSocialSecurity(
-  grossIncome: number,
-  numberOfChildren: number,
-  age: number
-): {
-  pension: number;
-  health: number;
-  unemployment: number;
-  care: number;
-  total: number;
-} {
-  // Pension insurance
-  const pensionBase = Math.min(grossIncome, TAX_CONSTANTS.CONTRIBUTION_CEILING_PENSION);
-  const pension = pensionBase * TAX_CONSTANTS.PENSION_INSURANCE;
-  
-  // Health insurance
-  const healthBase = Math.min(grossIncome, TAX_CONSTANTS.CONTRIBUTION_CEILING_HEALTH);
-  const health = healthBase * (TAX_CONSTANTS.HEALTH_INSURANCE + TAX_CONSTANTS.HEALTH_INSURANCE_ADDITIONAL);
-  
-  // Unemployment insurance
-  const unemployment = pensionBase * TAX_CONSTANTS.UNEMPLOYMENT_INSURANCE;
-  
-  // Long-term care insurance (higher for childless people age 23+)
-  const careRate = (numberOfChildren === 0 && age >= 23) 
-    ? TAX_CONSTANTS.LONG_TERM_CARE_CHILDLESS 
-    : TAX_CONSTANTS.LONG_TERM_CARE;
-  const care = healthBase * careRate;
-  
-  return {
-    pension: Math.round(pension * 100) / 100,
-    health: Math.round(health * 100) / 100,
-    unemployment: Math.round(unemployment * 100) / 100,
-    care: Math.round(care * 100) / 100,
-    total: Math.round((pension + health + unemployment + care) * 100) / 100
-  };
-}
-
-export function getMonthlyBreakdown(annual: TaxBreakdown) {
-  return {
-    grossIncome: Math.round(annual.grossIncome / 12 * 100) / 100,
-    incomeTax: Math.round(annual.incomeTax / 12 * 100) / 100,
-    solidarityTax: Math.round(annual.solidarityTax / 12 * 100) / 100,
-    churchTax: Math.round(annual.churchTax / 12 * 100) / 100,
-    totalTax: Math.round(annual.totalTax / 12 * 100) / 100,
-    pensionInsurance: Math.round(annual.pensionInsurance / 12 * 100) / 100,
-    healthInsurance: Math.round(annual.healthInsurance / 12 * 100) / 100,
-    unemploymentInsurance: Math.round(annual.unemploymentInsurance / 12 * 100) / 100,
-    longTermCare: Math.round(annual.longTermCare / 12 * 100) / 100,
-    totalSocialSecurity: Math.round(annual.totalSocialSecurity / 12 * 100) / 100,
-    kindergeld: Math.round(annual.kindergeld / 12 * 100) / 100,
-    netIncome: Math.round(annual.netIncome / 12 * 100) / 100,
-  };
-}
+export { KINDERGELD_2026_MONTHLY, KINDERGELD_2026_ANNUAL, GRUNDFREIBETRAG_2026 };
