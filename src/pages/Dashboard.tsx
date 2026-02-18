@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 import { Line, Doughnut, Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
