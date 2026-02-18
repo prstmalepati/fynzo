@@ -4,6 +4,20 @@ import { useAuth } from "../context/AuthContext";
 import SidebarLayout from "../components/SidebarLayout";
 import ProjectionInputs from "../components/projection/ProjectionInputs";
 import WealthProjectionChart from "../components/charts/WealthProjectionChart";
+import { useEffect } from 'react';
+
+const [savedFireTarget, setSavedFireTarget] = useState<any>(null);
+
+useEffect(() => {
+  const fireData = localStorage.getItem('myfynzo_fire_target');
+  if (fireData) {
+    try {
+      setSavedFireTarget(JSON.parse(fireData));
+    } catch (e) {
+      console.error('Failed to load FIRE target', e);
+    }
+  }
+}, []);
 
 export default function ProjectionPage() {
   const { user } = useAuth();
@@ -46,7 +60,37 @@ export default function ProjectionPage() {
                 </div>
               ) : (
                 <>
-                  {/* Summary Cards */}
+                  
+		{/* FIRE Target Card - ADD THIS ENTIRE BLOCK */}
+    		{savedFireTarget && (
+      			<div className="bg-gradient-to-br from-teal-500 to-teal-700 rounded-2xl p-6 text-white shadow-xl mb-4">
+        		<div className="flex items-center justify-between mb-2">
+          		<div className="text-sm opacity-90 font-semibold">Your FIRE Target</div>
+          		<span className="text-3xl">
+            			{savedFireTarget.type === 'lean' ? '🌱' :
+             			savedFireTarget.type === 'fat' ? '💎' :
+             			savedFireTarget.type === 'barista' ? '☕' : '🏖️'}
+          		</span>
+        		</div>
+        			<div className="text-5xl font-bold mb-2" style={{ fontFamily: "'Crimson Pro', serif" }}>
+          			€{(savedFireTarget.number / 1000).toFixed(0)}K
+        			</div>
+        			<div className="text-sm opacity-90">
+          			{savedFireTarget.type.charAt(0).toUpperCase() + savedFireTarget.type.slice(1)} FIRE
+        			</div>
+        			<div className="text-xs opacity-75 mt-2">
+          			Set in FIRE Calculator
+        			</div>
+      			</div>
+    		)}
+    
+    		{/* Summary Cards */}
+    		<div className="grid md:grid-cols-3 gap-4">
+      			<div className="bg-gradient-to-br from-primary to-teal-700 rounded-xl p-6 text-white">
+        		<div className="text-sm opacity-90 mb-1">Final Net Worth</div>
+        		<div className="text-3xl font-bold">€{(result.finalNetWorth / 1000).toFixed(0)}K</div>
+      		</div>
+		{/* Summary Cards */}
                   <div className="grid md:grid-cols-3 gap-4">
                     <div className="bg-gradient-to-br from-primary to-teal-700 rounded-xl p-6 text-white">
                       <div className="text-sm opacity-90 mb-1">Final Net Worth</div>
