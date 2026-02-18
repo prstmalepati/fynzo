@@ -59,6 +59,7 @@ export default function Calculators() {
             {activeCalculator === 'tax-capital-gains' && <GermanCapitalGainsTaxCalculator />}
             {activeCalculator === 'tax-income-germany' && <GermanIncomeTaxCalculator />}
             {activeCalculator === 'debt-payoff' && <DebtPayoffCalculator />}
+	    {activeCalculator === 'fire' && <FireCalculator />}
           </div>
         )}
       </div>
@@ -150,6 +151,18 @@ const calculators = [
       </svg>
     )
   },
+{
+  id: 'fire',
+  title: 'FIRE Calculator',
+  description: 'Calculate your Financial Independence number. Choose from Lean, Fat, Barista, or Coast FIRE.',
+  color: 'bg-teal-100',
+  icon: (
+    <svg className="w-7 h-7 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" />
+    </svg>
+  )
+}
 ];
 
 // Individual Calculator Components
@@ -917,6 +930,390 @@ function DebtPayoffCalculator() {
   );
 }
 
+function FireCalculator() {
+  const [annualExpenses, setAnnualExpenses] = useState(40000);
+  const [currentAge, setCurrentAge] = useState(30);
+  const [desiredRetirementAge, setDesiredRetirementAge] = useState(55);
+  const [currentSavings, setCurrentSavings] = useState(100000);
+  const [monthlySavings, setMonthlySavings] = useState(2000);
+  const [expectedReturn, setExpectedReturn] = useState(7);
+  const [safeWithdrawalRate, setSafeWithdrawalRate] = useState(4);
+  
+  // Part-time income for Barista FIRE
+  const [partTimeIncome, setPartTimeIncome] = useState(20000);
+  
+  // Coast FIRE settings
+  const [coastRetirementAge, setCoastRetirementAge] = useState(65);
+
+  const [selectedFireType, setSelectedFireType] = useState<'lean' | 'fat' | 'barista' | 'coast'>('lean');
+  const [showSaveSuccess, setShowSaveSuccess] = useState(false);
+
+  // Calculate different FIRE numbers
+  const leanFireNumber = (annualExpenses * 0.7) / (safeWithdrawalRate / 100);
+  const standardFireNumber = annualExpenses / (safeWithdrawalRate / 100);
+  const fatFireNumber = (annualExpenses * 2) / (safeWithdrawalRate / 100);
+  const baristaExpenses = annualExpenses - partTimeIncome;
+  const baristaFireNumber = Math.max(0, baristaExpenses) / (safeWithdrawalRate / 100);
+  
+  // Coast FIRE calculation
+  const yearsToCoastRetirement = coastRetirementAge - currentAge;
+  const coastFireNumber = annualExpenses / (safeWithdrawalRate / 100);
+  const coastFireTarget = coastFireNumber / Math.pow(1 + expectedReturn / 100, yearsToCoastRetirement);
+
+  // Calculate years to reach each FIRE type
+  const calculateYearsToFire = (target: number) => {
+    if (currentSavings >= target) return 0;
+    
+    const monthlyRate = expectedReturn / 100 / 12;
+    const monthlyTarget = target;
+    
+    if (monthlySavings <= 0) return 999;
+    
+    const months = Math.log((monthlyTarget * monthlyRate + monthlySavings) / (currentSavings * monthlyRate + monthlySavings)) / Math.log(1 + monthlyRate);
+    return Math.ceil(months / 12);
+  };
+
+  const leanYears = calculateYearsToFire(leanFireNumber);
+  const standardYears = calculateYearsToFire(standardFireNumber);
+  const fatYears = calculateYearsToFire(fatFireNumber);
+  const baristaYears = calculateYearsToFire(baristaFireNumber);
+  const coastYears = calculateYearsToFire(coastFireTarget);
+
+  const fireTypes = [
+    {
+      id: 'lean' as const,
+      name: 'Lean FIRE',
+      emoji: '🌱',
+      description: 'Minimalist lifestyle with 70% of current expenses',
+      color: 'from-emerald-500 to-green-600',
+      borderColor: 'border-emerald-300',
+      bgColor: 'bg-emerald-50',
+      target: leanFireNumber,
+      years: leanYears,
+      expenses: annualExpenses * 0.7,
+      details: 'Live frugally, focus on essentials, lower cost of living'
+    },
+    {
+      id: 'fat' as const,
+      name: 'Fat FIRE',
+      emoji: '💎',
+      description: 'Comfortable lifestyle with 2x current expenses',
+      color: 'from-purple-500 to-indigo-600',
+      borderColor: 'border-purple-300',
+      bgColor: 'bg-purple-50',
+      target: fatFireNumber,
+      years: fatYears,
+      expenses: annualExpenses * 2,
+      details: 'Luxury travel, dining out, no budget constraints'
+    },
+    {
+      id: 'barista' as const,
+      name: 'Barista FIRE',
+      emoji: '☕',
+      description: 'Part-time work covers living expenses',
+      color: 'from-amber-500 to-orange-600',
+      borderColor: 'border-amber-300',
+      bgColor: 'bg-amber-50',
+      target: baristaFireNumber,
+      years: baristaYears,
+      expenses: baristaExpenses,
+      details: 'Portfolio covers most expenses, work for fun/health insurance'
+    },
+    {
+      id: 'coast' as const,
+      name: 'Coast FIRE',
+      emoji: '🏖️',
+      description: 'Stop saving, let investments grow until traditional retirement',
+      color: 'from-cyan-500 to-blue-600',
+      borderColor: 'border-cyan-300',
+      bgColor: 'bg-cyan-50',
+      target: coastFireTarget,
+      years: coastYears,
+      expenses: annualExpenses,
+      details: `Reach €${Math.round(coastFireTarget / 1000)}K by age ${currentAge + coastYears}, then coast to ${coastRetirementAge}`
+    }
+  ];
+
+  const selectedFire = fireTypes.find(f => f.id === selectedFireType)!;
+
+  const handleSaveFireNumber = () => {
+    // Save to localStorage for use in Projection
+    const fireData = {
+      type: selectedFireType,
+      number: selectedFire.target,
+      expenses: selectedFire.expenses,
+      withdrawalRate: safeWithdrawalRate,
+      savedAt: new Date().toISOString()
+    };
+    
+    localStorage.setItem('myfynzo_fire_target', JSON.stringify(fireData));
+    
+    setShowSaveSuccess(true);
+    setTimeout(() => setShowSaveSuccess(false), 3000);
+  };
+
+  return (
+    <CalculatorCard title="FIRE Calculator">
+      <div className="grid lg:grid-cols-5 gap-8">
+        {/* Input Column */}
+        <div className="lg:col-span-2 space-y-5">
+          {/* Basic Info */}
+          <div className="bg-gradient-to-br from-teal-50 to-white p-6 rounded-xl border-2 border-teal-200">
+            <h4 className="font-bold text-secondary mb-4 flex items-center gap-2">
+              <span className="text-xl">📊</span> Your Current Situation
+            </h4>
+            <div className="space-y-4">
+              <Input 
+                label="Annual Expenses (€)" 
+                value={annualExpenses} 
+                onChange={setAnnualExpenses}
+                icon="💰"
+              />
+              <Input 
+                label="Current Age" 
+                value={currentAge} 
+                onChange={setCurrentAge}
+                icon="🎂"
+              />
+              <Input 
+                label="Current Savings (€)" 
+                value={currentSavings} 
+                onChange={setCurrentSavings}
+                icon="💵"
+              />
+              <Input 
+                label="Monthly Savings (€)" 
+                value={monthlySavings} 
+                onChange={setMonthlySavings}
+                icon="📈"
+              />
+            </div>
+          </div>
+
+          {/* Investment Settings */}
+          <div className="bg-gradient-to-br from-blue-50 to-white p-6 rounded-xl border-2 border-blue-200">
+            <h4 className="font-bold text-secondary mb-4 flex items-center gap-2">
+              <span className="text-xl">⚙️</span> Investment Settings
+            </h4>
+            <div className="space-y-4">
+              <Input 
+                label="Expected Annual Return (%)" 
+                value={expectedReturn} 
+                onChange={setExpectedReturn}
+                step={0.1}
+                icon="📊"
+              />
+              <Input 
+                label="Safe Withdrawal Rate (%)" 
+                value={safeWithdrawalRate} 
+                onChange={setSafeWithdrawalRate}
+                step={0.1}
+                icon="🎯"
+              />
+              <div className="bg-blue-100 border border-blue-300 rounded-lg p-3 text-xs text-blue-800">
+                <strong>4% Rule:</strong> Withdraw 4% of your portfolio annually. Historically safe for 30+ year retirements.
+              </div>
+            </div>
+          </div>
+
+          {/* Barista FIRE Settings */}
+          <div className="bg-gradient-to-br from-amber-50 to-white p-6 rounded-xl border-2 border-amber-200">
+            <h4 className="font-bold text-secondary mb-4 flex items-center gap-2">
+              <span className="text-xl">☕</span> Barista FIRE Settings
+            </h4>
+            <div className="space-y-4">
+              <Input 
+                label="Part-Time Annual Income (€)" 
+                value={partTimeIncome} 
+                onChange={setPartTimeIncome}
+                icon="💼"
+              />
+              <div className="text-sm text-slate-600">
+                Income from part-time work that covers some expenses
+              </div>
+            </div>
+          </div>
+
+          {/* Coast FIRE Settings */}
+          <div className="bg-gradient-to-br from-cyan-50 to-white p-6 rounded-xl border-2 border-cyan-200">
+            <h4 className="font-bold text-secondary mb-4 flex items-center gap-2">
+              <span className="text-xl">🏖️</span> Coast FIRE Settings
+            </h4>
+            <div className="space-y-4">
+              <Input 
+                label="Traditional Retirement Age" 
+                value={coastRetirementAge} 
+                onChange={setCoastRetirementAge}
+                icon="🎯"
+              />
+              <div className="text-sm text-slate-600">
+                Age when you'll retire without additional saving
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Results Column */}
+        <div className="lg:col-span-3 space-y-4">
+          {/* FIRE Type Cards */}
+          <div className="grid md:grid-cols-2 gap-4">
+            {fireTypes.map((fire) => (
+              <button
+                key={fire.id}
+                onClick={() => setSelectedFireType(fire.id)}
+                className={`text-left p-6 rounded-xl border-2 transition-all ${
+                  selectedFireType === fire.id
+                    ? `${fire.borderColor} shadow-lg scale-105 ${fire.bgColor}`
+                    : 'border-slate-200 bg-white hover:shadow-md'
+                }`}
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <div className="text-3xl mb-2">{fire.emoji}</div>
+                    <h3 className="text-xl font-bold text-secondary mb-1">
+                      {fire.name}
+                    </h3>
+                  </div>
+                  {selectedFireType === fire.id && (
+                    <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
+                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
+                <p className="text-sm text-slate-600 mb-4">{fire.description}</p>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-600">Target:</span>
+                    <span className="font-bold text-secondary">€{Math.round(fire.target / 1000)}K</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-600">Years to reach:</span>
+                    <span className="font-bold text-primary">
+                      {fire.years < 999 ? `${fire.years} years` : '∞'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-600">Annual expenses:</span>
+                    <span className="font-bold text-slate-700">€{Math.round(fire.expenses / 1000)}K</span>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+
+          {/* Detailed Breakdown for Selected Type */}
+          <div className={`bg-gradient-to-br ${selectedFire.color} rounded-2xl p-8 text-white shadow-2xl`}>
+            <div className="flex items-center gap-3 mb-6">
+              <span className="text-5xl">{selectedFire.emoji}</span>
+              <div>
+                <h2 className="text-3xl font-bold mb-1">{selectedFire.name}</h2>
+                <p className="text-white/90">{selectedFire.details}</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="bg-white/20 backdrop-blur rounded-xl p-4">
+                <div className="text-sm opacity-90 mb-1">FIRE Number</div>
+                <div className="text-3xl font-bold">€{Math.round(selectedFire.target / 1000)}K</div>
+              </div>
+              <div className="bg-white/20 backdrop-blur rounded-xl p-4">
+                <div className="text-sm opacity-90 mb-1">Years to FIRE</div>
+                <div className="text-3xl font-bold">
+                  {selectedFire.years < 999 ? selectedFire.years : '∞'}
+                </div>
+              </div>
+              <div className="bg-white/20 backdrop-blur rounded-xl p-4">
+                <div className="text-sm opacity-90 mb-1">FIRE Age</div>
+                <div className="text-3xl font-bold">
+                  {selectedFire.years < 999 ? currentAge + selectedFire.years : 'N/A'}
+                </div>
+              </div>
+              <div className="bg-white/20 backdrop-blur rounded-xl p-4">
+                <div className="text-sm opacity-90 mb-1">Annual Expenses</div>
+                <div className="text-3xl font-bold">€{Math.round(selectedFire.expenses / 1000)}K</div>
+              </div>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="bg-white/20 backdrop-blur rounded-xl p-4 mb-6">
+              <div className="flex justify-between text-sm mb-2">
+                <span>Current Progress</span>
+                <span>{Math.min(100, (currentSavings / selectedFire.target * 100)).toFixed(1)}%</span>
+              </div>
+              <div className="h-4 bg-white/30 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-white rounded-full transition-all duration-500"
+                  style={{ width: `${Math.min(100, (currentSavings / selectedFire.target * 100))}%` }}
+                />
+              </div>
+              <div className="flex justify-between text-xs mt-2 opacity-90">
+                <span>€{Math.round(currentSavings / 1000)}K</span>
+                <span>€{Math.round(selectedFire.target / 1000)}K</span>
+              </div>
+            </div>
+
+            {/* Save Button */}
+            <button
+              onClick={handleSaveFireNumber}
+              className="w-full bg-white text-secondary px-6 py-4 rounded-xl font-bold text-lg hover:bg-slate-100 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              Set as My FIRE Target
+            </button>
+
+            {showSaveSuccess && (
+              <div className="mt-4 bg-green-500 text-white px-4 py-3 rounded-lg flex items-center gap-2 animate-fade-in">
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
+                </svg>
+                <span>FIRE target saved! It will now be used in your Wealth Projection.</span>
+              </div>
+            )}
+          </div>
+
+          {/* Comparison Table */}
+          <div className="bg-white rounded-xl p-6 border-2 border-slate-200">
+            <h3 className="text-xl font-bold text-secondary mb-4">Compare All FIRE Types</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b-2 border-slate-200">
+                    <th className="text-left py-3 font-semibold text-slate-700">Type</th>
+                    <th className="text-right py-3 font-semibold text-slate-700">Target</th>
+                    <th className="text-right py-3 font-semibold text-slate-700">Years</th>
+                    <th className="text-right py-3 font-semibold text-slate-700">FIRE Age</th>
+                    <th className="text-right py-3 font-semibold text-slate-700">Expenses</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {fireTypes.map((fire) => (
+                    <tr 
+                      key={fire.id}
+                      className={`border-b border-slate-100 ${selectedFireType === fire.id ? fire.bgColor : ''}`}
+                    >
+                      <td className="py-3">
+                        <span className="mr-2">{fire.emoji}</span>
+                        {fire.name}
+                      </td>
+                      <td className="text-right font-semibold">€{Math.round(fire.target / 1000)}K</td>
+                      <td className="text-right">{fire.years < 999 ? `${fire.years}y` : '∞'}</td>
+                      <td className="text-right">{fire.years < 999 ? currentAge + fire.years : 'N/A'}</td>
+                      <td className="text-right">€{Math.round(fire.expenses / 1000)}K</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </CalculatorCard>
+  );
+}
 // Reusable Components
 function CalculatorCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
