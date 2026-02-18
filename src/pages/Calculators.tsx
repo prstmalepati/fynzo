@@ -402,20 +402,26 @@ function GermanIncomeTaxCalculator() {
   const currentYear = new Date().getFullYear();
   const [grossIncome, setGrossIncome] = useState(60000);
   const [filingStatus, setFilingStatus] = useState<'single' | 'married'>('single');
+  const [taxClass, setTaxClass] = useState(1);
   const [numberOfChildren, setNumberOfChildren] = useState(0);
   const [includeChurchTax, setIncludeChurchTax] = useState(false);
   const [age, setAge] = useState(30);
   const [viewMode, setViewMode] = useState<'annual' | 'monthly'>('annual');
+  const [showResults, setShowResults] = useState(false);
 
-  const taxResult = calculateGermanTax({
+  const handleCalculate = () => {
+    setShowResults(true);
+  };
+
+  const taxResult = showResults ? calculateGermanTax({
     grossIncome,
     filingStatus,
     numberOfChildren,
     includeChurchTax,
     age
-  });
+  }) : null;
 
-  const monthly = getMonthlyBreakdown(taxResult);
+  const monthly = taxResult ? getMonthlyBreakdown(taxResult) : null;
   const isMonthly = viewMode === 'monthly';
 
   return (
@@ -450,36 +456,41 @@ function GermanIncomeTaxCalculator() {
                         : 'bg-white border-2 border-slate-200 text-slate-600 hover:border-slate-300'
                     }`}
                   >
-                    💑 Married
+                    💑 Couple
                   </button>
                 </div>
               </div>
 
               <div>
+                <label className="text-sm font-semibold text-slate-700 mb-2 block">Tax Class (Steuerklasse)</label>
+                <select
+                  value={taxClass}
+                  onChange={(e) => setTaxClass(Number(e.target.value))}
+                  className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-white font-medium"
+                >
+                  <option value={1}>Class I - Single, no children</option>
+                  <option value={2}>Class II - Single parent</option>
+                  <option value={3}>Class III - Married, higher income</option>
+                  <option value={4}>Class IV - Married, equal income</option>
+                  <option value={5}>Class V - Married, lower income</option>
+                  <option value={6}>Class VI - Second job</option>
+                </select>
+              </div>
+
+              <div>
                 <label className="text-sm font-semibold text-slate-700 mb-2 block">Number of Children</label>
-                <div className="grid grid-cols-4 gap-2">
-                  {[0, 1, 2, 3].map(num => (
-                    <button
-                      key={num}
-                      onClick={() => setNumberOfChildren(num)}
-                      className={`px-3 py-2 rounded-lg font-semibold transition-all ${
-                        numberOfChildren === num
-                          ? 'bg-red-600 text-white shadow-lg'
-                          : 'bg-white border-2 border-slate-200 text-slate-600 hover:border-slate-300'
-                      }`}
-                    >
-                      {num}
-                    </button>
-                  ))}
-                </div>
-                {numberOfChildren > 3 && (
-                  <input
-                    type="number"
-                    value={numberOfChildren}
-                    onChange={e => setNumberOfChildren(Number(e.target.value))}
-                    className="mt-2 w-full px-4 py-2 border-2 border-slate-200 rounded-lg"
-                  />
-                )}
+                <select
+                  value={numberOfChildren}
+                  onChange={(e) => setNumberOfChildren(Number(e.target.value))}
+                  className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-white font-medium"
+                >
+                  <option value={0}>0 - No children</option>
+                  <option value={1}>1 child</option>
+                  <option value={2}>2 children</option>
+                  <option value={3}>3 children</option>
+                  <option value={4}>4 children</option>
+                  <option value={5}>5+ children</option>
+                </select>
               </div>
 
               <div className="flex items-center justify-between">
@@ -509,143 +520,164 @@ function GermanIncomeTaxCalculator() {
             </div>
           </div>
 
-          {/* View Mode Toggle */}
-          <div className="bg-gradient-to-br from-slate-50 to-white p-6 rounded-xl border-2 border-slate-200">
-            <label className="text-sm font-semibold text-slate-700 mb-3 block">View Mode</label>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => setViewMode('annual')}
-                className={`px-4 py-3 rounded-lg font-semibold transition-all ${
-                  viewMode === 'annual'
-                    ? 'bg-primary text-white shadow-lg'
-                    : 'bg-white border-2 border-slate-200 text-slate-600 hover:border-slate-300'
-                }`}
-              >
-                📅 Annual
-              </button>
-              <button
-                onClick={() => setViewMode('monthly')}
-                className={`px-4 py-3 rounded-lg font-semibold transition-all ${
-                  viewMode === 'monthly'
-                    ? 'bg-primary text-white shadow-lg'
-                    : 'bg-white border-2 border-slate-200 text-slate-600 hover:border-slate-300'
-                }`}
-              >
-                📆 Monthly
-              </button>
+          {/* Calculate Button */}
+          <button
+            onClick={handleCalculate}
+            className="w-full px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl hover:from-red-700 hover:to-red-800 transition-all duration-300 font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105"
+          >
+            Calculate Tax
+          </button>
+
+          {/* View Mode Toggle - Only show after calculation */}
+          {showResults && (
+            <div className="bg-gradient-to-br from-slate-50 to-white p-6 rounded-xl border-2 border-slate-200">
+              <label className="text-sm font-semibold text-slate-700 mb-3 block">View Mode</label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => setViewMode('annual')}
+                  className={`px-4 py-3 rounded-lg font-semibold transition-all ${
+                    viewMode === 'annual'
+                      ? 'bg-primary text-white shadow-lg'
+                      : 'bg-white border-2 border-slate-200 text-slate-600 hover:border-slate-300'
+                  }`}
+                >
+                  📅 Annual
+                </button>
+                <button
+                  onClick={() => setViewMode('monthly')}
+                  className={`px-4 py-3 rounded-lg font-semibold transition-all ${
+                    viewMode === 'monthly'
+                      ? 'bg-primary text-white shadow-lg'
+                      : 'bg-white border-2 border-slate-200 text-slate-600 hover:border-slate-300'
+                  }`}
+                >
+                  💶 Monthly
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Results Column */}
         <div className="lg:col-span-3 space-y-4">
-          {/* Main Result Card */}
-          <div className="bg-gradient-to-br from-red-600 to-red-800 rounded-2xl p-8 text-white shadow-2xl">
-            <div className="text-sm opacity-90 mb-2 font-semibold">{isMonthly ? 'Monthly' : 'Annual'} Net Income</div>
-            <div className="text-6xl font-bold mb-6" style={{ fontFamily: "'Crimson Pro', serif" }}>
-              €{(isMonthly ? monthly.netIncome : taxResult.netIncome).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+          {!showResults ? (
+            /* Placeholder before calculation */
+            <div className="bg-white rounded-2xl p-12 border-2 border-slate-200 text-center">
+              <div className="text-6xl mb-4">🇩🇪</div>
+              <h3 className="text-2xl font-bold text-secondary mb-2">Ready to calculate your taxes?</h3>
+              <p className="text-slate-600">Fill in your details and click "Calculate Tax" to see your breakdown</p>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-3 bg-white/10 rounded-lg backdrop-blur">
-                <div className="text-xs opacity-90 mb-1">Effective Tax Rate</div>
-                <div className="text-2xl font-bold">{taxResult.effectiveTaxRate.toFixed(1)}%</div>
-              </div>
-              <div className="p-3 bg-white/10 rounded-lg backdrop-blur">
-                <div className="text-xs opacity-90 mb-1">Marginal Tax Rate</div>
-                <div className="text-2xl font-bold">{taxResult.marginalTaxRate.toFixed(0)}%</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Tax Breakdown */}
-          <div className="bg-white rounded-xl p-6 border-2 border-slate-200">
-            <h4 className="font-bold text-secondary mb-4">💶 Tax Breakdown</h4>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between py-2 border-b border-slate-100">
-                <span className="text-slate-600">Gross Income:</span>
-                <span className="font-bold text-secondary">€{(isMonthly ? monthly.grossIncome : taxResult.grossIncome).toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between py-2 border-b border-slate-100">
-                <span className="text-slate-600">- Income Tax:</span>
-                <span className="font-semibold text-red-600">€{(isMonthly ? monthly.incomeTax : taxResult.incomeTax).toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between py-2 border-b border-slate-100">
-                <span className="text-slate-600">- Solidarity Tax:</span>
-                <span className="font-semibold text-red-600">€{(isMonthly ? monthly.solidarityTax : taxResult.solidarityTax).toLocaleString()}</span>
-              </div>
-              {includeChurchTax && (
-                <div className="flex justify-between py-2 border-b border-slate-100">
-                  <span className="text-slate-600">- Church Tax:</span>
-                  <span className="font-semibold text-red-600">€{(isMonthly ? monthly.churchTax : taxResult.churchTax).toLocaleString()}</span>
+          ) : (
+            <>
+              {/* Main Result Card */}
+              <div className="bg-gradient-to-br from-red-600 to-red-800 rounded-2xl p-8 text-white shadow-2xl">
+                <div className="text-sm opacity-90 mb-2 font-semibold">{isMonthly ? 'Monthly' : 'Annual'} Net Income</div>
+                <div className="text-6xl font-bold mb-6" style={{ fontFamily: "'Crimson Pro', serif" }}>
+                  €{(isMonthly ? monthly!.netIncome : taxResult!.netIncome).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                 </div>
-              )}
-              <div className="flex justify-between py-2 border-b border-slate-100 font-bold">
-                <span className="text-slate-700">Total Tax:</span>
-                <span className="text-red-600">€{(isMonthly ? monthly.totalTax : taxResult.totalTax).toLocaleString()}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Social Security Breakdown */}
-          <div className="bg-white rounded-xl p-6 border-2 border-slate-200">
-            <h4 className="font-bold text-secondary mb-4">🏥 Social Security Contributions</h4>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between py-2">
-                <span className="text-slate-600">Pension Insurance (9.3%):</span>
-                <span className="font-semibold">€{(isMonthly ? monthly.pensionInsurance : taxResult.pensionInsurance).toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between py-2">
-                <span className="text-slate-600">Health Insurance (~9%):</span>
-                <span className="font-semibold">€{(isMonthly ? monthly.healthInsurance : taxResult.healthInsurance).toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between py-2">
-                <span className="text-slate-600">Unemployment (1.3%):</span>
-                <span className="font-semibold">€{(isMonthly ? monthly.unemploymentInsurance : taxResult.unemploymentInsurance).toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between py-2">
-                <span className="text-slate-600">Long-term Care (~{numberOfChildren === 0 && age >= 23 ? '2.0' : '1.8'}%):</span>
-                <span className="font-semibold">€{(isMonthly ? monthly.longTermCare : taxResult.longTermCare).toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between py-2 border-t border-slate-200 font-bold pt-3">
-                <span className="text-slate-700">Total Social Security:</span>
-                <span className="text-secondary">€{(isMonthly ? monthly.totalSocialSecurity : taxResult.totalSocialSecurity).toLocaleString()}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Tax Allowances & Benefits */}
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="bg-emerald-50 rounded-xl p-5 border-2 border-emerald-200">
-              <div className="text-xs text-emerald-800 mb-1 font-semibold">Grundfreibetrag</div>
-              <div className="text-2xl font-bold text-emerald-700">€{taxResult.grundfreibetrag.toLocaleString()}</div>
-              <div className="text-xs text-emerald-600 mt-1">Tax-free allowance</div>
-            </div>
-            {numberOfChildren > 0 && (
-              <div className="bg-blue-50 rounded-xl p-5 border-2 border-blue-200">
-                <div className="text-xs text-blue-800 mb-1 font-semibold">Kindergeld ({numberOfChildren} {numberOfChildren === 1 ? 'child' : 'children'})</div>
-                <div className="text-2xl font-bold text-blue-700">€{(isMonthly ? monthly.kindergeld : taxResult.kindergeld).toLocaleString()}</div>
-                <div className="text-xs text-blue-600 mt-1">{isMonthly ? 'Monthly' : 'Annual'} child benefit</div>
-              </div>
-            )}
-          </div>
-
-          {/* Tax Zones Breakdown */}
-          <div className="bg-white rounded-xl p-6 border-2 border-slate-200">
-            <h4 className="font-bold text-secondary mb-4">📊 Progressive Tax Zones</h4>
-            <div className="space-y-3">
-              {taxResult.taxZones.map((zone) => (
-                <div key={zone.zone} className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
-                  <div>
-                    <div className="font-semibold text-sm text-secondary">{zone.name}</div>
-                    <div className="text-xs text-slate-600">{zone.range} • {zone.rate}</div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-3 bg-white/10 rounded-lg backdrop-blur">
+                    <div className="text-xs opacity-90 mb-1">Effective Tax Rate</div>
+                    <div className="text-2xl font-bold">{taxResult!.effectiveTaxRate.toFixed(1)}%</div>
                   </div>
-                  <div className="text-right">
-                    <div className="font-bold text-secondary">€{zone.taxAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
+                  <div className="p-3 bg-white/10 rounded-lg backdrop-blur">
+                    <div className="text-xs opacity-90 mb-1">Marginal Tax Rate</div>
+                    <div className="text-2xl font-bold">{taxResult!.marginalTaxRate.toFixed(0)}%</div>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
+
+              {/* Tax Breakdown */}
+              <div className="bg-white rounded-xl p-6 border-2 border-slate-200">
+                <h4 className="font-bold text-secondary mb-4">💶 Tax Breakdown</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between py-2 border-b border-slate-100">
+                    <span className="text-slate-600">Gross Income:</span>
+                    <span className="font-bold text-secondary">€{(isMonthly ? monthly!.grossIncome : taxResult!.grossIncome).toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-slate-100">
+                    <span className="text-slate-600">- Income Tax:</span>
+                    <span className="font-semibold text-red-600">€{(isMonthly ? monthly!.incomeTax : taxResult!.incomeTax).toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-slate-100">
+                    <span className="text-slate-600">- Solidarity Tax:</span>
+                    <span className="font-semibold text-red-600">€{(isMonthly ? monthly!.solidarityTax : taxResult!.solidarityTax).toLocaleString()}</span>
+                  </div>
+                  {includeChurchTax && (
+                    <div className="flex justify-between py-2 border-b border-slate-100">
+                      <span className="text-slate-600">- Church Tax:</span>
+                      <span className="font-semibold text-red-600">€{(isMonthly ? monthly!.churchTax : taxResult!.churchTax).toLocaleString()}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between py-2 border-b border-slate-100 font-bold">
+                    <span className="text-slate-700">Total Tax:</span>
+                    <span className="text-red-600">€{(isMonthly ? monthly!.totalTax : taxResult!.totalTax).toLocaleString()}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Social Security Breakdown */}
+              <div className="bg-white rounded-xl p-6 border-2 border-slate-200">
+                <h4 className="font-bold text-secondary mb-4">🏥 Social Security Contributions</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between py-2">
+                    <span className="text-slate-600">Pension Insurance (9.3%):</span>
+                    <span className="font-semibold">€{(isMonthly ? monthly!.pensionInsurance : taxResult!.pensionInsurance).toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between py-2">
+                    <span className="text-slate-600">Health Insurance (~9%):</span>
+                    <span className="font-semibold">€{(isMonthly ? monthly!.healthInsurance : taxResult!.healthInsurance).toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between py-2">
+                    <span className="text-slate-600">Unemployment (1.3%):</span>
+                    <span className="font-semibold">€{(isMonthly ? monthly!.unemploymentInsurance : taxResult!.unemploymentInsurance).toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between py-2">
+                    <span className="text-slate-600">Long-term Care (~{numberOfChildren === 0 && age >= 23 ? '2.0' : '1.8'}%):</span>
+                    <span className="font-semibold">€{(isMonthly ? monthly!.longTermCare : taxResult!.longTermCare).toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-t border-slate-200 font-bold pt-3">
+                    <span className="text-slate-700">Total Social Security:</span>
+                    <span className="text-secondary">€{(isMonthly ? monthly!.totalSocialSecurity : taxResult!.totalSocialSecurity).toLocaleString()}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tax Allowances & Benefits */}
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="bg-emerald-50 rounded-xl p-5 border-2 border-emerald-200">
+                  <div className="text-xs text-emerald-800 mb-1 font-semibold">Grundfreibetrag</div>
+                  <div className="text-2xl font-bold text-emerald-700">€{taxResult!.grundfreibetrag.toLocaleString()}</div>
+                  <div className="text-xs text-emerald-600 mt-1">Tax-free allowance</div>
+                </div>
+                {numberOfChildren > 0 && (
+                  <div className="bg-blue-50 rounded-xl p-5 border-2 border-blue-200">
+                    <div className="text-xs text-blue-800 mb-1 font-semibold">Kindergeld ({numberOfChildren} {numberOfChildren === 1 ? 'child' : 'children'})</div>
+                    <div className="text-2xl font-bold text-blue-700">€{(isMonthly ? monthly!.kindergeld : taxResult!.kindergeld).toLocaleString()}</div>
+                    <div className="text-xs text-blue-600 mt-1">{isMonthly ? 'Monthly' : 'Annual'} child benefit</div>
+                  </div>
+                )}
+              </div>
+
+              {/* Tax Zones Breakdown */}
+              <div className="bg-white rounded-xl p-6 border-2 border-slate-200">
+                <h4 className="font-bold text-secondary mb-4">📊 Progressive Tax Zones</h4>
+                <div className="space-y-3">
+                  {taxResult!.taxZones.map((zone) => (
+                    <div key={zone.zone} className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                      <div>
+                        <div className="font-semibold text-sm text-secondary">{zone.name}</div>
+                        <div className="text-xs text-slate-600">{zone.range} • {zone.rate}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold text-secondary">€{zone.taxAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </CalculatorCard>
