@@ -1,6 +1,5 @@
 import {
   signInWithPopup,
-  signInWithRedirect,
   GoogleAuthProvider,
   OAuthProvider,
   RecaptchaVerifier,
