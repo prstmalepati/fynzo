@@ -15,7 +15,7 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
 
   const handleLogout = async () => {
     await logout();
-    navigate('/login');
+    navigate('/');
   };
 
   const menuItems = [
