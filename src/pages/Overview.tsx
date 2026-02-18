@@ -26,14 +26,6 @@ export default function Overview() {
     return () => observer.disconnect();
   }, []);
 
-  const handleGetStarted = () => {
-    if (user) {
-      navigate('/dashboard');
-    } else {
-      navigate('/login');
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-teal-50">
       {/* Navigation */}
@@ -45,12 +37,31 @@ export default function Overview() {
             </div>
             <span className="text-2xl font-bold text-secondary" style={{ fontFamily: "'Crimson Pro', serif" }}>fynzo</span>
           </div>
-          <button
-            onClick={handleGetStarted}
-            className="px-6 py-2.5 bg-primary text-white rounded-lg hover:bg-teal-800 transition-all duration-300 font-medium shadow-sm hover:shadow-md"
-          >
-            {user ? 'Go to Dashboard' : 'Get Started'}
-          </button>
+          <div className="flex items-center gap-3">
+            {user ? (
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="px-6 py-2.5 bg-primary text-white rounded-lg hover:bg-teal-800 transition-all duration-300 font-medium shadow-sm hover:shadow-md"
+              >
+                Go to Dashboard
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={() => navigate('/login')}
+                  className="px-6 py-2.5 text-primary border-2 border-primary rounded-lg hover:bg-teal-50 transition-all duration-300 font-medium"
+                >
+                  Login
+                </button>
+                <button
+                  onClick={() => navigate('/login')}
+                  className="px-6 py-2.5 bg-primary text-white rounded-lg hover:bg-teal-800 transition-all duration-300 font-medium shadow-sm hover:shadow-md"
+                >
+                  Get Started
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </nav>
 
@@ -73,16 +84,16 @@ export default function Overview() {
             </p>
             <div className="flex gap-4">
               <button
-                onClick={handleGetStarted}
+                onClick={() => navigate('/projection')}
                 className="px-8 py-4 bg-primary text-white rounded-xl hover:bg-teal-800 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl hover:scale-105 transform"
               >
-                {user ? 'Go to Dashboard' : 'Calculate Your FIRE Number'}
+                Calculate Your FIRE Number - FREE
               </button>
               <button
-                onClick={() => navigate('/calculators')}
+                onClick={() => user ? navigate('/calculators') : navigate('/login')}
                 className="px-8 py-4 bg-white text-primary border-2 border-primary rounded-xl hover:bg-teal-50 transition-all duration-300 font-semibold"
               >
-                Explore Tools
+                Expert Tools {!user && '(Login Required)'}
               </button>
             </div>
             <div className="flex gap-8 pt-4">
@@ -240,12 +251,12 @@ export default function Overview() {
             Join ambitious Europeans building wealth with clarity. Your financial future deserves better than spreadsheets.
           </p>
           <button
-            onClick={handleGetStarted}
+            onClick={() => navigate('/projection')}
             className="px-10 py-5 bg-white text-primary rounded-xl hover:bg-teal-50 transition-all duration-300 font-bold text-lg shadow-2xl hover:shadow-xl hover:scale-105 transform"
           >
-            {user ? 'Go to Dashboard →' : 'Calculate Your FIRE Number →'}
+            Calculate Your FIRE Number - FREE →
           </button>
-          <p className="text-sm text-teal-200 mt-6">Free forever. No credit card required.</p>
+          <p className="text-sm text-teal-200 mt-6">Free forever. No credit card required. Expert tools available with login.</p>
         </div>
       </section>
 

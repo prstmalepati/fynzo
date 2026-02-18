@@ -10,10 +10,10 @@ export default function Calculators() {
       <div className="p-8">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-secondary mb-2" style={{ fontFamily: "'Crimson Pro', serif" }}>
-            Financial Calculators
+            Expert Financial Calculators
           </h1>
           <p className="text-slate-600" style={{ fontFamily: "'Manrope', sans-serif" }}>
-            Quick tools for everyday financial decisions
+            Advanced tools for comprehensive financial planning
           </p>
         </div>
         {/* Calculator Grid */}
