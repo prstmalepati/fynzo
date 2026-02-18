@@ -45,8 +45,8 @@ export function calculateWealthProjection(input: any) {
         ? `${age1 + year} / ${age2 + year}`
         : `${age1 + year}`,
       totalIncome,
-      expenses,
-      investmentBalance,
+      totalExpenses: expenses,
+      investmentValue: investmentBalance,
       netWorth: investmentBalance - debt,
       annualSavings,
       savingsRate:

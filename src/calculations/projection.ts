@@ -62,14 +62,12 @@ export function calculateProjection(inputs: ProjectionInput) {
 
   return {
     timeline: timelineWithFire,
-    netWorthEnd,
+    finalNetWorth: netWorthEnd,
     netWorthStart,
     totalSavings,
-    fire: {
-      fireNumber,
-      fireAge: fireStats?.fireAge,
-      fireYear: fireStats?.fireYear,
-      yearsToFire: fireStats?.yearsToFire
-    }
+    fireNumber,
+    fireAge: fireStats?.fireAge,
+    fireYear: fireStats?.fireYear,
+    yearsToFire: fireStats?.yearsToFire
   };
 }
