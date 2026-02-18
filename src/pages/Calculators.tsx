@@ -38,368 +38,6 @@ export default function Calculators() {
             ))}
           </div>
         )}
-function GermanIncomeTaxCalculator() {
-  const currentYear = new Date().getFullYear();
-  const [filingStatus, setFilingStatus] = useState<'single' | 'married'>('single');
-  const [taxClassPartner1, setTaxClassPartner1] = useState(1);
-  const [taxClassPartner2, setTaxClassPartner2] = useState(4);
-  const [numberOfChildren, setNumberOfChildren] = useState(0);
-  const [includeChurchTax, setIncludeChurchTax] = useState(false);
-  const [bundesland, setBundesland] = useState('Bayern');
-  const [viewMode, setViewMode] = useState<'annual' | 'monthly'>('annual');
-  const [showResults, setShowResults] = useState(false);
-
-  // Income inputs
-  const [grossIncome, setGrossIncome] = useState(60000);
-  const [age, setAge] = useState(30);
-  
-  // Couple-specific inputs
-  const [grossIncomePartner2, setGrossIncomePartner2] = useState(45000);
-  const [agePartner2, setAgePartner2] = useState(28);
-  
-  // Capital gains
-  const [capitalGains, setCapitalGains] = useState(0);
-
-  // Kindergeld constants (2024/2025)
-  const KINDERGELD_PER_CHILD_MONTHLY = 250;
-  const KINDERGELD_PER_CHILD_ANNUAL = KINDERGELD_PER_CHILD_MONTHLY * 12;
-
-  // Church tax rates by Bundesland
-  const churchTaxRates: { [key: string]: number } = {
-    'Baden-Württemberg': 0.08,
-    'Bayern': 0.08,
-    'Berlin': 0.09,
-    'Brandenburg': 0.09,
-    'Bremen': 0.09,
-    'Hamburg': 0.09,
-    'Hessen': 0.09,
-    'Mecklenburg-Vorpommern': 0.09,
-    'Niedersachsen': 0.09,
-    'Nordrhein-Westfalen': 0.09,
-    'Rheinland-Pfalz': 0.09,
-    'Saarland': 0.09,
-    'Sachsen': 0.09,
-    'Sachsen-Anhalt': 0.09,
-    'Schleswig-Holstein': 0.09,
-    'Thüringen': 0.09,
-  };
-
-  const handleCalculate = () => {
-    setShowResults(true);
-  };
-
-  // Calculate Kindergeld automatically
-  const kindergeldAnnual = numberOfChildren * KINDERGELD_PER_CHILD_ANNUAL;
-  const kindergeldMonthly = numberOfChildren * KINDERGELD_PER_CHILD_MONTHLY;
-
-  // Calculate capital gains tax (Abgeltungsteuer)
-  const capitalGainsTaxRate = 0.26375; // 25% + 5.5% Soli
-  const capitalGainsTax = capitalGains * capitalGainsTaxRate;
-  const capitalGainsNet = capitalGains - capitalGainsTax;
-
-  const taxResult = showResults ? calculateGermanTax({
-    grossIncome,
-    grossIncome2: filingStatus === 'married' ? grossIncomePartner2 : undefined,
-    capitalGains,
-    filingStatus,
-    numberOfChildren,
-    includeChurchTax,
-    age,
-    churchTaxRate: includeChurchTax ? churchTaxRates[bundesland] : 0,
-    taxClassPartner1: filingStatus === 'single' ? taxClassPartner1 : taxClassPartner1,
-    taxClassPartner2: filingStatus === 'married' ? taxClassPartner2 : undefined,
-  }) : null;
-
-  const monthly = taxResult ? getMonthlyBreakdown(taxResult) : null;
-  const isMonthly = viewMode === 'monthly';
-
-  return (
-    <CalculatorCard title={`German Income Tax Calculator ${currentYear}`}>
-      <div className="grid lg:grid-cols-5 gap-8">
-        {/* Input Column */}
-        <div className="lg:col-span-2 space-y-5">
-          {/* Filing Status & Tax Classes */}
-          <div className="bg-gradient-to-br from-red-50 to-white p-6 rounded-xl border-2 border-red-200">
-            <h4 className="font-bold text-secondary mb-4 flex items-center gap-2">
-              <span className="text-xl">👥</span> Tax Profile
-            </h4>
-            <div className="space-y-4">
-              {/* Filing Status */}
-              <div>
-                <label className="text-sm font-semibold text-slate-700 mb-2 block">Filing Status</label>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    onClick={() => setFilingStatus('single')}
-                    className={`px-4 py-3 rounded-lg font-semibold transition-all ${
-                      filingStatus === 'single'
-                        ? 'bg-red-600 text-white shadow-lg'
-                        : 'bg-white border-2 border-slate-200 text-slate-600 hover:border-slate-300'
-                    }`}
-                  >
-                    👤 Single
-                  </button>
-                  <button
-                    onClick={() => setFilingStatus('married')}
-                    className={`px-4 py-3 rounded-lg font-semibold transition-all ${
-                      filingStatus === 'married'
-                        ? 'bg-red-600 text-white shadow-lg'
-                        : 'bg-white border-2 border-slate-200 text-slate-600 hover:border-slate-300'
-                    }`}
-                  >
-                    💑 Couple
-                  </button>
-                </div>
-              </div>
-
-              {/* Tax Class for Single */}
-              {filingStatus === 'single' && (
-                <div>
-                  <label className="text-sm font-semibold text-slate-700 mb-2 block">Tax Class (Steuerklasse)</label>
-                  <select
-                    value={taxClassPartner1}
-                    onChange={(e) => setTaxClassPartner1(Number(e.target.value))}
-                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-white font-medium"
-                  >
-                    <option value={1}>Class I - Single, no children</option>
-                    <option value={2}>Class II - Single parent</option>
-                    <option value={6}>Class VI - Second job</option>
-                  </select>
-                </div>
-              )}
-
-              {/* Tax Classes for Couple */}
-              {filingStatus === 'married' && (
-                <>
-                  <div>
-                    <label className="text-sm font-semibold text-slate-700 mb-2 block">Partner 1 Tax Class</label>
-                    <select
-                      value={taxClassPartner1}
-                      onChange={(e) => setTaxClassPartner1(Number(e.target.value))}
-                      className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-white font-medium"
-                    >
-                      <option value={3}>Class III - Married, higher income</option>
-                      <option value={4}>Class IV - Married, equal income</option>
-                      <option value={5}>Class V - Married, lower income</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-sm font-semibold text-slate-700 mb-2 block">Partner 2 Tax Class</label>
-                    <select
-                      value={taxClassPartner2}
-                      onChange={(e) => setTaxClassPartner2(Number(e.target.value))}
-                      className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-white font-medium"
-                    >
-                      <option value={3}>Class III - Married, higher income</option>
-                      <option value={4}>Class IV - Married, equal income</option>
-                      <option value={5}>Class V - Married, lower income</option>
-                    </select>
-                  </div>
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm">
-                    <div className="font-semibold text-blue-900 mb-1">💡 Common Combinations:</div>
-                    <div className="text-blue-700 space-y-1">
-                      <div>• 3/5 - One partner earns significantly more</div>
-                      <div>• 4/4 - Both partners earn similar amounts</div>
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {/* Children */}
-              <div>
-                <label className="text-sm font-semibold text-slate-700 mb-2 block">Number of Children</label>
-                <select
-                  value={numberOfChildren}
-                  onChange={(e) => setNumberOfChildren(Number(e.target.value))}
-                  className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-white font-medium"
-                >
-                  <option value={0}>0 - No children</option>
-                  <option value={1}>1 child</option>
-                  <option value={2}>2 children</option>
-                  <option value={3}>3 children</option>
-                  <option value={4}>4 children</option>
-                  <option value={5}>5+ children</option>
-                </select>
-                {numberOfChildren > 0 && (
-                  <div className="mt-2 bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-sm">
-                    <div className="font-semibold text-emerald-900">Kindergeld (automatic):</div>
-                    <div className="text-emerald-700">
-                      €{KINDERGELD_PER_CHILD_MONTHLY}/month per child × {numberOfChildren} = €{kindergeldMonthly}/month
-                    </div>
-                    <div className="text-emerald-700 font-semibold mt-1">
-                      Annual: €{kindergeldAnnual.toLocaleString()}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Bundesland */}
-              {includeChurchTax && (
-                <div>
-                  <label className="text-sm font-semibold text-slate-700 mb-2 block">Bundesland (State)</label>
-                  <select
-                    value={bundesland}
-                    onChange={(e) => setBundesland(e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-white font-medium"
-                  >
-                    {Object.keys(churchTaxRates).sort().map(state => (
-                      <option key={state} value={state}>
-                        {state} ({(churchTaxRates[state] * 100).toFixed(0)}%)
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
-              {/* Church Tax Toggle */}
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-semibold text-slate-700">
-                  Church Tax (Kirchensteuer)
-                </label>
-                <button
-                  onClick={() => setIncludeChurchTax(!includeChurchTax)}
-                  className={`w-14 h-7 rounded-full transition-all ${
-                    includeChurchTax ? 'bg-red-600' : 'bg-slate-300'
-                  } relative`}
-                >
-                  <div className={`w-5 h-5 bg-white rounded-full absolute top-1 transition-all ${
-                    includeChurchTax ? 'right-1' : 'left-1'
-                  }`} />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Income & Age - Partner 1 */}
-          <div className="bg-gradient-to-br from-slate-50 to-white p-6 rounded-xl border-2 border-slate-200">
-            <h4 className="font-bold text-secondary mb-4 flex items-center gap-2">
-              <span className="text-xl">💰</span> {filingStatus === 'married' ? 'Partner 1 ' : ''}Income & Details
-            </h4>
-            <div className="space-y-4">
-              <Input 
-                label={`${filingStatus === 'married' ? 'Partner 1 ' : ''}Annual Gross Income (€)`} 
-                value={grossIncome} 
-                onChange={setGrossIncome} 
-              />
-              <Input 
-                label={`${filingStatus === 'married' ? 'Partner 1 ' : ''}Age`} 
-                value={age} 
-                onChange={setAge} 
-              />
-            </div>
-          </div>
-
-          {/* Income & Age - Partner 2 (only for couples) */}
-          {filingStatus === 'married' && (
-            <div className="bg-gradient-to-br from-purple-50 to-white p-6 rounded-xl border-2 border-purple-200">
-              <h4 className="font-bold text-secondary mb-4 flex items-center gap-2">
-                <span className="text-xl">💰</span> Partner 2 Income & Details
-              </h4>
-              <div className="space-y-4">
-                <Input 
-                  label="Partner 2 Annual Gross Income (€)" 
-                  value={grossIncomePartner2} 
-                  onChange={setGrossIncomePartner2} 
-                />
-                <Input 
-                  label="Partner 2 Age" 
-                  value={agePartner2} 
-                  onChange={setAgePartner2} 
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Capital Gains */}
-          <div className="bg-gradient-to-br from-amber-50 to-white p-6 rounded-xl border-2 border-amber-200">
-            <h4 className="font-bold text-secondary mb-4 flex items-center gap-2">
-              <span className="text-xl">📈</span> Capital Gains (Kapitalerträge)
-            </h4>
-            <div className="space-y-4">
-              <Input 
-                label="Annual Capital Gains (€)" 
-                value={capitalGains} 
-                onChange={setCapitalGains}
-              />
-              {capitalGains > 0 && (
-                <div className="bg-amber-100 border border-amber-300 rounded-lg p-3 text-sm">
-                  <div className="font-semibold text-amber-900 mb-1">Abgeltungsteuer (26.375%):</div>
-                  <div className="text-amber-800">
-                    Tax: €{capitalGainsTax.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                  </div>
-                  <div className="text-amber-800 font-semibold">
-                    After-tax: €{capitalGainsNet.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                  </div>
-                  <div className="text-xs text-amber-700 mt-2">
-                    Note: First €1,000 (€2,000 for couples) is tax-free (Sparerpauschbetrag)
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Calculate Button */}
-          <button
-            onClick={handleCalculate}
-            className="w-full px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl hover:from-red-700 hover:to-red-800 transition-all duration-300 font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105"
-          >
-            Calculate Tax
-          </button>
-
-          {/* View Mode Toggle - Only show after calculation */}
-          {showResults && (
-            <div className="bg-gradient-to-br from-slate-50 to-white p-6 rounded-xl border-2 border-slate-200">
-              <label className="text-sm font-semibold text-slate-700 mb-3 block">View Mode</label>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  onClick={() => setViewMode('annual')}
-                  className={`px-4 py-3 rounded-lg font-semibold transition-all ${
-                    viewMode === 'annual'
-                      ? 'bg-primary text-white shadow-lg'
-                      : 'bg-white border-2 border-slate-200 text-slate-600 hover:border-slate-300'
-                  }`}
-                >
-                  📅 Annual
-                </button>
-                <button
-                  onClick={() => setViewMode('monthly')}
-                  className={`px-4 py-3 rounded-lg font-semibold transition-all ${
-                    viewMode === 'monthly'
-                      ? 'bg-primary text-white shadow-lg'
-                      : 'bg-white border-2 border-slate-200 text-slate-600 hover:border-slate-300'
-                  }`}
-                >
-                  💶 Monthly
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Results Column */}
-        <div className="lg:col-span-3 space-y-4">
-          {!showResults ? (
-            /* Placeholder before calculation */
-            <div className="bg-white rounded-2xl p-12 border-2 border-slate-200 text-center">
-              <div className="text-6xl mb-4">🇩🇪</div>
-              <h3 className="text-2xl font-bold text-secondary mb-2">Ready to calculate your taxes?</h3>
-              <p className="text-slate-600">Fill in your details and click "Calculate Tax" to see your breakdown</p>
-              {filingStatus === 'married' && (
-                <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800">
-                  💑 Couple mode active - Enter both partners' incomes for accurate calculation
-                </div>
-              )}
-            </div>
-          ) : (
-            <>
-              {/* Results content here - keep existing results display */}
-              {/* ... existing results sections ... */}
-            </>
-          )}
-        </div>
-      </div>
-    </CalculatorCard>
-  );
-}
 
         {/* Active Calculator */}
         {activeCalculator && (
@@ -759,6 +397,8 @@ function GermanCapitalGainsTaxCalculator() {
     </CalculatorCard>
   );
 }
+
+
 function GermanIncomeTaxCalculator() {
   const currentYear = new Date().getFullYear();
   const [filingStatus, setFilingStatus] = useState<'single' | 'married'>('single');
@@ -815,20 +455,17 @@ function GermanIncomeTaxCalculator() {
 
   // Calculate capital gains tax (Abgeltungsteuer)
   const capitalGainsTaxRate = 0.26375; // 25% + 5.5% Soli
-  const capitalGainsTax = capitalGains * capitalGainsTaxRate;
+  const sparerpauschbetrag = filingStatus === 'married' ? 2000 : 1000;
+  const taxableCapitalGains = Math.max(0, capitalGains - sparerpauschbetrag);
+  const capitalGainsTax = taxableCapitalGains * capitalGainsTaxRate;
   const capitalGainsNet = capitalGains - capitalGainsTax;
 
   const taxResult = showResults ? calculateGermanTax({
-    grossIncome,
-    grossIncome2: filingStatus === 'married' ? grossIncomePartner2 : undefined,
-    capitalGains,
+    grossIncome: filingStatus === 'married' ? grossIncome + grossIncomePartner2 : grossIncome,
     filingStatus,
     numberOfChildren,
     includeChurchTax,
     age,
-    churchTaxRate: includeChurchTax ? churchTaxRates[bundesland] : 0,
-    taxClassPartner1: filingStatus === 'single' ? taxClassPartner1 : taxClassPartner1,
-    taxClassPartner2: filingStatus === 'married' ? taxClassPartner2 : undefined,
   }) : null;
 
   const monthly = taxResult ? getMonthlyBreakdown(taxResult) : null;
@@ -1051,7 +688,7 @@ function GermanIncomeTaxCalculator() {
                     After-tax: €{capitalGainsNet.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                   </div>
                   <div className="text-xs text-amber-700 mt-2">
-                    Note: First €1,000 (€2,000 for couples) is tax-free (Sparerpauschbetrag)
+                    Note: First €{sparerpauschbetrag.toLocaleString()} is tax-free (Sparerpauschbetrag)
                   </div>
                 </div>
               )}
@@ -1112,8 +749,119 @@ function GermanIncomeTaxCalculator() {
             </div>
           ) : (
             <>
-              {/* Results content here - keep existing results display */}
-              {/* ... existing results sections ... */}
+              {/* Main Result Card */}
+              <div className="bg-gradient-to-br from-red-600 to-red-800 rounded-2xl p-8 text-white shadow-2xl">
+                <div className="text-sm opacity-90 mb-2 font-semibold">{isMonthly ? 'Monthly' : 'Annual'} Net Income</div>
+                <div className="text-6xl font-bold mb-6" style={{ fontFamily: "'Crimson Pro', serif" }}>
+                  €{(isMonthly ? monthly!.netIncome : taxResult!.netIncome).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-3 bg-white/10 rounded-lg backdrop-blur">
+                    <div className="text-xs opacity-90 mb-1">Effective Tax Rate</div>
+                    <div className="text-2xl font-bold">{taxResult!.effectiveTaxRate.toFixed(1)}%</div>
+                  </div>
+                  <div className="p-3 bg-white/10 rounded-lg backdrop-blur">
+                    <div className="text-xs opacity-90 mb-1">Marginal Tax Rate</div>
+                    <div className="text-2xl font-bold">{taxResult!.marginalTaxRate.toFixed(0)}%</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tax Breakdown */}
+              <div className="bg-white rounded-xl p-6 border-2 border-slate-200">
+                <h4 className="font-bold text-secondary mb-4">💶 Tax Breakdown</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between py-2 border-b border-slate-100">
+                    <span className="text-slate-600">Gross Income:</span>
+                    <span className="font-bold text-secondary">€{(isMonthly ? monthly!.grossIncome : taxResult!.grossIncome).toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-slate-100">
+                    <span className="text-slate-600">- Income Tax:</span>
+                    <span className="font-semibold text-red-600">€{(isMonthly ? monthly!.incomeTax : taxResult!.incomeTax).toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-slate-100">
+                    <span className="text-slate-600">- Solidarity Tax:</span>
+                    <span className="font-semibold text-red-600">€{(isMonthly ? monthly!.solidarityTax : taxResult!.solidarityTax).toLocaleString()}</span>
+                  </div>
+                  {includeChurchTax && (
+                    <div className="flex justify-between py-2 border-b border-slate-100">
+                      <span className="text-slate-600">- Church Tax:</span>
+                      <span className="font-semibold text-red-600">€{(isMonthly ? monthly!.churchTax : taxResult!.churchTax).toLocaleString()}</span>
+                    </div>
+                  )}
+                  {capitalGains > 0 && (
+                    <div className="flex justify-between py-2 border-b border-slate-100">
+                      <span className="text-slate-600">- Capital Gains Tax:</span>
+                      <span className="font-semibold text-red-600">€{(isMonthly ? (capitalGainsTax/12) : capitalGainsTax).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between py-2 border-b border-slate-100 font-bold">
+                    <span className="text-slate-700">Total Tax:</span>
+                    <span className="text-red-600">€{(isMonthly ? monthly!.totalTax : taxResult!.totalTax).toLocaleString()}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Social Security Breakdown */}
+              <div className="bg-white rounded-xl p-6 border-2 border-slate-200">
+                <h4 className="font-bold text-secondary mb-4">🏥 Social Security Contributions</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between py-2">
+                    <span className="text-slate-600">Pension Insurance (9.3%):</span>
+                    <span className="font-semibold">€{(isMonthly ? monthly!.pensionInsurance : taxResult!.pensionInsurance).toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between py-2">
+                    <span className="text-slate-600">Health Insurance (~9%):</span>
+                    <span className="font-semibold">€{(isMonthly ? monthly!.healthInsurance : taxResult!.healthInsurance).toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between py-2">
+                    <span className="text-slate-600">Unemployment (1.3%):</span>
+                    <span className="font-semibold">€{(isMonthly ? monthly!.unemploymentInsurance : taxResult!.unemploymentInsurance).toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between py-2">
+                    <span className="text-slate-600">Long-term Care (~{numberOfChildren === 0 && age >= 23 ? '2.0' : '1.8'}%):</span>
+                    <span className="font-semibold">€{(isMonthly ? monthly!.longTermCare : taxResult!.longTermCare).toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-t border-slate-200 font-bold pt-3">
+                    <span className="text-slate-700">Total Social Security:</span>
+                    <span className="text-secondary">€{(isMonthly ? monthly!.totalSocialSecurity : taxResult!.totalSocialSecurity).toLocaleString()}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tax Allowances & Benefits */}
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="bg-emerald-50 rounded-xl p-5 border-2 border-emerald-200">
+                  <div className="text-xs text-emerald-800 mb-1 font-semibold">Grundfreibetrag</div>
+                  <div className="text-2xl font-bold text-emerald-700">€{taxResult!.grundfreibetrag.toLocaleString()}</div>
+                  <div className="text-xs text-emerald-600 mt-1">Tax-free allowance</div>
+                </div>
+                {numberOfChildren > 0 && (
+                  <div className="bg-blue-50 rounded-xl p-5 border-2 border-blue-200">
+                    <div className="text-xs text-blue-800 mb-1 font-semibold">Kindergeld ({numberOfChildren} {numberOfChildren === 1 ? 'child' : 'children'})</div>
+                    <div className="text-2xl font-bold text-blue-700">€{(isMonthly ? kindergeldMonthly : kindergeldAnnual).toLocaleString()}</div>
+                    <div className="text-xs text-blue-600 mt-1">{isMonthly ? 'Monthly' : 'Annual'} child benefit</div>
+                  </div>
+                )}
+              </div>
+
+              {/* Tax Zones Breakdown */}
+              <div className="bg-white rounded-xl p-6 border-2 border-slate-200">
+                <h4 className="font-bold text-secondary mb-4">📊 Progressive Tax Zones</h4>
+                <div className="space-y-3">
+                  {taxResult!.taxZones.map((zone) => (
+                    <div key={zone.zone} className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                      <div>
+                        <div className="font-semibold text-sm text-secondary">{zone.name}</div>
+                        <div className="text-xs text-slate-600">{zone.range} • {zone.rate}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold text-secondary">€{zone.taxAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </>
           )}
         </div>
@@ -1121,6 +869,7 @@ function GermanIncomeTaxCalculator() {
     </CalculatorCard>
   );
 }
+
 
 function DebtPayoffCalculator() {
   const [debt, setDebt] = useState(20000);
