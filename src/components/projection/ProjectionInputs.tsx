@@ -1,6 +1,24 @@
 import { useState } from "react"
-import { ProjectionInput } from "../../types/projection"
 import { calculateProjection } from "../../calculations/projection"
+
+interface ProjectionInput {
+  years: number;
+  isCouple: boolean;
+  age1: number;
+  age2?: number;
+  income1: number;
+  income2?: number;
+  bonusIncome?: number;
+  otherIncome?: number;
+  initialInvestment: number;
+  monthlyInvestment: number;
+  investmentReturn: number;
+  incomeGrowth?: number;
+  monthlyExpenses: number;
+  expenseGrowth: number;
+  currentDebt?: number;
+  monthlyDebtPayment?: number;
+}
 
 type Props = {
   onCalculate: (result: any) => void
@@ -19,8 +37,8 @@ export default function ProjectionInputs({ onCalculate }: Props) {
     income1: 60000,
     income2: 50000,
 
-    bonusIncome: undefined as any,
-    otherIncome: undefined as any,
+    bonusIncome: undefined,
+    otherIncome: undefined,
 
     initialInvestment: 20000,
     monthlyInvestment: 1000,
@@ -29,12 +47,12 @@ export default function ProjectionInputs({ onCalculate }: Props) {
     monthlyExpenses: 2500,
     expenseGrowth: 0.02,
 
-    currentDebt: undefined as any,
-    monthlyDebtPayment: undefined as any,
+    currentDebt: undefined,
+    monthlyDebtPayment: undefined,
   })
 
   function update<K extends keyof ProjectionInput>(key: K, value: ProjectionInput[K]) {
-    setForm(prev => ({ ...prev, [key]: value }))
+    setForm((prev: ProjectionInput) => ({ ...prev, [key]: value }))
   }
 
   function handleCalculate() {
