@@ -68,6 +68,17 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-teal-50 flex items-center justify-center px-6">
+      {/* Back to Home Button */}
+      <button
+        onClick={() => navigate('/')}
+        className="fixed top-6 left-6 flex items-center gap-2 text-primary hover:text-teal-800 font-semibold transition-all hover:gap-3 z-50"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Back to Home
+      </button>
+      
       <div className="max-w-md w-full">
         {/* Logo & Header */}
         <div className="text-center mb-8">
