@@ -1,4 +1,5 @@
-import { useAuth } from '../context/AuthContext';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Line, Doughnut, Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -31,6 +32,7 @@ ChartJS.register(
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().toLocaleDateString('en-US', { month: 'long' });
 
@@ -224,9 +226,10 @@ export default function Dashboard() {
           </div>
 
           {/* Asset Allocation */}
-          <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-lg">
-            <h3 className="text-xl font-bold text-secondary mb-4" style={{ fontFamily: "'Crimson Pro', serif" }}>
+          <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-lg hover:shadow-xl transition-shadow cursor-pointer" onClick={() => navigate('/investments')}>
+            <h3 className="text-xl font-bold text-secondary mb-4 flex items-center justify-between" style={{ fontFamily: "'Crimson Pro', serif" }}>
               Asset Allocation
+              <span className="text-sm font-normal text-slate-500">Click to manage →</span>
             </h3>
             <div className="h-64 flex items-center justify-center">
               <Doughnut
