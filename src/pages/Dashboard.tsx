@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Line, Doughnut, Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -204,7 +204,7 @@ export default function Dashboard() {
                       backgroundColor: 'rgba(15, 23, 42, 0.9)',
                       padding: 12,
                       callbacks: {
-                        label: (context) => '€' + context.parsed.y.toLocaleString()
+                        label: (context) => '€' + (context.parsed.y || 0).toLocaleString()
                       }
                     }
                   },
@@ -278,7 +278,7 @@ export default function Dashboard() {
                     legend: { position: 'top' },
                     tooltip: {
                       callbacks: {
-                        label: (context) => context.dataset.label + ': €' + context.parsed.y.toLocaleString()
+                        label: (context) => context.dataset.label + ': €' + (context.parsed.y || 0).toLocaleString()
                       }
                     }
                   },

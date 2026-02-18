@@ -1,12 +1,9 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import SidebarLayout from "../components/SidebarLayout";
 import ProjectionInputs from "../components/projection/ProjectionInputs";
 import WealthProjectionChart from "../components/charts/WealthProjectionChart";
-import { calculateProjection } from "../calculations/projection";
 
 export default function ProjectionPage() {
-  const navigate = useNavigate();
   const [result, setResult] = useState<any>(null);
   const [showResults, setShowResults] = useState(false);
 

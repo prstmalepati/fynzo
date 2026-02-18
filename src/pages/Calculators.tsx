@@ -1,10 +1,8 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import SidebarLayout from '../components/SidebarLayout';
 import { calculateGermanTax, getMonthlyBreakdown } from '../calculations/germanTax';
 
 export default function Calculators() {
-  const navigate = useNavigate();
   const [activeCalculator, setActiveCalculator] = useState<string | null>(null);
 
   return (
@@ -419,7 +417,6 @@ function GermanIncomeTaxCalculator() {
 
   const monthly = getMonthlyBreakdown(taxResult);
   const isMonthly = viewMode === 'monthly';
-  const display = isMonthly ? monthly : taxResult;
 
   return (
     <CalculatorCard title={`German Income Tax Calculator ${currentYear}`}>
