@@ -75,7 +75,7 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
             </div>
             {sidebarOpen && (
               <span className="text-2xl font-bold text-secondary" style={{ fontFamily: "'Crimson Pro', serif" }}>
-                fynzo
+                myfynzo
               </span>
             )}
           </Link>
