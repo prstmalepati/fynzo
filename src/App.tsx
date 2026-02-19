@@ -2,6 +2,8 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { CurrencyProvider } from "./context/CurrencyContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import LifestyleBasket from './pages/LifestyleBasket';
+import AntiPortfolio from './pages/AntiPortfolio';
 
 // Public pages
 import LandingPageExtended from './pages/LandingPageExtended';
@@ -65,41 +67,14 @@ export default function App() {
           <Route path="/projection" element={<ProjectionPage />} />
 
           {/* Protected routes - Login required */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          
-          <Route
-            path="/investments"
-            element={
-              <ProtectedRoute>
-                <Investments />
-              </ProtectedRoute>
-            }
-          />
-          
-          <Route
-            path="/calculators"
-            element={
-              <ProtectedRoute>
-                <Calculators />
-              </ProtectedRoute>
-            }
-          />
-          
-          <Route
-            path="/settings"
-            element={
-              <ProtectedRoute>
-                <Settings />
-              </ProtectedRoute>
-            }
-          />
+      // Protected routes
+		<Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+		<Route path="/investments" element={<ProtectedRoute><Investments /></ProtectedRoute>} />
+		<Route path="/lifestyle-basket" element={<ProtectedRoute><LifestyleBasket /></ProtectedRoute>} />
+		<Route path="/projection" element={<ProtectedRoute><ProjectionPage /></ProtectedRoute>} />
+		<Route path="/calculators" element={<ProtectedRoute><Calculators /></ProtectedRoute>} />
+		<Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+		<Route path="/anti-portfolio" element={<ProtectedRoute><AntiPortfolio /></ProtectedRoute>} />
 
           {/* Catch all - redirect to landing page */}
           <Route path="*" element={<Navigate to="/" replace />} />
