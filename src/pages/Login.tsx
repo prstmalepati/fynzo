@@ -56,7 +56,7 @@ export default function Login() {
         {/* Logo */}
         <div className="text-center mb-8">
           <h1 className="text-5xl font-bold text-secondary mb-2" style={{ fontFamily: "'Crimson Pro', serif" }}>
-            MyFynzo
+            myfynzo
           </h1>
           <p className="text-slate-600">Your Wealth Management Platform</p>
         </div>
@@ -156,11 +156,6 @@ export default function Login() {
               {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
             </button>
           </div>
-        </div>
-
-        {/* Demo Credentials (Remove in production) */}
-        <div className="mt-6 text-center text-xs text-slate-500">
-          <p>Demo: test@example.com / password123</p>
         </div>
       </div>
 
