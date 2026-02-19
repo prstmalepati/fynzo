@@ -35,7 +35,7 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
         {/* Logo */}
         <div className="p-6 border-b border-slate-200">
           <h1 className="text-2xl font-bold text-primary" style={{ fontFamily: "'Crimson Pro', serif" }}>
-            MyFynzo
+            myfynzo
           </h1>
           <p className="text-xs text-slate-500 mt-1">Wealth Management</p>
         </div>
