@@ -1,224 +1,166 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { signInWithGoogle, signInWithMicrosoft, signInWithApple, sendPhoneVerification, verifyPhoneCode } from '../firebase/auth';
-import { ConfirmationResult } from 'firebase/auth';
+import { auth } from '../firebase/config';
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup
+} from 'firebase/auth';
 
 export default function Login() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [verificationCode, setVerificationCode] = useState('');
-  const [showPhoneInput, setShowPhoneInput] = useState(false);
-  const [confirmation, setConfirmation] = useState<ConfirmationResult | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSocialLogin = async (provider: 'google' | 'microsoft' | 'apple') => {
-    setLoading(true);
+  const handleEmailAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
     setError('');
+    setLoading(true);
 
-    let result;
-    if (provider === 'google') {
-      result = await signInWithGoogle();
-    } else if (provider === 'microsoft') {
-      result = await signInWithMicrosoft();
-    } else {
-      result = await signInWithApple();
-    }
-
-    setLoading(false);
-
-    if (result.error) {
-      setError(result.error);
-    } else {
+    try {
+      if (isSignUp) {
+        await createUserWithEmailAndPassword(auth, email, password);
+      } else {
+        await signInWithEmailAndPassword(auth, email, password);
+      }
       navigate('/dashboard');
+    } catch (err: any) {
+      setError(err.message || 'Authentication failed');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleSendCode = async () => {
-    setLoading(true);
+  const handleGoogleSignIn = async () => {
     setError('');
-
-    const result = await sendPhoneVerification(phoneNumber, 'recaptcha-container');
-    
-    setLoading(false);
-
-    if (result.error) {
-      setError(result.error);
-    } else if (result.confirmation) {
-      setConfirmation(result.confirmation);
-    }
-  };
-
-  const handleVerifyCode = async () => {
-    if (!confirmation) return;
-
     setLoading(true);
-    setError('');
 
-    const result = await verifyPhoneCode(confirmation, verificationCode);
-    
-    setLoading(false);
-
-    if (result.error) {
-      setError(result.error);
-    } else {
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
       navigate('/dashboard');
+    } catch (err: any) {
+      setError(err.message || 'Google sign in failed');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-teal-50 flex items-center justify-center px-6">
-      {/* Back to Home Button */}
-      <button
-        onClick={() => navigate('/')}
-        className="fixed top-6 left-6 flex items-center gap-2 text-primary hover:text-teal-800 font-semibold transition-all hover:gap-3 z-50"
-      >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-        </svg>
-        Back to Home
-      </button>
-      
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50 to-slate-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
-        {/* Logo & Header */}
+        {/* Logo */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-br from-primary to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl">
-            <span className="text-white font-bold text-3xl">f</span>
-          </div>
-          <h1 className="text-4xl font-bold text-secondary mb-2" style={{ fontFamily: "'Crimson Pro', serif" }}>
-            Welcome to myfynzo
+          <h1 className="text-5xl font-bold text-secondary mb-2" style={{ fontFamily: "'Crimson Pro', serif" }}>
+            MyFynzo
           </h1>
-          <p className="text-slate-600" style={{ fontFamily: "'Manrope', sans-serif" }}>
-            Sign in to start planning your financial future
-          </p>
+          <p className="text-slate-600">Your Wealth Management Platform</p>
         </div>
 
         {/* Login Card */}
-        <div className="bg-white rounded-2xl shadow-2xl p-8 border border-slate-200">
+        <div className="bg-white rounded-2xl shadow-2xl p-8 border-2 border-slate-200">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-secondary mb-2">
+              {isSignUp ? 'Create Account' : 'Welcome Back'}
+            </h2>
+            <p className="text-slate-600 text-sm">
+              {isSignUp ? 'Start your FIRE journey today' : 'Sign in to continue'}
+            </p>
+          </div>
+
+          {/* Error Message */}
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-800 text-sm">
+            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
               {error}
             </div>
           )}
 
-          {/* Social Login Buttons */}
-          <div className="space-y-3">
-            {/* Google */}
-            <button
-              onClick={() => handleSocialLogin('google')}
-              disabled={loading}
-              className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-white border-2 border-slate-200 rounded-xl hover:border-slate-300 hover:shadow-md transition-all font-semibold text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 24 24">
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-              </svg>
-              Continue with Google
-            </button>
+          {/* Email/Password Form */}
+          <form onSubmit={handleEmailAuth} className="space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                placeholder="you@example.com"
+              />
+            </div>
 
-            {/* Microsoft */}
-            <button
-              onClick={() => handleSocialLogin('microsoft')}
-              disabled={loading}
-              className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-white border-2 border-slate-200 rounded-xl hover:border-slate-300 hover:shadow-md transition-all font-semibold text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 23 23">
-                <path fill="#f35325" d="M0 0h11v11H0z"/>
-                <path fill="#81bc06" d="M12 0h11v11H12z"/>
-                <path fill="#05a6f0" d="M0 12h11v11H0z"/>
-                <path fill="#ffba08" d="M12 12h11v11H12z"/>
-              </svg>
-              Continue with Microsoft
-            </button>
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Password
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
+                className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                placeholder="••••••••"
+              />
+            </div>
 
-            {/* Apple */}
             <button
-              onClick={() => handleSocialLogin('apple')}
+              type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-black text-white rounded-xl hover:bg-slate-800 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-4 bg-gradient-to-r from-primary to-teal-600 text-white rounded-xl font-bold hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
-              </svg>
-              Continue with Apple
+              {loading ? 'Please wait...' : (isSignUp ? 'Sign Up' : 'Sign In')}
             </button>
+          </form>
 
-            {/* Phone Number */}
-            <button
-              onClick={() => setShowPhoneInput(!showPhoneInput)}
-              className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-primary text-white rounded-xl hover:bg-teal-700 transition-all font-semibold"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-              </svg>
-              Continue with Phone
-            </button>
+          {/* Divider */}
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-slate-200"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-white text-slate-500">or</span>
+            </div>
           </div>
 
-          {/* Phone Input Section */}
-          {showPhoneInput && (
-            <div className="mt-6 pt-6 border-t border-slate-200 space-y-4">
-              {!confirmation ? (
-                <>
-                  <div>
-                    <label className="text-sm font-semibold text-slate-700 mb-2 block">
-                      Phone Number
-                    </label>
-                    <input
-                      type="tel"
-                      value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(e.target.value)}
-                      placeholder="+49 123 456 7890"
-                      className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all"
-                    />
-                    <p className="text-xs text-slate-500 mt-2">
-                      Include country code (e.g., +49 for Germany)
-                    </p>
-                  </div>
-                  <button
-                    onClick={handleSendCode}
-                    disabled={loading || !phoneNumber}
-                    className="w-full px-6 py-3 bg-primary text-white rounded-xl hover:bg-teal-700 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {loading ? 'Sending...' : 'Send Verification Code'}
-                  </button>
-                  <div id="recaptcha-container"></div>
-                </>
-              ) : (
-                <>
-                  <div>
-                    <label className="text-sm font-semibold text-slate-700 mb-2 block">
-                      Verification Code
-                    </label>
-                    <input
-                      type="text"
-                      value={verificationCode}
-                      onChange={(e) => setVerificationCode(e.target.value)}
-                      placeholder="123456"
-                      className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all"
-                    />
-                    <p className="text-xs text-slate-500 mt-2">
-                      Enter the 6-digit code sent to {phoneNumber}
-                    </p>
-                  </div>
-                  <button
-                    onClick={handleVerifyCode}
-                    disabled={loading || !verificationCode}
-                    className="w-full px-6 py-3 bg-primary text-white rounded-xl hover:bg-teal-700 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {loading ? 'Verifying...' : 'Verify & Sign In'}
-                  </button>
-                </>
-              )}
-            </div>
-          )}
+          {/* Google Sign In */}
+          <button
+            onClick={handleGoogleSignIn}
+            disabled={loading}
+            className="w-full py-4 border-2 border-slate-200 rounded-xl font-semibold text-slate-700 hover:bg-slate-50 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Continue with Google
+          </button>
 
-          {/* Terms */}
-          <p className="text-xs text-slate-500 text-center mt-6">
-            By continuing, you agree to Fynzo's Terms of Service and Privacy Policy
-          </p>
+          {/* Toggle Sign Up/Sign In */}
+          <div className="mt-6 text-center">
+            <button
+              onClick={() => {
+                setIsSignUp(!isSignUp);
+                setError('');
+              }}
+              className="text-sm text-primary hover:text-teal-700 font-semibold"
+            >
+              {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
+            </button>
+          </div>
+        </div>
+
+        {/* Demo Credentials (Remove in production) */}
+        <div className="mt-6 text-center text-xs text-slate-500">
+          <p>Demo: test@example.com / password123</p>
         </div>
       </div>
 
