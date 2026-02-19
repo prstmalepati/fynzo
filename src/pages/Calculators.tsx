@@ -1,1352 +1,750 @@
 import { useState } from 'react';
+import { useCurrency } from '../context/CurrencyContext';
 import SidebarLayout from '../components/SidebarLayout';
-import { calculateGermanTax, getMonthlyBreakdown } from '../calculations/germanTax';
+import { calculateGermanTax } from '../calculations/germanTax';
 
 export default function Calculators() {
-  const [activeCalculator, setActiveCalculator] = useState<string | null>(null);
+  const { formatAmount, formatCompact, currency } = useCurrency();
+  const [activeCalculator, setActiveCalculator] = useState('fire');
 
   return (
     <SidebarLayout>
-      <div className="p-8">
+      <div className="p-8 max-w-7xl mx-auto">
+        {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-secondary mb-2" style={{ fontFamily: "'Crimson Pro', serif" }}>
             Financial Calculators
           </h1>
-          <p className="text-slate-600" style={{ fontFamily: "'Manrope', sans-serif" }}>
-            Advanced tools for comprehensive financial planning
+          <p className="text-slate-600">
+            Tools to plan your financial future
           </p>
         </div>
-        {/* Calculator Grid */}
-        {!activeCalculator && (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {calculators.map((calc) => (
-              <button
-                key={calc.id}
-                onClick={() => setActiveCalculator(calc.id)}
-                className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:scale-105 transition-all duration-300 text-left group"
-              >
-                <div className={`w-14 h-14 ${calc.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                  {calc.icon}
-                </div>
-                <h3 className="text-2xl font-bold text-secondary mb-2" style={{ fontFamily: "'Crimson Pro', serif" }}>
-                  {calc.title}
-                </h3>
-                <p className="text-slate-600 text-sm leading-relaxed">
-                  {calc.description}
-                </p>
-              </button>
-            ))}
-          </div>
-        )}
 
-        {/* Active Calculator */}
-        {activeCalculator && (
-          <div>
+        {/* Calculator Tabs */}
+        <div className="mb-8 flex flex-wrap gap-3">
+          {[
+            { id: 'fire', label: '🔥 FIRE Calculator', color: 'orange' },
+            { id: 'compound', label: '📈 Compound Interest', color: 'blue' },
+            { id: 'tax', label: '🇩🇪 German Tax', color: 'red' },
+            { id: 'retirement', label: '👴 Retirement', color: 'purple' },
+            { id: 'debt', label: '💳 Debt Payoff', color: 'green' }
+          ].map(calc => (
             <button
-              onClick={() => setActiveCalculator(null)}
-              className="mb-6 flex items-center gap-2 text-primary hover:text-teal-800 font-medium"
+              key={calc.id}
+              onClick={() => setActiveCalculator(calc.id)}
+              className={`px-6 py-3 rounded-xl font-semibold transition-all ${
+                activeCalculator === calc.id
+                  ? 'bg-primary text-white shadow-lg scale-105'
+                  : 'bg-white border-2 border-slate-200 text-slate-700 hover:border-primary'
+              }`}
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-              Back to all calculators
+              {calc.label}
             </button>
+          ))}
+        </div>
 
-            {activeCalculator === 'compound-interest' && <CompoundInterestCalculator />}
-            {activeCalculator === 'retirement' && <RetirementCalculator />}
-            {activeCalculator === 'savings-rate' && <SavingsRateCalculator />}
-            {activeCalculator === 'rule-72' && <Rule72Calculator />}
-            {activeCalculator === 'tax-capital-gains' && <GermanCapitalGainsTaxCalculator />}
-            {activeCalculator === 'tax-income-germany' && <GermanIncomeTaxCalculator />}
-            {activeCalculator === 'debt-payoff' && <DebtPayoffCalculator />}
-	    {activeCalculator === 'fire' && <FireCalculator />}
-          </div>
-        )}
+        {/* Calculator Content */}
+        {activeCalculator === 'fire' && <FIRECalculator formatAmount={formatAmount} formatCompact={formatCompact} currency={currency} />}
+        {activeCalculator === 'compound' && <CompoundInterestCalculator formatAmount={formatAmount} formatCompact={formatCompact} currency={currency} />}
+        {activeCalculator === 'tax' && <GermanTaxCalculator formatAmount={formatAmount} />}
+        {activeCalculator === 'retirement' && <RetirementCalculator formatAmount={formatAmount} formatCompact={formatCompact} currency={currency} />}
+        {activeCalculator === 'debt' && <DebtPayoffCalculator formatAmount={formatAmount} currency={currency} />}
+
+        {/* Google Fonts */}
+        <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap');
+        `}</style>
       </div>
-
-      {/* Google Fonts */}
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap');
-      `}</style>
     </SidebarLayout>
   );
 }
 
-// Calculator Definitions
-const calculators = [
-  {
-    id: 'compound-interest',
-    title: 'Compound Interest',
-    description: 'See how your investments grow exponentially over time with compound returns.',
-    color: 'bg-blue-100',
-    icon: (
-      <svg className="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-      </svg>
-    )
-  },
-  {
-    id: 'retirement',
-    title: 'Retirement Savings',
-    description: 'Calculate how much you need to save monthly to reach your retirement goals.',
-    color: 'bg-emerald-100',
-    icon: (
-      <svg className="w-7 h-7 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    )
-  },
-  {
-    id: 'savings-rate',
-    title: 'Savings Rate',
-    description: 'Discover what percentage of your income you\'re saving and how it affects your FIRE timeline.',
-    color: 'bg-purple-100',
-    icon: (
-      <svg className="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-      </svg>
-    )
-  },
-  {
-    id: 'rule-72',
-    title: 'Rule of 72',
-    description: 'Quickly estimate how long it takes for your money to double at different interest rates.',
-    color: 'bg-amber-100',
-    icon: (
-      <svg className="w-7 h-7 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    )
-  },
-  {
-    id: 'tax-capital-gains',
-    title: 'German Capital Gains',
-    description: 'Calculate your after-tax returns on investments in Germany (26.375% Abgeltungsteuer).',
-    color: 'bg-orange-100',
-    icon: (
-      <svg className="w-7 h-7 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
-      </svg>
-    )
-  },
-  {
-    id: 'tax-income-germany',
-    title: 'German Income Tax',
-    description: 'Comprehensive German income tax calculator with Grundfreibetrag, Kindergeld, progressive zones, and social security.',
-    color: 'bg-red-100',
-    icon: (
-      <svg className="w-7 h-7 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-      </svg>
-    )
-  },
-  {
-    id: 'debt-payoff',
-    title: 'Debt Payoff',
-    description: 'Create a plan to eliminate debt and see how extra payments shorten your timeline.',
-    color: 'bg-teal-100',
-    icon: (
-      <svg className="w-7 h-7 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-      </svg>
-    )
-  },
-{
-  id: 'fire',
-  title: 'FIRE Calculator',
-  description: 'Calculate your Financial Independence number. Choose from Lean, Fat, Barista, or Coast FIRE.',
-  color: 'bg-teal-100',
-  icon: (
-    <svg className="w-7 h-7 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" />
-    </svg>
-  )
-}
-];
-
-// Individual Calculator Components
-function CompoundInterestCalculator() {
-  const [initial, setInitial] = useState(10000);
-  const [monthly, setMonthly] = useState(500);
-  const [rate, setRate] = useState(7);
-  const [years, setYears] = useState(30);
-
-  const finalAmount = initial * Math.pow(1 + rate / 100, years) + 
-                      monthly * 12 * ((Math.pow(1 + rate / 100, years) - 1) / (rate / 100));
-
-  return (
-    <CalculatorCard title="Compound Interest Calculator">
-      <div className="grid lg:grid-cols-5 gap-8">
-        {/* Input Column - Takes 2 columns */}
-        <div className="lg:col-span-2 space-y-5">
-          <div className="bg-gradient-to-br from-slate-50 to-white p-6 rounded-xl border-2 border-slate-200">
-            <h4 className="font-bold text-secondary mb-4 flex items-center gap-2">
-              <span className="text-xl">💰</span> Investment Details
-            </h4>
-            <div className="space-y-4">
-              <Input label="Initial Investment (€)" value={initial} onChange={setInitial} />
-              <Input label="Monthly Contribution (€)" value={monthly} onChange={setMonthly} />
-              <Input label="Annual Return (%)" value={rate} onChange={setRate} step={0.1} />
-              <Input label="Years" value={years} onChange={setYears} />
-            </div>
-          </div>
-        </div>
-
-        {/* Results Column - Takes 3 columns */}
-        <div className="lg:col-span-3 space-y-4">
-          <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl p-8 text-white shadow-2xl">
-            <div className="text-sm opacity-90 mb-2 font-semibold">Future Value</div>
-            <div className="text-6xl font-bold mb-6" style={{ fontFamily: "'Crimson Pro', serif" }}>
-              €{finalAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-            </div>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center p-3 bg-white/10 rounded-lg backdrop-blur">
-                <span className="opacity-90">Total Contributions:</span>
-                <span className="font-bold text-lg">€{(initial + monthly * 12 * years).toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between items-center p-3 bg-white/10 rounded-lg backdrop-blur">
-                <span className="opacity-90">Investment Gains:</span>
-                <span className="font-bold text-lg">€{(finalAmount - initial - monthly * 12 * years).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
-              </div>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white rounded-xl p-5 border-2 border-blue-200">
-              <div className="text-xs text-slate-600 mb-1 font-semibold">Effective Rate</div>
-              <div className="text-2xl font-bold text-blue-600">{((finalAmount / (initial + monthly * 12 * years) - 1) * 100).toFixed(1)}%</div>
-            </div>
-            <div className="bg-white rounded-xl p-5 border-2 border-blue-200">
-              <div className="text-xs text-slate-600 mb-1 font-semibold">Gain Multiple</div>
-              <div className="text-2xl font-bold text-blue-600">{(finalAmount / (initial + monthly * 12 * years)).toFixed(2)}x</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </CalculatorCard>
-  );
-}
-
-function RetirementCalculator() {
-  const [currentAge, setCurrentAge] = useState(30);
-  const [retirementAge, setRetirementAge] = useState(65);
-  const [targetAmount, setTargetAmount] = useState(1000000);
-  const [currentSavings, setCurrentSavings] = useState(50000);
-  const [returnRate, setReturnRate] = useState(7);
-
-  const years = retirementAge - currentAge;
-  const monthlyNeeded = ((targetAmount - currentSavings * Math.pow(1 + returnRate / 100, years)) / 
-                        (12 * ((Math.pow(1 + returnRate / 100, years) - 1) / (returnRate / 100))));
-
-  return (
-    <CalculatorCard title="Retirement Savings Calculator">
-      <div className="grid lg:grid-cols-5 gap-8">
-        {/* Input Column */}
-        <div className="lg:col-span-2 space-y-5">
-          <div className="bg-gradient-to-br from-emerald-50 to-white p-6 rounded-xl border-2 border-emerald-200">
-            <h4 className="font-bold text-secondary mb-4 flex items-center gap-2">
-              <span className="text-xl">🎯</span> Retirement Goals
-            </h4>
-            <div className="space-y-4">
-              <Input label="Current Age" value={currentAge} onChange={setCurrentAge} />
-              <Input label="Retirement Age" value={retirementAge} onChange={setRetirementAge} />
-              <Input label="Target Amount (€)" value={targetAmount} onChange={setTargetAmount} />
-              <Input label="Current Savings (€)" value={currentSavings} onChange={setCurrentSavings} />
-              <Input label="Expected Return (%)" value={returnRate} onChange={setReturnRate} step={0.1} />
-            </div>
-          </div>
-        </div>
-
-        {/* Results Column */}
-        <div className="lg:col-span-3 space-y-4">
-          <div className="bg-gradient-to-br from-emerald-600 to-emerald-800 rounded-2xl p-8 text-white shadow-2xl">
-            <div className="text-sm opacity-90 mb-2 font-semibold">Monthly Savings Needed</div>
-            <div className="text-6xl font-bold mb-6" style={{ fontFamily: "'Crimson Pro', serif" }}>
-              €{monthlyNeeded > 0 ? monthlyNeeded.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '0'}
-            </div>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center p-3 bg-white/10 rounded-lg backdrop-blur">
-                <span className="opacity-90">Years to Retirement:</span>
-                <span className="font-bold text-lg">{years} years</span>
-              </div>
-              <div className="flex justify-between items-center p-3 bg-white/10 rounded-lg backdrop-blur">
-                <span className="opacity-90">Annual Savings:</span>
-                <span className="font-bold text-lg">€{(monthlyNeeded * 12).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
-              </div>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white rounded-xl p-5 border-2 border-emerald-200">
-              <div className="text-xs text-slate-600 mb-1 font-semibold">Total to Save</div>
-              <div className="text-2xl font-bold text-emerald-600">€{(monthlyNeeded * 12 * years).toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
-            </div>
-            <div className="bg-white rounded-xl p-5 border-2 border-emerald-200">
-              <div className="text-xs text-slate-600 mb-1 font-semibold">Savings Rate</div>
-              <div className="text-2xl font-bold text-emerald-600">{((monthlyNeeded * 12 / 60000) * 100).toFixed(0)}%</div>
-              <div className="text-xs text-slate-500 mt-1">of €60K income</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </CalculatorCard>
-  );
-}
-
-function SavingsRateCalculator() {
-  const [income, setIncome] = useState(60000);
-  const [expenses, setExpenses] = useState(36000);
-
-  const savingsRate = ((income - expenses) / income) * 100;
-  const yearsToFire = Math.log(1 / (1 - savingsRate / 100)) / Math.log(1.07); // Assuming 7% return
-
-  return (
-    <CalculatorCard title="Savings Rate Calculator">
-      <div className="grid md:grid-cols-2 gap-8">
-        <div className="space-y-6">
-          <Input label="Annual Income (€)" value={income} onChange={setIncome} />
-          <Input label="Annual Expenses (€)" value={expenses} onChange={setExpenses} />
-        </div>
-        <div className="space-y-6">
-          <div className="bg-gradient-to-br from-purple-600 to-purple-800 rounded-2xl p-8 text-white">
-            <div className="text-sm opacity-90 mb-2">Your Savings Rate</div>
-            <div className="text-5xl font-bold mb-2" style={{ fontFamily: "'Crimson Pro', serif" }}>
-              {savingsRate.toFixed(1)}%
-            </div>
-            <p className="text-sm opacity-90">
-              You save €{(income - expenses).toLocaleString()} per year
-            </p>
-          </div>
-          <div className="bg-white rounded-2xl p-6 border border-slate-200">
-            <div className="text-sm text-slate-600 mb-1">Estimated Years to FIRE</div>
-            <div className="text-3xl font-bold text-secondary" style={{ fontFamily: "'Crimson Pro', serif" }}>
-              {yearsToFire.toFixed(1)} years
-            </div>
-            <p className="text-xs text-slate-500 mt-2">
-              Based on 7% annual return and 4% withdrawal rate
-            </p>
-          </div>
-        </div>
-      </div>
-    </CalculatorCard>
-  );
-}
-
-function Rule72Calculator() {
-  const [rate, setRate] = useState(7);
-
-  const yearsToDouble = 72 / rate;
-
-  return (
-    <CalculatorCard title="Rule of 72 Calculator">
-      <div className="grid md:grid-cols-2 gap-8">
-        <div className="space-y-6">
-          <Input label="Annual Return Rate (%)" value={rate} onChange={setRate} step={0.1} />
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
-            <h4 className="font-semibold text-amber-900 mb-2">What is the Rule of 72?</h4>
-            <p className="text-sm text-amber-800">
-              A quick formula to estimate how long it takes for your money to double. 
-              Simply divide 72 by your expected annual return rate.
-            </p>
-          </div>
-        </div>
-        <div className="bg-gradient-to-br from-amber-500 to-amber-700 rounded-2xl p-8 text-white">
-          <div className="text-sm opacity-90 mb-2">Years to Double Your Money</div>
-          <div className="text-5xl font-bold mb-6" style={{ fontFamily: "'Crimson Pro', serif" }}>
-            {yearsToDouble.toFixed(1)} years
-          </div>
-          <div className="space-y-2 text-sm opacity-90">
-            <p>At {rate}% annual return:</p>
-            <p>• €10,000 → €20,000 in {yearsToDouble.toFixed(1)} years</p>
-            <p>• €50,000 → €100,000 in {yearsToDouble.toFixed(1)} years</p>
-          </div>
-        </div>
-      </div>
-    </CalculatorCard>
-  );
-}
-
-function GermanCapitalGainsTaxCalculator() {
-  const [capitalGain, setCapitalGain] = useState(10000);
-  const TAX_RATE = 0.26375; // German Abgeltungsteuer
-
-  const tax = capitalGain * TAX_RATE;
-  const afterTax = capitalGain - tax;
-
-  return (
-    <CalculatorCard title="German Capital Gains Tax Calculator">
-      <div className="grid md:grid-cols-2 gap-8">
-        <div className="space-y-6">
-          <Input label="Capital Gain (€)" value={capitalGain} onChange={setCapitalGain} />
-          <div className="bg-red-50 border border-red-200 rounded-xl p-6">
-            <h4 className="font-semibold text-red-900 mb-2">German Abgeltungsteuer</h4>
-            <p className="text-sm text-red-800 mb-2">
-              Capital gains in Germany are taxed at a flat rate of 26.375% (25% + 5.5% solidarity surcharge).
-            </p>
-            <p className="text-xs text-red-700">
-              Note: This doesn't include church tax (8-9%) if applicable.
-            </p>
-          </div>
-        </div>
-        <div className="space-y-4">
-          <div className="bg-gradient-to-br from-red-600 to-red-800 rounded-2xl p-8 text-white">
-            <div className="text-sm opacity-90 mb-2">Tax Owed</div>
-            <div className="text-5xl font-bold mb-2" style={{ fontFamily: "'Crimson Pro', serif" }}>
-              €{tax.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-            </div>
-            <p className="text-sm opacity-90">
-              {TAX_RATE * 100}% of €{capitalGain.toLocaleString()}
-            </p>
-          </div>
-          <div className="bg-white rounded-2xl p-6 border border-slate-200">
-            <div className="text-sm text-slate-600 mb-1">After-Tax Gain</div>
-            <div className="text-3xl font-bold text-secondary" style={{ fontFamily: "'Crimson Pro', serif" }}>
-              €{afterTax.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-            </div>
-          </div>
-        </div>
-      </div>
-    </CalculatorCard>
-  );
-}
-
-
-function GermanIncomeTaxCalculator() {
-  const currentYear = new Date().getFullYear();
-  const [filingStatus, setFilingStatus] = useState<'single' | 'married'>('single');
-  const [taxClassPartner1, setTaxClassPartner1] = useState(1);
-  const [taxClassPartner2, setTaxClassPartner2] = useState(4);
-  const [numberOfChildren, setNumberOfChildren] = useState(0);
-  const [includeChurchTax, setIncludeChurchTax] = useState(false);
-  const [bundesland, setBundesland] = useState('Bayern');
-  const [viewMode, setViewMode] = useState<'annual' | 'monthly'>('annual');
-  const [showResults, setShowResults] = useState(false);
-
-  // Income inputs
-  const [grossIncome, setGrossIncome] = useState(60000);
-  const [age, setAge] = useState(30);
-  
-  // Couple-specific inputs
-  const [grossIncomePartner2, setGrossIncomePartner2] = useState(45000);
-  const [agePartner2, setAgePartner2] = useState(28);
-  
-  // Capital gains
-  const [capitalGains, setCapitalGains] = useState(0);
-
-  // Kindergeld constants (2024/2025)
-  const KINDERGELD_PER_CHILD_MONTHLY = 250;
-  const KINDERGELD_PER_CHILD_ANNUAL = KINDERGELD_PER_CHILD_MONTHLY * 12;
-
-  // Church tax rates by Bundesland
-  const churchTaxRates: { [key: string]: number } = {
-    'Baden-Württemberg': 0.08,
-    'Bayern': 0.08,
-    'Berlin': 0.09,
-    'Brandenburg': 0.09,
-    'Bremen': 0.09,
-    'Hamburg': 0.09,
-    'Hessen': 0.09,
-    'Mecklenburg-Vorpommern': 0.09,
-    'Niedersachsen': 0.09,
-    'Nordrhein-Westfalen': 0.09,
-    'Rheinland-Pfalz': 0.09,
-    'Saarland': 0.09,
-    'Sachsen': 0.09,
-    'Sachsen-Anhalt': 0.09,
-    'Schleswig-Holstein': 0.09,
-    'Thüringen': 0.09,
-  };
-
-  const handleCalculate = () => {
-    setShowResults(true);
-  };
-
-  // Calculate Kindergeld automatically
-  const kindergeldAnnual = numberOfChildren * KINDERGELD_PER_CHILD_ANNUAL;
-  const kindergeldMonthly = numberOfChildren * KINDERGELD_PER_CHILD_MONTHLY;
-
-  // Calculate capital gains tax (Abgeltungsteuer)
-  const capitalGainsTaxRate = 0.26375; // 25% + 5.5% Soli
-  const sparerpauschbetrag = filingStatus === 'married' ? 2000 : 1000;
-  const taxableCapitalGains = Math.max(0, capitalGains - sparerpauschbetrag);
-  const capitalGainsTax = taxableCapitalGains * capitalGainsTaxRate;
-  const capitalGainsNet = capitalGains - capitalGainsTax;
-
-  const taxResult = showResults ? calculateGermanTax({
-    grossIncome: filingStatus === 'married' ? grossIncome + grossIncomePartner2 : grossIncome,
-    filingStatus,
-    numberOfChildren,
-    includeChurchTax,
-    age,
-  }) : null;
-
-  const monthly = taxResult ? getMonthlyBreakdown(taxResult) : null;
-  const isMonthly = viewMode === 'monthly';
-
-  return (
-    <CalculatorCard title={`German Income Tax Calculator ${currentYear}`}>
-      <div className="grid lg:grid-cols-5 gap-8">
-        {/* Input Column */}
-        <div className="lg:col-span-2 space-y-5">
-          {/* Filing Status & Tax Classes */}
-          <div className="bg-gradient-to-br from-red-50 to-white p-6 rounded-xl border-2 border-red-200">
-            <h4 className="font-bold text-secondary mb-4 flex items-center gap-2">
-              <span className="text-xl">👥</span> Tax Profile
-            </h4>
-            <div className="space-y-4">
-              {/* Filing Status */}
-              <div>
-                <label className="text-sm font-semibold text-slate-700 mb-2 block">Filing Status</label>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    onClick={() => setFilingStatus('single')}
-                    className={`px-4 py-3 rounded-lg font-semibold transition-all ${
-                      filingStatus === 'single'
-                        ? 'bg-red-600 text-white shadow-lg'
-                        : 'bg-white border-2 border-slate-200 text-slate-600 hover:border-slate-300'
-                    }`}
-                  >
-                    👤 Single
-                  </button>
-                  <button
-                    onClick={() => setFilingStatus('married')}
-                    className={`px-4 py-3 rounded-lg font-semibold transition-all ${
-                      filingStatus === 'married'
-                        ? 'bg-red-600 text-white shadow-lg'
-                        : 'bg-white border-2 border-slate-200 text-slate-600 hover:border-slate-300'
-                    }`}
-                  >
-                    💑 Couple
-                  </button>
-                </div>
-              </div>
-
-              {/* Tax Class for Single */}
-              {filingStatus === 'single' && (
-                <div>
-                  <label className="text-sm font-semibold text-slate-700 mb-2 block">Tax Class (Steuerklasse)</label>
-                  <select
-                    value={taxClassPartner1}
-                    onChange={(e) => setTaxClassPartner1(Number(e.target.value))}
-                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-white font-medium"
-                  >
-                    <option value={1}>Class I - Single, no children</option>
-                    <option value={2}>Class II - Single parent</option>
-                    <option value={6}>Class VI - Second job</option>
-                  </select>
-                </div>
-              )}
-
-              {/* Tax Classes for Couple */}
-              {filingStatus === 'married' && (
-                <>
-                  <div>
-                    <label className="text-sm font-semibold text-slate-700 mb-2 block">Partner 1 Tax Class</label>
-                    <select
-                      value={taxClassPartner1}
-                      onChange={(e) => setTaxClassPartner1(Number(e.target.value))}
-                      className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-white font-medium"
-                    >
-                      <option value={3}>Class III - Married, higher income</option>
-                      <option value={4}>Class IV - Married, equal income</option>
-                      <option value={5}>Class V - Married, lower income</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-sm font-semibold text-slate-700 mb-2 block">Partner 2 Tax Class</label>
-                    <select
-                      value={taxClassPartner2}
-                      onChange={(e) => setTaxClassPartner2(Number(e.target.value))}
-                      className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-white font-medium"
-                    >
-                      <option value={3}>Class III - Married, higher income</option>
-                      <option value={4}>Class IV - Married, equal income</option>
-                      <option value={5}>Class V - Married, lower income</option>
-                    </select>
-                  </div>
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm">
-                    <div className="font-semibold text-blue-900 mb-1">💡 Common Combinations:</div>
-                    <div className="text-blue-700 space-y-1">
-                      <div>• 3/5 - One partner earns significantly more</div>
-                      <div>• 4/4 - Both partners earn similar amounts</div>
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {/* Children */}
-              <div>
-                <label className="text-sm font-semibold text-slate-700 mb-2 block">Number of Children</label>
-                <select
-                  value={numberOfChildren}
-                  onChange={(e) => setNumberOfChildren(Number(e.target.value))}
-                  className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-white font-medium"
-                >
-                  <option value={0}>0 - No children</option>
-                  <option value={1}>1 child</option>
-                  <option value={2}>2 children</option>
-                  <option value={3}>3 children</option>
-                  <option value={4}>4 children</option>
-                  <option value={5}>5+ children</option>
-                </select>
-                {numberOfChildren > 0 && (
-                  <div className="mt-2 bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-sm">
-                    <div className="font-semibold text-emerald-900">Kindergeld (automatic):</div>
-                    <div className="text-emerald-700">
-                      €{KINDERGELD_PER_CHILD_MONTHLY}/month per child × {numberOfChildren} = €{kindergeldMonthly}/month
-                    </div>
-                    <div className="text-emerald-700 font-semibold mt-1">
-                      Annual: €{kindergeldAnnual.toLocaleString()}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Bundesland */}
-              {includeChurchTax && (
-                <div>
-                  <label className="text-sm font-semibold text-slate-700 mb-2 block">Bundesland (State)</label>
-                  <select
-                    value={bundesland}
-                    onChange={(e) => setBundesland(e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-white font-medium"
-                  >
-                    {Object.keys(churchTaxRates).sort().map(state => (
-                      <option key={state} value={state}>
-                        {state} ({(churchTaxRates[state] * 100).toFixed(0)}%)
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
-              {/* Church Tax Toggle */}
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-semibold text-slate-700">
-                  Church Tax (Kirchensteuer)
-                </label>
-                <button
-                  onClick={() => setIncludeChurchTax(!includeChurchTax)}
-                  className={`w-14 h-7 rounded-full transition-all ${
-                    includeChurchTax ? 'bg-red-600' : 'bg-slate-300'
-                  } relative`}
-                >
-                  <div className={`w-5 h-5 bg-white rounded-full absolute top-1 transition-all ${
-                    includeChurchTax ? 'right-1' : 'left-1'
-                  }`} />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Income & Age - Partner 1 */}
-          <div className="bg-gradient-to-br from-slate-50 to-white p-6 rounded-xl border-2 border-slate-200">
-            <h4 className="font-bold text-secondary mb-4 flex items-center gap-2">
-              <span className="text-xl">💰</span> {filingStatus === 'married' ? 'Partner 1 ' : ''}Income & Details
-            </h4>
-            <div className="space-y-4">
-              <Input 
-                label={`${filingStatus === 'married' ? 'Partner 1 ' : ''}Annual Gross Income (€)`} 
-                value={grossIncome} 
-                onChange={setGrossIncome} 
-              />
-              <Input 
-                label={`${filingStatus === 'married' ? 'Partner 1 ' : ''}Age`} 
-                value={age} 
-                onChange={setAge} 
-              />
-            </div>
-          </div>
-
-          {/* Income & Age - Partner 2 (only for couples) */}
-          {filingStatus === 'married' && (
-            <div className="bg-gradient-to-br from-purple-50 to-white p-6 rounded-xl border-2 border-purple-200">
-              <h4 className="font-bold text-secondary mb-4 flex items-center gap-2">
-                <span className="text-xl">💰</span> Partner 2 Income & Details
-              </h4>
-              <div className="space-y-4">
-                <Input 
-                  label="Partner 2 Annual Gross Income (€)" 
-                  value={grossIncomePartner2} 
-                  onChange={setGrossIncomePartner2} 
-                />
-                <Input 
-                  label="Partner 2 Age" 
-                  value={agePartner2} 
-                  onChange={setAgePartner2} 
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Capital Gains */}
-          <div className="bg-gradient-to-br from-amber-50 to-white p-6 rounded-xl border-2 border-amber-200">
-            <h4 className="font-bold text-secondary mb-4 flex items-center gap-2">
-              <span className="text-xl">📈</span> Capital Gains (Kapitalerträge)
-            </h4>
-            <div className="space-y-4">
-              <Input 
-                label="Annual Capital Gains (€)" 
-                value={capitalGains} 
-                onChange={setCapitalGains}
-              />
-              {capitalGains > 0 && (
-                <div className="bg-amber-100 border border-amber-300 rounded-lg p-3 text-sm">
-                  <div className="font-semibold text-amber-900 mb-1">Abgeltungsteuer (26.375%):</div>
-                  <div className="text-amber-800">
-                    Tax: €{capitalGainsTax.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                  </div>
-                  <div className="text-amber-800 font-semibold">
-                    After-tax: €{capitalGainsNet.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                  </div>
-                  <div className="text-xs text-amber-700 mt-2">
-                    Note: First €{sparerpauschbetrag.toLocaleString()} is tax-free (Sparerpauschbetrag)
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Calculate Button */}
-          <button
-            onClick={handleCalculate}
-            className="w-full px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl hover:from-red-700 hover:to-red-800 transition-all duration-300 font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105"
-          >
-            Calculate Tax
-          </button>
-
-          {/* View Mode Toggle - Only show after calculation */}
-          {showResults && (
-            <div className="bg-gradient-to-br from-slate-50 to-white p-6 rounded-xl border-2 border-slate-200">
-              <label className="text-sm font-semibold text-slate-700 mb-3 block">View Mode</label>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  onClick={() => setViewMode('annual')}
-                  className={`px-4 py-3 rounded-lg font-semibold transition-all ${
-                    viewMode === 'annual'
-                      ? 'bg-primary text-white shadow-lg'
-                      : 'bg-white border-2 border-slate-200 text-slate-600 hover:border-slate-300'
-                  }`}
-                >
-                  📅 Annual
-                </button>
-                <button
-                  onClick={() => setViewMode('monthly')}
-                  className={`px-4 py-3 rounded-lg font-semibold transition-all ${
-                    viewMode === 'monthly'
-                      ? 'bg-primary text-white shadow-lg'
-                      : 'bg-white border-2 border-slate-200 text-slate-600 hover:border-slate-300'
-                  }`}
-                >
-                  💶 Monthly
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Results Column */}
-        <div className="lg:col-span-3 space-y-4">
-          {!showResults ? (
-            /* Placeholder before calculation */
-            <div className="bg-white rounded-2xl p-12 border-2 border-slate-200 text-center">
-              <div className="text-6xl mb-4">🇩🇪</div>
-              <h3 className="text-2xl font-bold text-secondary mb-2">Ready to calculate your taxes?</h3>
-              <p className="text-slate-600">Fill in your details and click "Calculate Tax" to see your breakdown</p>
-              {filingStatus === 'married' && (
-                <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800">
-                  💑 Couple mode active - Enter both partners' incomes for accurate calculation
-                </div>
-              )}
-            </div>
-          ) : (
-            <>
-              {/* Main Result Card */}
-              <div className="bg-gradient-to-br from-red-600 to-red-800 rounded-2xl p-8 text-white shadow-2xl">
-                <div className="text-sm opacity-90 mb-2 font-semibold">{isMonthly ? 'Monthly' : 'Annual'} Net Income</div>
-                <div className="text-6xl font-bold mb-6" style={{ fontFamily: "'Crimson Pro', serif" }}>
-                  €{(isMonthly ? monthly!.netIncome : taxResult!.netIncome).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-3 bg-white/10 rounded-lg backdrop-blur">
-                    <div className="text-xs opacity-90 mb-1">Effective Tax Rate</div>
-                    <div className="text-2xl font-bold">{taxResult!.effectiveTaxRate.toFixed(1)}%</div>
-                  </div>
-                  <div className="p-3 bg-white/10 rounded-lg backdrop-blur">
-                    <div className="text-xs opacity-90 mb-1">Marginal Tax Rate</div>
-                    <div className="text-2xl font-bold">{taxResult!.marginalTaxRate.toFixed(0)}%</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Tax Breakdown */}
-              <div className="bg-white rounded-xl p-6 border-2 border-slate-200">
-                <h4 className="font-bold text-secondary mb-4">💶 Tax Breakdown</h4>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between py-2 border-b border-slate-100">
-                    <span className="text-slate-600">Gross Income:</span>
-                    <span className="font-bold text-secondary">€{(isMonthly ? monthly!.grossIncome : taxResult!.grossIncome).toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between py-2 border-b border-slate-100">
-                    <span className="text-slate-600">- Income Tax:</span>
-                    <span className="font-semibold text-red-600">€{(isMonthly ? monthly!.incomeTax : taxResult!.incomeTax).toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between py-2 border-b border-slate-100">
-                    <span className="text-slate-600">- Solidarity Tax:</span>
-                    <span className="font-semibold text-red-600">€{(isMonthly ? monthly!.solidarityTax : taxResult!.solidarityTax).toLocaleString()}</span>
-                  </div>
-                  {includeChurchTax && (
-                    <div className="flex justify-between py-2 border-b border-slate-100">
-                      <span className="text-slate-600">- Church Tax:</span>
-                      <span className="font-semibold text-red-600">€{(isMonthly ? monthly!.churchTax : taxResult!.churchTax).toLocaleString()}</span>
-                    </div>
-                  )}
-                  {capitalGains > 0 && (
-                    <div className="flex justify-between py-2 border-b border-slate-100">
-                      <span className="text-slate-600">- Capital Gains Tax:</span>
-                      <span className="font-semibold text-red-600">€{(isMonthly ? (capitalGainsTax/12) : capitalGainsTax).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between py-2 border-b border-slate-100 font-bold">
-                    <span className="text-slate-700">Total Tax:</span>
-                    <span className="text-red-600">€{(isMonthly ? monthly!.totalTax : taxResult!.totalTax).toLocaleString()}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Social Security Breakdown */}
-              <div className="bg-white rounded-xl p-6 border-2 border-slate-200">
-                <h4 className="font-bold text-secondary mb-4">🏥 Social Security Contributions</h4>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between py-2">
-                    <span className="text-slate-600">Pension Insurance (9.3%):</span>
-                    <span className="font-semibold">€{(isMonthly ? monthly!.pensionInsurance : taxResult!.pensionInsurance).toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between py-2">
-                    <span className="text-slate-600">Health Insurance (~9%):</span>
-                    <span className="font-semibold">€{(isMonthly ? monthly!.healthInsurance : taxResult!.healthInsurance).toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between py-2">
-                    <span className="text-slate-600">Unemployment (1.3%):</span>
-                    <span className="font-semibold">€{(isMonthly ? monthly!.unemploymentInsurance : taxResult!.unemploymentInsurance).toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between py-2">
-                    <span className="text-slate-600">Long-term Care (~{numberOfChildren === 0 && age >= 23 ? '2.0' : '1.8'}%):</span>
-                    <span className="font-semibold">€{(isMonthly ? monthly!.longTermCare : taxResult!.longTermCare).toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between py-2 border-t border-slate-200 font-bold pt-3">
-                    <span className="text-slate-700">Total Social Security:</span>
-                    <span className="text-secondary">€{(isMonthly ? monthly!.totalSocialSecurity : taxResult!.totalSocialSecurity).toLocaleString()}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Tax Allowances & Benefits */}
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="bg-emerald-50 rounded-xl p-5 border-2 border-emerald-200">
-                  <div className="text-xs text-emerald-800 mb-1 font-semibold">Grundfreibetrag</div>
-                  <div className="text-2xl font-bold text-emerald-700">€{taxResult!.grundfreibetrag.toLocaleString()}</div>
-                  <div className="text-xs text-emerald-600 mt-1">Tax-free allowance</div>
-                </div>
-                {numberOfChildren > 0 && (
-                  <div className="bg-blue-50 rounded-xl p-5 border-2 border-blue-200">
-                    <div className="text-xs text-blue-800 mb-1 font-semibold">Kindergeld ({numberOfChildren} {numberOfChildren === 1 ? 'child' : 'children'})</div>
-                    <div className="text-2xl font-bold text-blue-700">€{(isMonthly ? kindergeldMonthly : kindergeldAnnual).toLocaleString()}</div>
-                    <div className="text-xs text-blue-600 mt-1">{isMonthly ? 'Monthly' : 'Annual'} child benefit</div>
-                  </div>
-                )}
-              </div>
-
-              {/* Tax Zones Breakdown */}
-              <div className="bg-white rounded-xl p-6 border-2 border-slate-200">
-                <h4 className="font-bold text-secondary mb-4">📊 Progressive Tax Zones</h4>
-                <div className="space-y-3">
-                  {taxResult!.taxZones.map((zone) => (
-                    <div key={zone.zone} className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
-                      <div>
-                        <div className="font-semibold text-sm text-secondary">{zone.name}</div>
-                        <div className="text-xs text-slate-600">{zone.range} • {zone.rate}</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-bold text-secondary">€{zone.taxAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-    </CalculatorCard>
-  );
-}
-
-
-function DebtPayoffCalculator() {
-  const [debt, setDebt] = useState(20000);
-  const [interestRate, setInterestRate] = useState(5);
-  const [monthlyPayment, setMonthlyPayment] = useState(500);
-
-  const monthlyRate = interestRate / 100 / 12;
-  const monthsToPayoff = debt > 0 && monthlyPayment > debt * monthlyRate 
-    ? Math.log(monthlyPayment / (monthlyPayment - debt * monthlyRate)) / Math.log(1 + monthlyRate)
-    : 0;
-  const totalPaid = monthlyPayment * monthsToPayoff;
-  const totalInterest = totalPaid - debt;
-
-  return (
-    <CalculatorCard title="Debt Payoff Calculator">
-      <div className="grid md:grid-cols-2 gap-8">
-        <div className="space-y-6">
-          <Input label="Total Debt (€)" value={debt} onChange={setDebt} />
-          <Input label="Interest Rate (%)" value={interestRate} onChange={setInterestRate} step={0.1} />
-          <Input label="Monthly Payment (€)" value={monthlyPayment} onChange={setMonthlyPayment} />
-        </div>
-        <div className="space-y-4">
-          <div className="bg-gradient-to-br from-teal-600 to-teal-800 rounded-2xl p-8 text-white">
-            <div className="text-sm opacity-90 mb-2">Time to Debt Freedom</div>
-            <div className="text-5xl font-bold mb-2" style={{ fontFamily: "'Crimson Pro', serif" }}>
-              {monthsToPayoff > 0 ? (monthsToPayoff / 12).toFixed(1) : '∞'} years
-            </div>
-            <p className="text-sm opacity-90">
-              {monthsToPayoff > 0 ? `${Math.ceil(monthsToPayoff)} months` : 'Payment too low'}
-            </p>
-          </div>
-          <div className="bg-white rounded-2xl p-6 border border-slate-200 space-y-3">
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-600">Total Paid:</span>
-              <span className="font-semibold text-secondary">€{totalPaid.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-600">Interest Paid:</span>
-              <span className="font-semibold text-red-600">€{totalInterest.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </CalculatorCard>
-  );
-}
-
-function FireCalculator() {
+// ============================================================================
+// FIRE CALCULATOR
+// ============================================================================
+function FIRECalculator({ formatAmount, formatCompact, currency }: any) {
   const [annualExpenses, setAnnualExpenses] = useState(40000);
-  const [currentAge, setCurrentAge] = useState(30);
-  const [desiredRetirementAge, setDesiredRetirementAge] = useState(55);
   const [currentSavings, setCurrentSavings] = useState(100000);
-  const [monthlySavings, setMonthlySavings] = useState(2000);
+  const [monthlySavings, setMonthlySavings] = useState(3000);
   const [expectedReturn, setExpectedReturn] = useState(7);
-  const [safeWithdrawalRate, setSafeWithdrawalRate] = useState(4);
-  
-  // Part-time income for Barista FIRE
-  const [partTimeIncome, setPartTimeIncome] = useState(20000);
-  
-  // Coast FIRE settings
-  const [coastRetirementAge, setCoastRetirementAge] = useState(65);
 
-  const [selectedFireType, setSelectedFireType] = useState<'lean' | 'fat' | 'barista' | 'coast'>('lean');
-  const [showSaveSuccess, setShowSaveSuccess] = useState(false);
+  const leanFIRE = annualExpenses * 20;
+  const regularFIRE = annualExpenses * 25;
+  const fatFIRE = annualExpenses * 30;
+  const baristaFIRE = annualExpenses * 25 * 0.5;
 
-  // Calculate different FIRE numbers
-  const leanFireNumber = (annualExpenses * 0.7) / (safeWithdrawalRate / 100);
-  const standardFireNumber = annualExpenses / (safeWithdrawalRate / 100);
-  const fatFireNumber = (annualExpenses * 2) / (safeWithdrawalRate / 100);
-  const baristaExpenses = annualExpenses - partTimeIncome;
-  const baristaFireNumber = Math.max(0, baristaExpenses) / (safeWithdrawalRate / 100);
-  
-  // Coast FIRE calculation
-  const yearsToCoastRetirement = coastRetirementAge - currentAge;
-  const coastFireNumber = annualExpenses / (safeWithdrawalRate / 100);
-  const coastFireTarget = coastFireNumber / Math.pow(1 + expectedReturn / 100, yearsToCoastRetirement);
-
-  // Calculate years to reach each FIRE type
-  const calculateYearsToFire = (target: number) => {
+  const calculateYearsToFIRE = (target: number) => {
     if (currentSavings >= target) return 0;
     
-    const monthlyRate = expectedReturn / 100 / 12;
-    const monthlyTarget = target;
-    
-    if (monthlySavings <= 0) return 999;
-    
-    const months = Math.log((monthlyTarget * monthlyRate + monthlySavings) / (currentSavings * monthlyRate + monthlySavings)) / Math.log(1 + monthlyRate);
-    return Math.ceil(months / 12);
-  };
+    let balance = currentSavings;
+    let years = 0;
+    const monthlyReturn = expectedReturn / 100 / 12;
 
-  const leanYears = calculateYearsToFire(leanFireNumber);
-  const standardYears = calculateYearsToFire(standardFireNumber);
-  const fatYears = calculateYearsToFire(fatFireNumber);
-  const baristaYears = calculateYearsToFire(baristaFireNumber);
-  const coastYears = calculateYearsToFire(coastFireTarget);
-
-  const fireTypes = [
-    {
-      id: 'lean' as const,
-      name: 'Lean FIRE',
-      emoji: '🌱',
-      description: 'Minimalist lifestyle with 70% of current expenses',
-      color: 'from-emerald-500 to-green-600',
-      borderColor: 'border-emerald-300',
-      bgColor: 'bg-emerald-50',
-      target: leanFireNumber,
-      years: leanYears,
-      expenses: annualExpenses * 0.7,
-      details: 'Live frugally, focus on essentials, lower cost of living'
-    },
-    {
-      id: 'fat' as const,
-      name: 'Fat FIRE',
-      emoji: '💎',
-      description: 'Comfortable lifestyle with 2x current expenses',
-      color: 'from-purple-500 to-indigo-600',
-      borderColor: 'border-purple-300',
-      bgColor: 'bg-purple-50',
-      target: fatFireNumber,
-      years: fatYears,
-      expenses: annualExpenses * 2,
-      details: 'Luxury travel, dining out, no budget constraints'
-    },
-    {
-      id: 'barista' as const,
-      name: 'Barista FIRE',
-      emoji: '☕',
-      description: 'Part-time work covers living expenses',
-      color: 'from-amber-500 to-orange-600',
-      borderColor: 'border-amber-300',
-      bgColor: 'bg-amber-50',
-      target: baristaFireNumber,
-      years: baristaYears,
-      expenses: baristaExpenses,
-      details: 'Portfolio covers most expenses, work for fun/health insurance'
-    },
-    {
-      id: 'coast' as const,
-      name: 'Coast FIRE',
-      emoji: '🏖️',
-      description: 'Stop saving, let investments grow until traditional retirement',
-      color: 'from-cyan-500 to-blue-600',
-      borderColor: 'border-cyan-300',
-      bgColor: 'bg-cyan-50',
-      target: coastFireTarget,
-      years: coastYears,
-      expenses: annualExpenses,
-      details: `Reach €${Math.round(coastFireTarget / 1000)}K by age ${currentAge + coastYears}, then coast to ${coastRetirementAge}`
+    while (balance < target && years < 100) {
+      for (let month = 0; month < 12; month++) {
+        balance = balance * (1 + monthlyReturn) + monthlySavings;
+      }
+      years++;
     }
-  ];
 
-  const selectedFire = fireTypes.find(f => f.id === selectedFireType)!;
-
-  const handleSaveFireNumber = () => {
-    // Save to localStorage for use in Projection
-    const fireData = {
-      type: selectedFireType,
-      number: selectedFire.target,
-      expenses: selectedFire.expenses,
-      withdrawalRate: safeWithdrawalRate,
-      savedAt: new Date().toISOString()
-    };
-    
-    localStorage.setItem('myfynzo_fire_target', JSON.stringify(fireData));
-    
-    setShowSaveSuccess(true);
-    setTimeout(() => setShowSaveSuccess(false), 3000);
+    return years;
   };
+
+  const yearsToRegularFIRE = calculateYearsToFIRE(regularFIRE);
+  const currentAge = 35;
+  const fireAge = currentAge + yearsToRegularFIRE;
 
   return (
-    <CalculatorCard title="FIRE Calculator">
-      <div className="grid lg:grid-cols-5 gap-8">
-        {/* Input Column */}
-        <div className="lg:col-span-2 space-y-5">
-          {/* Basic Info */}
-          <div className="bg-gradient-to-br from-teal-50 to-white p-6 rounded-xl border-2 border-teal-200">
-            <h4 className="font-bold text-secondary mb-4 flex items-center gap-2">
-              <span className="text-xl">📊</span> Your Current Situation
-            </h4>
-            <div className="space-y-4">
-              <Input 
-                label="Annual Expenses (€)" 
-                value={annualExpenses} 
-                onChange={setAnnualExpenses}
-                icon="💰"
-              />
-              <Input 
-                label="Current Age" 
-                value={currentAge} 
-                onChange={setCurrentAge}
-                icon="🎂"
-              />
-              <Input 
-                label="Current Savings (€)" 
-                value={currentSavings} 
-                onChange={setCurrentSavings}
-                icon="💵"
-              />
-              <Input 
-                label="Monthly Savings (€)" 
-                value={monthlySavings} 
-                onChange={setMonthlySavings}
-                icon="📈"
-              />
-            </div>
+    <div className="space-y-6">
+      <div className="bg-white rounded-2xl p-8 border-2 border-slate-200">
+        <h2 className="text-2xl font-bold text-secondary mb-6">Your Numbers</h2>
+        <div className="grid md:grid-cols-3 gap-6">
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
+              Annual Expenses ({currency})
+            </label>
+            <input
+              type="number"
+              value={annualExpenses}
+              onChange={(e) => setAnnualExpenses(Number(e.target.value))}
+              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
+            />
           </div>
-
-          {/* Investment Settings */}
-          <div className="bg-gradient-to-br from-blue-50 to-white p-6 rounded-xl border-2 border-blue-200">
-            <h4 className="font-bold text-secondary mb-4 flex items-center gap-2">
-              <span className="text-xl">⚙️</span> Investment Settings
-            </h4>
-            <div className="space-y-4">
-              <Input 
-                label="Expected Annual Return (%)" 
-                value={expectedReturn} 
-                onChange={setExpectedReturn}
-                step={0.1}
-                icon="📊"
-              />
-              <Input 
-                label="Safe Withdrawal Rate (%)" 
-                value={safeWithdrawalRate} 
-                onChange={setSafeWithdrawalRate}
-                step={0.1}
-                icon="🎯"
-              />
-              <div className="bg-blue-100 border border-blue-300 rounded-lg p-3 text-xs text-blue-800">
-                <strong>4% Rule:</strong> Withdraw 4% of your portfolio annually. Historically safe for 30+ year retirements.
-              </div>
-            </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
+              Current Savings ({currency})
+            </label>
+            <input
+              type="number"
+              value={currentSavings}
+              onChange={(e) => setCurrentSavings(Number(e.target.value))}
+              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
+            />
           </div>
-
-          {/* Barista FIRE Settings */}
-          <div className="bg-gradient-to-br from-amber-50 to-white p-6 rounded-xl border-2 border-amber-200">
-            <h4 className="font-bold text-secondary mb-4 flex items-center gap-2">
-              <span className="text-xl">☕</span> Barista FIRE Settings
-            </h4>
-            <div className="space-y-4">
-              <Input 
-                label="Part-Time Annual Income (€)" 
-                value={partTimeIncome} 
-                onChange={setPartTimeIncome}
-                icon="💼"
-              />
-              <div className="text-sm text-slate-600">
-                Income from part-time work that covers some expenses
-              </div>
-            </div>
-          </div>
-
-          {/* Coast FIRE Settings */}
-          <div className="bg-gradient-to-br from-cyan-50 to-white p-6 rounded-xl border-2 border-cyan-200">
-            <h4 className="font-bold text-secondary mb-4 flex items-center gap-2">
-              <span className="text-xl">🏖️</span> Coast FIRE Settings
-            </h4>
-            <div className="space-y-4">
-              <Input 
-                label="Traditional Retirement Age" 
-                value={coastRetirementAge} 
-                onChange={setCoastRetirementAge}
-                icon="🎯"
-              />
-              <div className="text-sm text-slate-600">
-                Age when you'll retire without additional saving
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Results Column */}
-        <div className="lg:col-span-3 space-y-4">
-          {/* FIRE Type Cards */}
-          <div className="grid md:grid-cols-2 gap-4">
-            {fireTypes.map((fire) => (
-              <button
-                key={fire.id}
-                onClick={() => setSelectedFireType(fire.id)}
-                className={`text-left p-6 rounded-xl border-2 transition-all ${
-                  selectedFireType === fire.id
-                    ? `${fire.borderColor} shadow-lg scale-105 ${fire.bgColor}`
-                    : 'border-slate-200 bg-white hover:shadow-md'
-                }`}
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <div className="text-3xl mb-2">{fire.emoji}</div>
-                    <h3 className="text-xl font-bold text-secondary mb-1">
-                      {fire.name}
-                    </h3>
-                  </div>
-                  {selectedFireType === fire.id && (
-                    <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" />
-                      </svg>
-                    </div>
-                  )}
-                </div>
-                <p className="text-sm text-slate-600 mb-4">{fire.description}</p>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-600">Target:</span>
-                    <span className="font-bold text-secondary">€{Math.round(fire.target / 1000)}K</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-600">Years to reach:</span>
-                    <span className="font-bold text-primary">
-                      {fire.years < 999 ? `${fire.years} years` : '∞'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-600">Annual expenses:</span>
-                    <span className="font-bold text-slate-700">€{Math.round(fire.expenses / 1000)}K</span>
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
-
-          {/* Detailed Breakdown for Selected Type */}
-          <div className={`bg-gradient-to-br ${selectedFire.color} rounded-2xl p-8 text-white shadow-2xl`}>
-            <div className="flex items-center gap-3 mb-6">
-              <span className="text-5xl">{selectedFire.emoji}</span>
-              <div>
-                <h2 className="text-3xl font-bold mb-1">{selectedFire.name}</h2>
-                <p className="text-white/90">{selectedFire.details}</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="bg-white/20 backdrop-blur rounded-xl p-4">
-                <div className="text-sm opacity-90 mb-1">FIRE Number</div>
-                <div className="text-3xl font-bold">€{Math.round(selectedFire.target / 1000)}K</div>
-              </div>
-              <div className="bg-white/20 backdrop-blur rounded-xl p-4">
-                <div className="text-sm opacity-90 mb-1">Years to FIRE</div>
-                <div className="text-3xl font-bold">
-                  {selectedFire.years < 999 ? selectedFire.years : '∞'}
-                </div>
-              </div>
-              <div className="bg-white/20 backdrop-blur rounded-xl p-4">
-                <div className="text-sm opacity-90 mb-1">FIRE Age</div>
-                <div className="text-3xl font-bold">
-                  {selectedFire.years < 999 ? currentAge + selectedFire.years : 'N/A'}
-                </div>
-              </div>
-              <div className="bg-white/20 backdrop-blur rounded-xl p-4">
-                <div className="text-sm opacity-90 mb-1">Annual Expenses</div>
-                <div className="text-3xl font-bold">€{Math.round(selectedFire.expenses / 1000)}K</div>
-              </div>
-            </div>
-
-            {/* Progress Bar */}
-            <div className="bg-white/20 backdrop-blur rounded-xl p-4 mb-6">
-              <div className="flex justify-between text-sm mb-2">
-                <span>Current Progress</span>
-                <span>{Math.min(100, (currentSavings / selectedFire.target * 100)).toFixed(1)}%</span>
-              </div>
-              <div className="h-4 bg-white/30 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-white rounded-full transition-all duration-500"
-                  style={{ width: `${Math.min(100, (currentSavings / selectedFire.target * 100))}%` }}
-                />
-              </div>
-              <div className="flex justify-between text-xs mt-2 opacity-90">
-                <span>€{Math.round(currentSavings / 1000)}K</span>
-                <span>€{Math.round(selectedFire.target / 1000)}K</span>
-              </div>
-            </div>
-
-            {/* Save Button */}
-            <button
-              onClick={handleSaveFireNumber}
-              className="w-full bg-white text-secondary px-6 py-4 rounded-xl font-bold text-lg hover:bg-slate-100 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              Set as My FIRE Target
-            </button>
-
-            {showSaveSuccess && (
-              <div className="mt-4 bg-green-500 text-white px-4 py-3 rounded-lg flex items-center gap-2 animate-fade-in">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
-                </svg>
-                <span>FIRE target saved! It will now be used in your Wealth Projection.</span>
-              </div>
-            )}
-          </div>
-
-          {/* Comparison Table */}
-          <div className="bg-white rounded-xl p-6 border-2 border-slate-200">
-            <h3 className="text-xl font-bold text-secondary mb-4">Compare All FIRE Types</h3>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b-2 border-slate-200">
-                    <th className="text-left py-3 font-semibold text-slate-700">Type</th>
-                    <th className="text-right py-3 font-semibold text-slate-700">Target</th>
-                    <th className="text-right py-3 font-semibold text-slate-700">Years</th>
-                    <th className="text-right py-3 font-semibold text-slate-700">FIRE Age</th>
-                    <th className="text-right py-3 font-semibold text-slate-700">Expenses</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {fireTypes.map((fire) => (
-                    <tr 
-                      key={fire.id}
-                      className={`border-b border-slate-100 ${selectedFireType === fire.id ? fire.bgColor : ''}`}
-                    >
-                      <td className="py-3">
-                        <span className="mr-2">{fire.emoji}</span>
-                        {fire.name}
-                      </td>
-                      <td className="text-right font-semibold">€{Math.round(fire.target / 1000)}K</td>
-                      <td className="text-right">{fire.years < 999 ? `${fire.years}y` : '∞'}</td>
-                      <td className="text-right">{fire.years < 999 ? currentAge + fire.years : 'N/A'}</td>
-                      <td className="text-right">€{Math.round(fire.expenses / 1000)}K</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
+              Monthly Savings ({currency})
+            </label>
+            <input
+              type="number"
+              value={monthlySavings}
+              onChange={(e) => setMonthlySavings(Number(e.target.value))}
+              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
+            />
           </div>
         </div>
       </div>
-    </CalculatorCard>
-  );
-}
-// Reusable Components
-function CalculatorCard({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-200">
-      <h2 className="text-3xl font-bold text-secondary mb-8" style={{ fontFamily: "'Crimson Pro', serif" }}>
-        {title}
-      </h2>
-      {children}
+
+      <div className="grid md:grid-cols-4 gap-6">
+        <div className="bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl p-6 text-white shadow-xl">
+          <div className="text-sm opacity-90 mb-2">Lean FIRE</div>
+          <div className="text-3xl font-bold mb-2">{formatCompact(leanFIRE)}</div>
+          <div className="text-xs opacity-75 mb-4">{formatAmount(leanFIRE)}</div>
+          <div className="text-xs opacity-90">Minimal lifestyle</div>
+          <div className="text-sm mt-2 opacity-90">{calculateYearsToFIRE(leanFIRE)} years away</div>
+        </div>
+
+        <div className="bg-gradient-to-br from-primary to-teal-600 rounded-2xl p-6 text-white shadow-xl ring-4 ring-primary/20">
+          <div className="text-sm opacity-90 mb-2">Regular FIRE ⭐</div>
+          <div className="text-3xl font-bold mb-2">{formatCompact(regularFIRE)}</div>
+          <div className="text-xs opacity-75 mb-4">{formatAmount(regularFIRE)}</div>
+          <div className="text-xs opacity-90">Comfortable living</div>
+          <div className="text-sm mt-2 font-bold">{yearsToRegularFIRE} years away</div>
+          <div className="text-xs opacity-75">Age {fireAge}</div>
+        </div>
+
+        <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl p-6 text-white shadow-xl">
+          <div className="text-sm opacity-90 mb-2">Fat FIRE</div>
+          <div className="text-3xl font-bold mb-2">{formatCompact(fatFIRE)}</div>
+          <div className="text-xs opacity-75 mb-4">{formatAmount(fatFIRE)}</div>
+          <div className="text-xs opacity-90">Luxury lifestyle</div>
+          <div className="text-sm mt-2 opacity-90">{calculateYearsToFIRE(fatFIRE)} years away</div>
+        </div>
+
+        <div className="bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl p-6 text-white shadow-xl">
+          <div className="text-sm opacity-90 mb-2">Barista FIRE</div>
+          <div className="text-3xl font-bold mb-2">{formatCompact(baristaFIRE)}</div>
+          <div className="text-xs opacity-75 mb-4">{formatAmount(baristaFIRE)}</div>
+          <div className="text-xs opacity-90">Part-time work</div>
+          <div className="text-sm mt-2 opacity-90">{calculateYearsToFIRE(baristaFIRE)} years away</div>
+        </div>
+      </div>
+
+      <div className="bg-gradient-to-br from-slate-50 to-white rounded-2xl p-8 border-2 border-slate-200">
+        <h3 className="text-xl font-bold text-secondary mb-4">How It Works</h3>
+        <div className="grid md:grid-cols-2 gap-6 text-sm">
+          <div>
+            <h4 className="font-bold text-secondary mb-2">📊 The 4% Rule</h4>
+            <p className="text-slate-700 leading-relaxed">
+              Multiply your annual expenses by 25 to get your FIRE number. This allows you to
+              withdraw 4% per year indefinitely.
+            </p>
+          </div>
+          <div>
+            <h4 className="font-bold text-secondary mb-2">🎯 Different Types</h4>
+            <p className="text-slate-700 leading-relaxed">
+              <strong>Lean:</strong> 20x expenses • <strong>Regular:</strong> 25x expenses • 
+              <strong>Fat:</strong> 30x expenses • <strong>Barista:</strong> Half FIRE + part-time
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
 
-function Input({ label, value, onChange, step = 1 }: { label: string; value: number; onChange: (v: number) => void; step?: number }) {
+// ============================================================================
+// COMPOUND INTEREST CALCULATOR
+// ============================================================================
+function CompoundInterestCalculator({ formatAmount, formatCompact, currency }: any) {
+  const [principal, setPrincipal] = useState(10000);
+  const [monthlyContribution, setMonthlyContribution] = useState(500);
+  const [annualRate, setAnnualRate] = useState(7);
+  const [years, setYears] = useState(30);
+
+  const calculateCompound = () => {
+    const monthlyRate = annualRate / 100 / 12;
+    const totalMonths = years * 12;
+    
+    let balance = principal;
+    for (let i = 0; i < totalMonths; i++) {
+      balance = balance * (1 + monthlyRate) + monthlyContribution;
+    }
+    
+    return balance;
+  };
+
+  const futureValue = calculateCompound();
+  const totalContributed = principal + (monthlyContribution * 12 * years);
+  const totalInterest = futureValue - totalContributed;
+
   return (
-    <label className="flex flex-col gap-2">
-      <span className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-        <span className="text-primary">●</span>
-        {label}
-      </span>
-      <div className="relative">
-        <input
-          type="number"
-          value={value}
-          onChange={e => onChange(Number(e.target.value))}
-          step={step}
-          className="w-full px-4 py-3.5 pr-10 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all bg-white font-medium text-secondary hover:border-slate-300"
-        />
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-          </svg>
+    <div className="space-y-6">
+      <div className="bg-white rounded-2xl p-8 border-2 border-slate-200">
+        <h2 className="text-2xl font-bold text-secondary mb-6">Investment Details</h2>
+        <div className="grid md:grid-cols-4 gap-6">
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
+              Initial Amount ({currency})
+            </label>
+            <input
+              type="number"
+              value={principal}
+              onChange={(e) => setPrincipal(Number(e.target.value))}
+              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
+              Monthly Contribution ({currency})
+            </label>
+            <input
+              type="number"
+              value={monthlyContribution}
+              onChange={(e) => setMonthlyContribution(Number(e.target.value))}
+              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
+              Annual Return (%)
+            </label>
+            <input
+              type="number"
+              value={annualRate}
+              onChange={(e) => setAnnualRate(Number(e.target.value))}
+              step="0.5"
+              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
+              Time Period (Years)
+            </label>
+            <input
+              type="number"
+              value={years}
+              onChange={(e) => setYears(Number(e.target.value))}
+              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
+            />
+          </div>
         </div>
       </div>
-    </label>
+
+      <div className="grid md:grid-cols-3 gap-6">
+        <div className="bg-gradient-to-br from-primary to-teal-600 rounded-2xl p-6 text-white shadow-xl">
+          <div className="text-sm opacity-90 mb-2">Future Value</div>
+          <div className="text-4xl font-bold mb-2">{formatCompact(futureValue)}</div>
+          <div className="text-sm opacity-75">{formatAmount(futureValue)}</div>
+        </div>
+        <div className="bg-white rounded-2xl p-6 border-2 border-blue-200 bg-blue-50">
+          <div className="text-sm text-blue-900 mb-2">Total Contributed</div>
+          <div className="text-4xl font-bold text-blue-700 mb-2">{formatCompact(totalContributed)}</div>
+          <div className="text-sm text-blue-600">{formatAmount(totalContributed)}</div>
+        </div>
+        <div className="bg-white rounded-2xl p-6 border-2 border-green-200 bg-green-50">
+          <div className="text-sm text-green-900 mb-2">Interest Earned</div>
+          <div className="text-4xl font-bold text-green-700 mb-2">{formatCompact(totalInterest)}</div>
+          <div className="text-sm text-green-600">{formatAmount(totalInterest)}</div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-2xl p-8 border-2 border-slate-200">
+        <h3 className="text-xl font-bold text-secondary mb-4">Breakdown</h3>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+            <span className="text-slate-700">Initial Investment</span>
+            <span className="font-bold text-secondary">{formatAmount(principal)}</span>
+          </div>
+          <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+            <span className="text-slate-700">Monthly Contributions ({years} years)</span>
+            <span className="font-bold text-secondary">{formatAmount(monthlyContribution * 12 * years)}</span>
+          </div>
+          <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
+            <span className="text-green-900 font-semibold">Investment Growth</span>
+            <span className="font-bold text-green-700">{formatAmount(totalInterest)}</span>
+          </div>
+          <div className="flex items-center justify-between p-4 bg-primary/10 rounded-lg border-2 border-primary">
+            <span className="text-primary font-bold">Total Future Value</span>
+            <span className="font-bold text-primary text-xl">{formatAmount(futureValue)}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// GERMAN TAX CALCULATOR
+// ============================================================================
+function GermanTaxCalculator({ formatAmount }: any) {
+  const [grossSalary, setGrossSalary] = useState(60000);
+  const [taxClass, setTaxClass] = useState(1);
+  const [bundesland, setBundesland] = useState('Bayern');
+  const [hasChurchTax, setHasChurchTax] = useState(true);
+  const [children, setChildren] = useState(0);
+
+  const taxResult = calculateGermanTax(grossSalary, taxClass, bundesland, hasChurchTax, children);
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-white rounded-2xl p-8 border-2 border-slate-200">
+        <h2 className="text-2xl font-bold text-secondary mb-6">Tax Information</h2>
+        <div className="grid md:grid-cols-3 gap-6">
+          <div className="md:col-span-2">
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
+              Gross Annual Salary (€)
+            </label>
+            <input
+              type="number"
+              value={grossSalary}
+              onChange={(e) => setGrossSalary(Number(e.target.value))}
+              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Tax Class</label>
+            <select
+              value={taxClass}
+              onChange={(e) => setTaxClass(Number(e.target.value))}
+              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold"
+            >
+              <option value={1}>Class I (Single)</option>
+              <option value={2}>Class II (Single parent)</option>
+              <option value={3}>Class III (Married, higher earner)</option>
+              <option value={4}>Class IV (Married, both work)</option>
+              <option value={5}>Class V (Married, lower earner)</option>
+              <option value={6}>Class VI (Multiple jobs)</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Bundesland</label>
+            <select
+              value={bundesland}
+              onChange={(e) => setBundesland(e.target.value)}
+              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold"
+            >
+              <option>Bayern</option>
+              <option>Baden-Württemberg</option>
+              <option>Berlin</option>
+              <option>Brandenburg</option>
+              <option>Bremen</option>
+              <option>Hamburg</option>
+              <option>Hessen</option>
+              <option>Niedersachsen</option>
+              <option>Nordrhein-Westfalen</option>
+              <option>Rheinland-Pfalz</option>
+              <option>Saarland</option>
+              <option>Sachsen</option>
+              <option>Sachsen-Anhalt</option>
+              <option>Schleswig-Holstein</option>
+              <option>Thüringen</option>
+              <option>Mecklenburg-Vorpommern</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Number of Children</label>
+            <input
+              type="number"
+              value={children}
+              onChange={(e) => setChildren(Math.max(0, Number(e.target.value)))}
+              min="0"
+              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
+            />
+          </div>
+          <div className="flex items-center">
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={hasChurchTax}
+                onChange={(e) => setHasChurchTax(e.target.checked)}
+                className="w-5 h-5 text-primary rounded focus:ring-2 focus:ring-primary/20"
+              />
+              <span className="ml-3 text-sm font-semibold text-slate-700">
+                Pay Church Tax ({bundesland === 'Bayern' || bundesland === 'Baden-Württemberg' ? '8%' : '9%'})
+              </span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-6">
+        <div className="bg-gradient-to-br from-red-600 to-orange-600 rounded-2xl p-6 text-white shadow-xl">
+          <div className="text-sm opacity-90 mb-2">Gross Salary</div>
+          <div className="text-4xl font-bold mb-2">{formatAmount(grossSalary)}</div>
+          <div className="text-sm opacity-75">Before all deductions</div>
+        </div>
+        <div className="bg-gradient-to-br from-green-600 to-teal-600 rounded-2xl p-6 text-white shadow-xl">
+          <div className="text-sm opacity-90 mb-2">Net Salary</div>
+          <div className="text-4xl font-bold mb-2">{formatAmount(taxResult.netSalary)}</div>
+          <div className="text-sm opacity-75">After all deductions</div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-2xl p-8 border-2 border-slate-200">
+        <h3 className="text-xl font-bold text-secondary mb-6">Tax Breakdown (2026 Rates)</h3>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between p-4 bg-red-50 rounded-lg border border-red-200">
+            <span className="text-red-900">Income Tax (Einkommensteuer)</span>
+            <span className="font-bold text-red-700">-{formatAmount(taxResult.incomeTax)}</span>
+          </div>
+          <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg border border-orange-200">
+            <span className="text-orange-900">Solidarity Surcharge (Solidaritätszuschlag)</span>
+            <span className="font-bold text-orange-700">-{formatAmount(taxResult.solidarity)}</span>
+          </div>
+          {hasChurchTax && (
+            <div className="flex items-center justify-between p-4 bg-amber-50 rounded-lg border border-amber-200">
+              <span className="text-amber-900">Church Tax (Kirchensteuer)</span>
+              <span className="font-bold text-amber-700">-{formatAmount(taxResult.churchTax)}</span>
+            </div>
+          )}
+          {children > 0 && (
+            <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
+              <span className="text-green-900">Kindergeld ({children} {children === 1 ? 'child' : 'children'})</span>
+              <span className="font-bold text-green-700">+{formatAmount(taxResult.kindergeld)}</span>
+            </div>
+          )}
+          <div className="flex items-center justify-between p-4 bg-primary/10 rounded-lg border-2 border-primary mt-4">
+            <span className="text-primary font-bold">Monthly Net Income</span>
+            <span className="font-bold text-primary text-xl">{formatAmount(taxResult.netSalary / 12)}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// RETIREMENT CALCULATOR
+// ============================================================================
+function RetirementCalculator({ formatAmount, formatCompact, currency }: any) {
+  const [currentAge, setCurrentAge] = useState(35);
+  const [retirementAge, setRetirementAge] = useState(65);
+  const [currentSavings, setCurrentSavings] = useState(100000);
+  const [monthlyContribution, setMonthlyContribution] = useState(2000);
+  const [expectedReturn, setExpectedReturn] = useState(7);
+  const [expectedInflation, setExpectedInflation] = useState(2);
+
+  const yearsToRetirement = retirementAge - currentAge;
+  
+  const calculateRetirement = () => {
+    const monthlyRate = expectedReturn / 100 / 12;
+    const totalMonths = yearsToRetirement * 12;
+    
+    let balance = currentSavings;
+    for (let i = 0; i < totalMonths; i++) {
+      balance = balance * (1 + monthlyRate) + monthlyContribution;
+    }
+    
+    return balance;
+  };
+
+  const retirementSavings = calculateRetirement();
+  const inflationAdjusted = retirementSavings / Math.pow(1 + expectedInflation / 100, yearsToRetirement);
+  const monthlyIncome = (retirementSavings * 0.04) / 12;
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-white rounded-2xl p-8 border-2 border-slate-200">
+        <h2 className="text-2xl font-bold text-secondary mb-6">Retirement Planning</h2>
+        <div className="grid md:grid-cols-3 gap-6">
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Current Age</label>
+            <input
+              type="number"
+              value={currentAge}
+              onChange={(e) => setCurrentAge(Number(e.target.value))}
+              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Retirement Age</label>
+            <input
+              type="number"
+              value={retirementAge}
+              onChange={(e) => setRetirementAge(Number(e.target.value))}
+              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Years to Retirement</label>
+            <div className="w-full px-4 py-3 bg-slate-100 rounded-xl font-bold text-primary text-lg text-center">
+              {yearsToRetirement} years
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Current Savings ({currency})</label>
+            <input
+              type="number"
+              value={currentSavings}
+              onChange={(e) => setCurrentSavings(Number(e.target.value))}
+              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Monthly Contribution ({currency})</label>
+            <input
+              type="number"
+              value={monthlyContribution}
+              onChange={(e) => setMonthlyContribution(Number(e.target.value))}
+              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Expected Return (%)</label>
+            <input
+              type="number"
+              value={expectedReturn}
+              onChange={(e) => setExpectedReturn(Number(e.target.value))}
+              step="0.5"
+              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-3 gap-6">
+        <div className="bg-gradient-to-br from-primary to-teal-600 rounded-2xl p-6 text-white shadow-xl">
+          <div className="text-sm opacity-90 mb-2">Retirement Savings (Nominal)</div>
+          <div className="text-4xl font-bold mb-2">{formatCompact(retirementSavings)}</div>
+          <div className="text-sm opacity-75">{formatAmount(retirementSavings)}</div>
+          <div className="mt-3 text-xs opacity-75">At age {retirementAge}</div>
+        </div>
+        <div className="bg-white rounded-2xl p-6 border-2 border-amber-200 bg-amber-50">
+          <div className="text-sm text-amber-900 mb-2">Inflation-Adjusted Value</div>
+          <div className="text-4xl font-bold text-amber-700 mb-2">{formatCompact(inflationAdjusted)}</div>
+          <div className="text-sm text-amber-600">{formatAmount(inflationAdjusted)}</div>
+          <div className="mt-3 text-xs text-amber-700">Today's purchasing power</div>
+        </div>
+        <div className="bg-white rounded-2xl p-6 border-2 border-green-200 bg-green-50">
+          <div className="text-sm text-green-900 mb-2">Monthly Retirement Income</div>
+          <div className="text-4xl font-bold text-green-700 mb-2">{formatCompact(monthlyIncome)}</div>
+          <div className="text-sm text-green-600">{formatAmount(monthlyIncome)}</div>
+          <div className="mt-3 text-xs text-green-700">Based on 4% withdrawal rule</div>
+        </div>
+      </div>
+
+      <div className="bg-gradient-to-br from-slate-50 to-white rounded-2xl p-8 border-2 border-slate-200">
+        <h3 className="text-xl font-bold text-secondary mb-6">Your Retirement Timeline</h3>
+        <div className="space-y-4">
+          <div className="flex items-center gap-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+              {currentAge}
+            </div>
+            <div className="flex-1">
+              <div className="font-bold text-secondary">Today</div>
+              <div className="text-sm text-slate-600">Current Savings: {formatAmount(currentSavings)}</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 pl-6">
+            <div className="w-1 h-16 bg-gradient-to-b from-blue-500 to-green-500"></div>
+            <div className="text-sm text-slate-600">
+              Contributing {formatAmount(monthlyContribution)}/month for {yearsToRetirement} years
+            </div>
+          </div>
+          <div className="flex items-center gap-4 p-4 bg-green-50 rounded-lg border border-green-200">
+            <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-bold">
+              {retirementAge}
+            </div>
+            <div className="flex-1">
+              <div className="font-bold text-secondary">Retirement</div>
+              <div className="text-sm text-slate-600">Total Savings: {formatAmount(retirementSavings)}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// DEBT PAYOFF CALCULATOR
+// ============================================================================
+function DebtPayoffCalculator({ formatAmount, currency }: any) {
+  const [debtAmount, setDebtAmount] = useState(25000);
+  const [interestRate, setInterestRate] = useState(18);
+  const [monthlyPayment, setMonthlyPayment] = useState(500);
+
+  const calculatePayoff = () => {
+    if (monthlyPayment <= 0 || interestRate < 0) {
+      return { months: 0, totalPaid: 0, totalInterest: 0 };
+    }
+
+    const monthlyRate = interestRate / 100 / 12;
+    let balance = debtAmount;
+    let months = 0;
+    let totalPaid = 0;
+
+    const monthlyInterest = balance * monthlyRate;
+    if (monthlyPayment <= monthlyInterest) {
+      return { months: Infinity, totalPaid: 0, totalInterest: 0 };
+    }
+
+    while (balance > 0 && months < 600) {
+      const interest = balance * monthlyRate;
+      const principal = monthlyPayment - interest;
+      
+      if (balance <= monthlyPayment) {
+        totalPaid += balance + interest;
+        balance = 0;
+        months++;
+        break;
+      }
+      
+      balance -= principal;
+      totalPaid += monthlyPayment;
+      months++;
+    }
+
+    return {
+      months,
+      totalPaid,
+      totalInterest: totalPaid - debtAmount
+    };
+  };
+
+  const payoff = calculatePayoff();
+  const years = Math.floor(payoff.months / 12);
+  const remainingMonths = payoff.months % 12;
+  const isPayoffImpossible = payoff.months === Infinity || payoff.months === 0;
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-white rounded-2xl p-8 border-2 border-slate-200">
+        <h2 className="text-2xl font-bold text-secondary mb-6">Debt Information</h2>
+        <div className="grid md:grid-cols-3 gap-6">
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Total Debt ({currency})</label>
+            <input
+              type="number"
+              value={debtAmount}
+              onChange={(e) => setDebtAmount(Number(e.target.value))}
+              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Annual Interest Rate (%)</label>
+            <input
+              type="number"
+              value={interestRate}
+              onChange={(e) => setInterestRate(Number(e.target.value))}
+              step="0.5"
+              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Monthly Payment ({currency})</label>
+            <input
+              type="number"
+              value={monthlyPayment}
+              onChange={(e) => setMonthlyPayment(Number(e.target.value))}
+              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
+            />
+          </div>
+        </div>
+      </div>
+
+      {isPayoffImpossible ? (
+        <div className="bg-red-50 border-2 border-red-300 rounded-2xl p-8 text-center">
+          <div className="text-6xl mb-4">⚠️</div>
+          <h3 className="text-2xl font-bold text-red-900 mb-2">Payment Too Low!</h3>
+          <p className="text-red-700 mb-4">
+            Your monthly payment doesn't cover the interest charges. Increase your payment to at least{' '}
+            <strong>{formatAmount((debtAmount * interestRate / 100 / 12) + 1)}</strong> per month.
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="bg-gradient-to-br from-primary to-teal-600 rounded-2xl p-6 text-white shadow-xl">
+              <div className="text-sm opacity-90 mb-2">Time to Payoff</div>
+              <div className="text-4xl font-bold mb-2">{years}y {remainingMonths}m</div>
+              <div className="text-sm opacity-75">{payoff.months} months total</div>
+            </div>
+            <div className="bg-white rounded-2xl p-6 border-2 border-red-200 bg-red-50">
+              <div className="text-sm text-red-900 mb-2">Total Amount Paid</div>
+              <div className="text-4xl font-bold text-red-700 mb-2">{formatAmount(payoff.totalPaid)}</div>
+              <div className="text-sm text-red-600">Principal + Interest</div>
+            </div>
+            <div className="bg-white rounded-2xl p-6 border-2 border-orange-200 bg-orange-50">
+              <div className="text-sm text-orange-900 mb-2">Total Interest</div>
+              <div className="text-4xl font-bold text-orange-700 mb-2">{formatAmount(payoff.totalInterest)}</div>
+              <div className="text-sm text-orange-600">Extra cost of debt</div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl p-8 border-2 border-slate-200">
+            <h3 className="text-xl font-bold text-secondary mb-6">Payment Breakdown</h3>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+                <span className="text-slate-700">Original Debt</span>
+                <span className="font-bold text-secondary">{formatAmount(debtAmount)}</span>
+              </div>
+              <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg border border-orange-200">
+                <span className="text-orange-900">Total Interest</span>
+                <span className="font-bold text-orange-700">+{formatAmount(payoff.totalInterest)}</span>
+              </div>
+              <div className="flex items-center justify-between p-4 bg-red-50 rounded-lg border-2 border-red-300">
+                <span className="text-red-900 font-bold">Total You'll Pay</span>
+                <span className="font-bold text-red-700 text-xl">{formatAmount(payoff.totalPaid)}</span>
+              </div>
+            </div>
+
+            <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <h4 className="font-bold text-secondary mb-3">💡 Pay More, Save More</h4>
+              <div className="text-sm text-slate-700 space-y-2">
+                <div>
+                  If you increase payment to {formatAmount(monthlyPayment + 100)}:
+                  <ul className="list-disc list-inside ml-4 mt-1 text-slate-600">
+                    <li>Save approximately {formatAmount((payoff.totalInterest * 0.15))} in interest</li>
+                    <li>Pay off {Math.floor(payoff.months * 0.15)} months faster</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
   );
 }
