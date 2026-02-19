@@ -1,12 +1,19 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { auth } from '../firebase/config';
+import { auth, db } from '../firebase/config';
 import { 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup
 } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+
+// WHITELIST - Only these emails can access the app
+const WHITELISTED_EMAILS = [
+  'balaji.k.malepati@gmail.com',  // Replace with your email
+  'kanchana.malepati@gmail.com'     // Replace with test user email
+];
 
 export default function Login() {
   const navigate = useNavigate();
@@ -16,20 +23,43 @@ export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const checkWhitelist = async (userEmail: string) => {
+    // Check if email is in whitelist
+    return WHITELISTED_EMAILS.includes(userEmail.toLowerCase());
+  };
+
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
+      // Check whitelist before allowing signup
+      const isWhitelisted = await checkWhitelist(email);
+      
+      if (!isWhitelisted) {
+        setError('🔒 Beta Access Only: myfynzo is currently in private beta. Join our waitlist to get early access!');
+        setLoading(false);
+        return;
+      }
+
       if (isSignUp) {
         await createUserWithEmailAndPassword(auth, email, password);
       } else {
         await signInWithEmailAndPassword(auth, email, password);
       }
+      
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.message || 'Authentication failed');
+      if (err.code === 'auth/user-not-found') {
+        setError('Account not found. myfynzo is currently in private beta.');
+      } else if (err.code === 'auth/wrong-password') {
+        setError('Incorrect password');
+      } else if (err.code === 'auth/email-already-in-use') {
+        setError('Email already registered. Please sign in.');
+      } else {
+        setError(err.message || 'Authentication failed');
+      }
     } finally {
       setLoading(false);
     }
@@ -41,7 +71,19 @@ export default function Login() {
 
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      
+      // Check whitelist
+      const isWhitelisted = await checkWhitelist(result.user.email || '');
+      
+      if (!isWhitelisted) {
+        // Sign out if not whitelisted
+        await auth.signOut();
+        setError('🔒 Beta Access Only: myfynzo is currently in private beta. Join our waitlist to get early access!');
+        setLoading(false);
+        return;
+      }
+      
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Google sign in failed');
@@ -61,14 +103,27 @@ export default function Login() {
           <p className="text-slate-600">Your Wealth Management Platform</p>
         </div>
 
+        {/* Beta Notice */}
+        <div className="mb-6 p-4 bg-amber-50 border-2 border-amber-200 rounded-xl">
+          <div className="flex items-start gap-3">
+            <div className="text-2xl">🔒</div>
+            <div className="flex-1">
+              <div className="font-bold text-amber-900 mb-1">Private Beta</div>
+              <div className="text-sm text-amber-700">
+                Currently available to invited users only. Full launch coming soon!
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Login Card */}
         <div className="bg-white rounded-2xl shadow-2xl p-8 border-2 border-slate-200">
           <div className="text-center mb-6">
             <h2 className="text-2xl font-bold text-secondary mb-2">
-              {isSignUp ? 'Create Account' : 'Welcome Back'}
+              {isSignUp ? 'Beta Access' : 'Welcome Back'}
             </h2>
             <p className="text-slate-600 text-sm">
-              {isSignUp ? 'Start your FIRE journey today' : 'Sign in to continue'}
+              {isSignUp ? 'Sign up with your whitelisted email' : 'Sign in to continue'}
             </p>
           </div>
 
@@ -153,9 +208,24 @@ export default function Login() {
               }}
               className="text-sm text-primary hover:text-teal-700 font-semibold"
             >
-              {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
+              {isSignUp ? 'Already have access? Sign In' : "Have beta access? Sign Up"}
             </button>
           </div>
+        </div>
+
+        {/* Waitlist CTA */}
+        <div className="mt-6 text-center p-6 bg-white rounded-xl border-2 border-slate-200">
+          <div className="text-4xl mb-3">🚀</div>
+          <h3 className="font-bold text-secondary mb-2">Want Early Access?</h3>
+          <p className="text-sm text-slate-600 mb-4">
+            Join our waitlist to be notified when we launch publicly
+          </p>
+          <button
+            onClick={() => window.location.href = '/'}
+            className="px-6 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-all font-semibold text-sm"
+          >
+            Back to Landing Page
+          </button>
         </div>
       </div>
 
