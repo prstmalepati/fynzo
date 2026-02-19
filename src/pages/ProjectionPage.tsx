@@ -1,301 +1,318 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import SidebarLayout from "../components/SidebarLayout";
-import ProjectionInputs from "../components/projection/ProjectionInputs";
-import WealthProjectionChart from "../components/charts/WealthProjectionChart";
+import { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useCurrency } from '../context/CurrencyContext';
+import { firestore } from '../firebase/config';
+import SidebarLayout from '../components/SidebarLayout';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function ProjectionPage() {
   const { user } = useAuth();
-  const navigate = useNavigate();
-  const [result, setResult] = useState<any>(null);
-  const [showResults, setShowResults] = useState(false);
+  const { formatAmount, formatCompact, currency } = useCurrency();
   
-  // Load saved FIRE target from FIRE Calculator
-  const [savedFireTarget, setSavedFireTarget] = useState<any>(null);
+  const [currentSavings, setCurrentSavings] = useState(50000);
+  const [monthlySavings, setMonthlySavings] = useState(2000);
+  const [expectedReturn, setExpectedReturn] = useState(7);
+  const [years, setYears] = useState(10);
+  const [inflationRate, setInflationRate] = useState(2);
 
-  useEffect(() => {
-    const fireData = localStorage.getItem('myfynzo_fire_target');
-    if (fireData) {
-      try {
-        setSavedFireTarget(JSON.parse(fireData));
-      } catch (e) {
-        console.error('Failed to load FIRE target', e);
+  // Calculate projections
+  const calculateProjection = () => {
+    const data = [];
+    let balance = currentSavings;
+    const monthlyReturn = expectedReturn / 100 / 12;
+    const monthlyInflation = inflationRate / 100 / 12;
+
+    for (let year = 0; year <= years; year++) {
+      // Calculate balance at end of year
+      if (year > 0) {
+        for (let month = 0; month < 12; month++) {
+          balance = balance * (1 + monthlyReturn) + monthlySavings;
+        }
       }
-    }
-  }, []);
 
-  const handleCalculate = (calculationResult: any) => {
-    setResult(calculationResult);
-    setShowResults(true);
+      // Calculate inflation-adjusted value
+      const inflationAdjusted = balance / Math.pow(1 + inflationRate / 100, year);
+
+      data.push({
+        year,
+        nominal: Math.round(balance),
+        real: Math.round(inflationAdjusted),
+        name: `Year ${year}`
+      });
+    }
+
+    return data;
   };
 
-  // If user is logged in, use sidebar layout
-  if (user) {
-    return (
-      <SidebarLayout>
-        <div className="p-8">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-secondary mb-2" style={{ fontFamily: "'Crimson Pro', serif" }}>
-              Wealth Projection Calculator
-            </h1>
-            <p className="text-slate-600" style={{ fontFamily: "'Manrope', sans-serif" }}>
-              Model your path to financial independence with precision
-            </p>
-          </div>
+  const projectionData = calculateProjection();
+  const finalValue = projectionData[projectionData.length - 1].nominal;
+  const realValue = projectionData[projectionData.length - 1].real;
+  const totalContributions = currentSavings + (monthlySavings * 12 * years);
+  const totalGrowth = finalValue - totalContributions;
 
-          <div className="grid lg:grid-cols-3 gap-8">
-            {/* Input Column */}
-            <div className="lg:col-span-1">
-              <ProjectionInputs onCalculate={handleCalculate} />
-            </div>
+  // FIRE calculation
+  const annualExpenses = monthlySavings * 6; // Assume expenses are half of savings
+  const fireNumber = annualExpenses * 25; // 4% rule
+  const yearsToFIRE = fireNumber > finalValue 
+    ? Math.ceil((fireNumber - currentSavings) / (monthlySavings * 12))
+    : years;
 
-            {/* Results Column */}
-            <div className="lg:col-span-2 space-y-8">
-              {!showResults ? (
-                <div className="bg-white rounded-2xl p-12 border border-slate-200 text-center">
-                  <div className="text-6xl mb-4">📊</div>
-                  <h3 className="text-2xl font-bold text-secondary mb-2">Ready to project your wealth?</h3>
-                  <p className="text-slate-600">Fill in your details and click Calculate to see your path to FIRE</p>
-                </div>
-              ) : (
-                <>
-                  {/* FIRE Target Card */}
-                  {savedFireTarget && (
-                    <div className="bg-gradient-to-br from-teal-500 to-teal-700 rounded-2xl p-6 text-white shadow-xl">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="text-sm opacity-90 font-semibold">Your FIRE Target</div>
-                        <span className="text-3xl">
-                          {savedFireTarget.type === 'lean' ? '🌱' :
-                           savedFireTarget.type === 'fat' ? '💎' :
-                           savedFireTarget.type === 'barista' ? '☕' : '🏖️'}
-                        </span>
-                      </div>
-                      <div className="text-5xl font-bold mb-2" style={{ fontFamily: "'Crimson Pro', serif" }}>
-                        €{(savedFireTarget.number / 1000).toFixed(0)}K
-                      </div>
-                      <div className="text-sm opacity-90">
-                        {savedFireTarget.type.charAt(0).toUpperCase() + savedFireTarget.type.slice(1)} FIRE
-                      </div>
-                      <div className="text-xs opacity-75 mt-2">
-                        Set in FIRE Calculator
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Summary Cards */}
-                  <div className="grid md:grid-cols-3 gap-4">
-                    <div className="bg-gradient-to-br from-primary to-teal-700 rounded-xl p-6 text-white">
-                      <div className="text-sm opacity-90 mb-1">Final Net Worth</div>
-                      <div className="text-3xl font-bold">€{(result.finalNetWorth / 1000).toFixed(0)}K</div>
-                    </div>
-                    <div className="bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-xl p-6 text-white">
-                      <div className="text-sm opacity-90 mb-1">FIRE Year</div>
-                      <div className="text-3xl font-bold">{result.fireYear || 'N/A'}</div>
-                    </div>
-                    <div className="bg-gradient-to-br from-purple-500 to-purple-700 rounded-xl p-6 text-white">
-                      <div className="text-sm opacity-90 mb-1">Years to FIRE</div>
-                      <div className="text-3xl font-bold">{result.yearsToFire || 'N/A'}</div>
-                    </div>
-                  </div>
-
-                  {/* Chart */}
-                  <div className="bg-white rounded-2xl p-6 border border-slate-200">
-                    <WealthProjectionChart data={result.timeline} />
-                  </div>
-
-                  {/* Timeline Table */}
-                  <div className="bg-white rounded-2xl p-6 border border-slate-200">
-                    <h3 className="text-xl font-bold text-secondary mb-4">Year-by-Year Breakdown</h3>
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-sm">
-                        <thead className="border-b-2 border-slate-200">
-                          <tr>
-                            <th className="pb-3 font-semibold text-slate-700">Year</th>
-                            <th className="pb-3 font-semibold text-slate-700">Age</th>
-                            <th className="pb-3 font-semibold text-slate-700">Income</th>
-                            <th className="pb-3 font-semibold text-slate-700">Expenses</th>
-                            <th className="pb-3 font-semibold text-slate-700">Savings</th>
-                            <th className="pb-3 font-semibold text-slate-700">Investments</th>
-                            <th className="pb-3 font-semibold text-slate-700">Net Worth</th>
-                            <th className="pb-3 font-semibold text-slate-700">Status</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {result.timeline.map((row: any, i: number) => (
-                            <tr 
-                              key={i} 
-                              className={`border-b border-slate-100 ${row.fireReached ? 'bg-emerald-50' : ''}`}
-                            >
-                              <td className="py-3 font-medium">{row.year}</td>
-                              <td className="py-3 text-slate-600">{row.ages}</td>
-                              <td className="py-3 text-slate-600">€{(row.totalIncome / 1000).toFixed(1)}K</td>
-                              <td className="py-3 text-slate-600">€{(row.totalExpenses / 1000).toFixed(1)}K</td>
-                              <td className="py-3 text-emerald-600 font-medium">€{(row.annualSavings / 1000).toFixed(1)}K</td>
-                              <td className="py-3 font-medium">€{(row.investmentValue / 1000).toFixed(0)}K</td>
-                              <td className="py-3 font-bold text-primary">€{(row.netWorth / 1000).toFixed(0)}K</td>
-                              <td className="py-3">
-                                {row.fireReached && (
-                                  <span className="px-2 py-1 bg-emerald-100 text-emerald-800 rounded text-xs font-semibold">
-                                    FIRE 🔥
-                                  </span>
-                                )}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* Google Fonts */}
-          <style>{`
-            @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap');
-          `}</style>
-        </div>
-      </SidebarLayout>
-    );
-  }
-
-  // If NOT logged in, show standalone page
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-teal-50">
-      <div className="p-8">
-        {/* Header with login prompt */}
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <button
-              onClick={() => navigate('/')}
-              className="flex items-center gap-3 mb-4 group"
-            >
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-teal-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <span className="text-white font-bold text-xl">f</span>
-              </div>
-              <h1 className="text-4xl font-bold text-secondary group-hover:text-primary transition-colors" style={{ fontFamily: "'Crimson Pro', serif" }}>
-                Wealth Projection Calculator
-              </h1>
-            </button>
-            <p className="text-slate-600" style={{ fontFamily: "'Manrope', sans-serif" }}>
-              Model your path to financial independence with precision
-            </p>
-          </div>
-          <button
-            onClick={() => navigate('/login')}
-            className="px-6 py-3 bg-primary text-white rounded-xl hover:bg-teal-700 transition-all font-semibold shadow-lg"
-          >
-            Save Results (Login)
-          </button>
+    <SidebarLayout>
+      <div className="p-8 max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-secondary mb-2" style={{ fontFamily: "'Crimson Pro', serif" }}>
+            Wealth Projection
+          </h1>
+          <p className="text-slate-600">
+            Model your financial future with compound growth
+          </p>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Input Column */}
-          <div className="lg:col-span-1">
-            <ProjectionInputs onCalculate={handleCalculate} />
+        {/* Input Cards */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* Current Savings */}
+          <div className="bg-white rounded-xl p-6 border-2 border-slate-200">
+            <label className="block text-sm font-semibold text-slate-700 mb-3">
+              Current Savings ({currency})
+            </label>
+            <input
+              type="number"
+              value={currentSavings}
+              onChange={(e) => setCurrentSavings(Number(e.target.value))}
+              className="w-full px-4 py-3 text-2xl font-bold border-2 border-slate-200 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+            />
           </div>
 
-          {/* Results Column */}
-          <div className="lg:col-span-2 space-y-8">
-            {!showResults ? (
-              <div className="bg-white rounded-2xl p-12 border border-slate-200 text-center">
-                <div className="text-6xl mb-4">📊</div>
-                <h3 className="text-2xl font-bold text-secondary mb-2">Ready to project your wealth?</h3>
-                <p className="text-slate-600">Fill in your details and click Calculate to see your path to FIRE</p>
+          {/* Monthly Savings */}
+          <div className="bg-white rounded-xl p-6 border-2 border-slate-200">
+            <label className="block text-sm font-semibold text-slate-700 mb-3">
+              Monthly Savings ({currency})
+            </label>
+            <input
+              type="number"
+              value={monthlySavings}
+              onChange={(e) => setMonthlySavings(Number(e.target.value))}
+              className="w-full px-4 py-3 text-2xl font-bold border-2 border-slate-200 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+            />
+          </div>
+
+          {/* Expected Return */}
+          <div className="bg-white rounded-xl p-6 border-2 border-slate-200">
+            <label className="block text-sm font-semibold text-slate-700 mb-3">
+              Annual Return (%)
+            </label>
+            <input
+              type="number"
+              value={expectedReturn}
+              onChange={(e) => setExpectedReturn(Number(e.target.value))}
+              step="0.5"
+              className="w-full px-4 py-3 text-2xl font-bold border-2 border-slate-200 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+            />
+          </div>
+
+          {/* Time Horizon */}
+          <div className="bg-white rounded-xl p-6 border-2 border-slate-200">
+            <label className="block text-sm font-semibold text-slate-700 mb-3">
+              Years to Project
+            </label>
+            <input
+              type="number"
+              value={years}
+              onChange={(e) => setYears(Math.min(50, Number(e.target.value)))}
+              min="1"
+              max="50"
+              className="w-full px-4 py-3 text-2xl font-bold border-2 border-slate-200 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+            />
+          </div>
+        </div>
+
+        {/* Results Cards */}
+        <div className="grid md:grid-cols-3 gap-6 mb-8">
+          {/* Final Value */}
+          <div className="bg-gradient-to-br from-primary to-teal-600 rounded-2xl p-6 text-white shadow-xl">
+            <div className="text-sm opacity-90 mb-2">Final Value (Nominal)</div>
+            <div className="text-4xl font-bold mb-2">
+              {formatCompact(finalValue)}
+            </div>
+            <div className="text-sm opacity-75">
+              {formatAmount(finalValue)}
+            </div>
+            <div className="mt-3 text-xs opacity-75">
+              In {years} years
+            </div>
+          </div>
+
+          {/* Real Value */}
+          <div className="bg-white rounded-2xl p-6 border-2 border-amber-200 bg-amber-50">
+            <div className="text-sm text-amber-900 font-semibold mb-2">
+              Real Value (Inflation-Adjusted)
+            </div>
+            <div className="text-4xl font-bold text-amber-700 mb-2">
+              {formatCompact(realValue)}
+            </div>
+            <div className="text-sm text-amber-600">
+              {formatAmount(realValue)}
+            </div>
+            <div className="mt-3 text-xs text-amber-700">
+              Adjusted for {inflationRate}% inflation
+            </div>
+          </div>
+
+          {/* Total Growth */}
+          <div className="bg-white rounded-2xl p-6 border-2 border-green-200 bg-green-50">
+            <div className="text-sm text-green-900 font-semibold mb-2">
+              Investment Growth
+            </div>
+            <div className="text-4xl font-bold text-green-700 mb-2">
+              {formatCompact(totalGrowth)}
+            </div>
+            <div className="text-sm text-green-600">
+              {formatAmount(totalGrowth)}
+            </div>
+            <div className="mt-3 text-xs text-green-700">
+              From {formatCompact(totalContributions)} contributed
+            </div>
+          </div>
+        </div>
+
+        {/* Chart */}
+        <div className="bg-white rounded-2xl p-8 border-2 border-slate-200 mb-8">
+          <h2 className="text-2xl font-bold text-secondary mb-6">Projection Chart</h2>
+          <div className="h-96">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={projectionData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis 
+                  dataKey="name" 
+                  tick={{ fontSize: 12 }}
+                />
+                <YAxis 
+                  tickFormatter={(value) => formatCompact(value)}
+                  tick={{ fontSize: 12 }}
+                />
+                <Tooltip 
+                  formatter={(value: number) => formatAmount(value)}
+                  contentStyle={{ 
+                    backgroundColor: 'white', 
+                    border: '2px solid #e2e8f0',
+                    borderRadius: '12px',
+                    padding: '12px'
+                  }}
+                />
+                <Legend />
+                <Line 
+                  type="monotone" 
+                  dataKey="nominal" 
+                  stroke="#14B8A6" 
+                  strokeWidth={3}
+                  name="Nominal Value"
+                  dot={{ fill: '#14B8A6', r: 4 }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="real" 
+                  stroke="#F59E0B" 
+                  strokeWidth={2}
+                  strokeDasharray="5 5"
+                  name="Real Value (Inflation-Adjusted)"
+                  dot={{ fill: '#F59E0B', r: 3 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* FIRE Target */}
+        <div className="bg-gradient-to-br from-orange-50 to-white rounded-2xl p-8 border-2 border-orange-200">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="text-4xl">🔥</div>
+            <div>
+              <h2 className="text-2xl font-bold text-secondary">FIRE Target</h2>
+              <p className="text-slate-600">Financial Independence, Retire Early</p>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            <div>
+              <div className="text-sm text-slate-600 mb-2">Your FIRE Number</div>
+              <div className="text-3xl font-bold text-orange-600 mb-1">
+                {formatCompact(fireNumber)}
               </div>
-            ) : (
-              <>
-                {/* FIRE Target Card */}
-                {savedFireTarget && (
-                  <div className="bg-gradient-to-br from-teal-500 to-teal-700 rounded-2xl p-6 text-white shadow-xl">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="text-sm opacity-90 font-semibold">Your FIRE Target</div>
-                      <span className="text-3xl">
-                        {savedFireTarget.type === 'lean' ? '🌱' :
-                         savedFireTarget.type === 'fat' ? '💎' :
-                         savedFireTarget.type === 'barista' ? '☕' : '🏖️'}
-                      </span>
-                    </div>
-                    <div className="text-5xl font-bold mb-2" style={{ fontFamily: "'Crimson Pro', serif" }}>
-                      €{(savedFireTarget.number / 1000).toFixed(0)}K
-                    </div>
-                    <div className="text-sm opacity-90">
-                      {savedFireTarget.type.charAt(0).toUpperCase() + savedFireTarget.type.slice(1)} FIRE
-                    </div>
-                    <div className="text-xs opacity-75 mt-2">
-                      Set in FIRE Calculator
-                    </div>
-                  </div>
-                )}
+              <div className="text-xs text-slate-600">
+                Based on 4% withdrawal rule
+              </div>
+            </div>
 
-                {/* Summary Cards */}
-                <div className="grid md:grid-cols-3 gap-4">
-                  <div className="bg-gradient-to-br from-primary to-teal-700 rounded-xl p-6 text-white">
-                    <div className="text-sm opacity-90 mb-1">Final Net Worth</div>
-                    <div className="text-3xl font-bold">€{(result.finalNetWorth / 1000).toFixed(0)}K</div>
-                  </div>
-                  <div className="bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-xl p-6 text-white">
-                    <div className="text-sm opacity-90 mb-1">FIRE Year</div>
-                    <div className="text-3xl font-bold">{result.fireYear || 'N/A'}</div>
-                  </div>
-                  <div className="bg-gradient-to-br from-purple-500 to-purple-700 rounded-xl p-6 text-white">
-                    <div className="text-sm opacity-90 mb-1">Years to FIRE</div>
-                    <div className="text-3xl font-bold">{result.yearsToFire || 'N/A'}</div>
-                  </div>
-                </div>
+            <div>
+              <div className="text-sm text-slate-600 mb-2">Projected Value</div>
+              <div className="text-3xl font-bold text-primary mb-1">
+                {formatCompact(finalValue)}
+              </div>
+              <div className="text-xs text-slate-600">
+                In {years} years
+              </div>
+            </div>
 
-                {/* Chart */}
-                <div className="bg-white rounded-2xl p-6 border border-slate-200">
-                  <WealthProjectionChart data={result.timeline} />
-                </div>
+            <div>
+              <div className="text-sm text-slate-600 mb-2">
+                {finalValue >= fireNumber ? 'You\'ll reach FIRE!' : 'Years to FIRE'}
+              </div>
+              <div className={`text-3xl font-bold mb-1 ${
+                finalValue >= fireNumber ? 'text-green-600' : 'text-amber-600'
+              }`}>
+                {finalValue >= fireNumber ? `✓ ${years} years` : `≈ ${yearsToFIRE} years`}
+              </div>
+              <div className="text-xs text-slate-600">
+                {finalValue >= fireNumber 
+                  ? 'Based on current projection' 
+                  : 'Keep saving to reach your goal'}
+              </div>
+            </div>
+          </div>
 
-                {/* Timeline Table */}
-                <div className="bg-white rounded-2xl p-6 border border-slate-200">
-                  <h3 className="text-xl font-bold text-secondary mb-4">Year-by-Year Breakdown</h3>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead className="border-b-2 border-slate-200">
-                        <tr>
-                          <th className="pb-3 font-semibold text-slate-700">Year</th>
-                          <th className="pb-3 font-semibold text-slate-700">Age</th>
-                          <th className="pb-3 font-semibold text-slate-700">Income</th>
-                          <th className="pb-3 font-semibold text-slate-700">Expenses</th>
-                          <th className="pb-3 font-semibold text-slate-700">Savings</th>
-                          <th className="pb-3 font-semibold text-slate-700">Investments</th>
-                          <th className="pb-3 font-semibold text-slate-700">Net Worth</th>
-                          <th className="pb-3 font-semibold text-slate-700">Status</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {result.timeline.map((row: any, i: number) => (
-                          <tr 
-                            key={i} 
-                            className={`border-b border-slate-100 ${row.fireReached ? 'bg-emerald-50' : ''}`}
-                          >
-                            <td className="py-3 font-medium">{row.year}</td>
-                            <td className="py-3 text-slate-600">{row.ages}</td>
-                            <td className="py-3 text-slate-600">€{(row.totalIncome / 1000).toFixed(1)}K</td>
-                            <td className="py-3 text-slate-600">€{(row.totalExpenses / 1000).toFixed(1)}K</td>
-                            <td className="py-3 text-emerald-600 font-medium">€{(row.annualSavings / 1000).toFixed(1)}K</td>
-                            <td className="py-3 font-medium">€{(row.investmentValue / 1000).toFixed(0)}K</td>
-                            <td className="py-3 font-bold text-primary">€{(row.netWorth / 1000).toFixed(0)}K</td>
-                            <td className="py-3">
-                              {row.fireReached && (
-                                <span className="px-2 py-1 bg-emerald-100 text-emerald-800 rounded text-xs font-semibold">
-                                  FIRE 🔥
-                                </span>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </>
-            )}
+          {finalValue < fireNumber && (
+            <div className="mt-6 p-4 bg-white rounded-lg border border-orange-200">
+              <div className="text-sm text-orange-900">
+                <strong>💡 Tip:</strong> To reach FIRE in {years} years, increase monthly savings by{' '}
+                <strong>{formatAmount((fireNumber - finalValue) / (years * 12))}</strong>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Inflation Adjustment */}
+        <div className="mt-8 bg-blue-50 rounded-2xl p-6 border-2 border-blue-200">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-xl font-bold text-secondary mb-1">
+                Inflation Adjustment
+              </h3>
+              <p className="text-sm text-slate-600">
+                Account for purchasing power loss over time
+              </p>
+            </div>
+            <div className="text-right">
+              <div className="text-sm text-blue-900 mb-1">Current Rate</div>
+              <div className="text-3xl font-bold text-blue-700">{inflationRate}%</div>
+            </div>
+          </div>
+          
+          <input
+            type="range"
+            min="0"
+            max="10"
+            step="0.5"
+            value={inflationRate}
+            onChange={(e) => setInflationRate(Number(e.target.value))}
+            className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+          />
+          
+          <div className="flex justify-between text-xs text-blue-700 mt-2">
+            <span>0%</span>
+            <span>5%</span>
+            <span>10%</span>
           </div>
         </div>
 
@@ -304,6 +321,6 @@ export default function ProjectionPage() {
           @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap');
         `}</style>
       </div>
-    </div>
+    </SidebarLayout>
   );
 }
