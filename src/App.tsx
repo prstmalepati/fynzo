@@ -4,6 +4,7 @@ import { CurrencyProvider } from "./context/CurrencyContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 // Public pages
+import LandingPageExtended from './pages/LandingPageExtended';
 import Login from "./pages/Login";
 import ProjectionPage from "./pages/ProjectionPage";
 
@@ -12,9 +13,6 @@ import Dashboard from "./pages/Dashboard";
 import Investments from "./pages/Investments";
 import Calculators from "./pages/Calculators";
 import Settings from "./pages/Settings";
-
-// Optional: Uncomment if you want to use the extended landing page
-// import LandingPageExtended from './pages/LandingPageExtended';
 
 // Public Route Component (redirects if logged in)
 function PublicRoute({ children }: { children: React.ReactNode }) {
@@ -45,14 +43,7 @@ export default function App() {
         <Routes>
           {/* Public routes - No login required */}
           
-          {/* Option 1: Simple redirect to login (CURRENT) */}
-          <Route 
-            path="/" 
-            element={<Navigate to="/login" replace />}
-          />
-          
-          {/* Option 2: Use extended landing page (UNCOMMENT to use) */}
-          {/* 
+          {/* Homepage: Extended Landing Page */}
           <Route 
             path="/" 
             element={
@@ -61,7 +52,6 @@ export default function App() {
               </PublicRoute>
             } 
           />
-          */}
           
           <Route 
             path="/login" 
@@ -72,7 +62,6 @@ export default function App() {
             } 
           />
           
-          {/* Public projection page - accessible without login */}
           <Route path="/projection" element={<ProjectionPage />} />
 
           {/* Protected routes - Login required */}
@@ -112,8 +101,8 @@ export default function App() {
             }
           />
 
-          {/* Catch all - redirect to login */}
-          <Route path="*" element={<Navigate to="/login" replace />} />
+          {/* Catch all - redirect to landing page */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </CurrencyProvider>
     </AuthProvider>
