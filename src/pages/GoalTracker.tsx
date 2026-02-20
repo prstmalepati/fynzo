@@ -2,10 +2,8 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
 import { db } from '../firebase/config';
-import { collection, addDoc, deleteDoc, doc, query, orderBy, getDocs, updateDoc, Timestamp } from 'firebase/firestore';
+import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import SidebarLayout from '../components/SidebarLayout';
-import GoalCard from '../components/GoalCard';
-import CreateGoalModal from '../components/CreateGoalModal';
 
 export interface Goal {
   id: string;
@@ -34,7 +32,6 @@ export default function GoalTracker() {
   const { user } = useAuth();
   const { formatAmount, formatCompact } = useCurrency();
   const [goals, setGoals] = useState<Goal[]>([]);
-  const [showCreateModal, setShowCreateModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState<string>('all');
 
@@ -68,48 +65,6 @@ export default function GoalTracker() {
     } catch (error) {
       console.error('Error loading goals:', error);
       setLoading(false);
-    }
-  };
-
-  const handleCreateGoal = async (goal: Omit<Goal, 'id' | 'createdAt' | 'updatedAt'>) => {
-    try {
-      const goalsRef = collection(db, 'users', user.uid, 'goals');
-      await addDoc(goalsRef, {
-        ...goal,
-        targetDate: Timestamp.fromDate(goal.targetDate),
-        projectedCompletionDate: Timestamp.fromDate(goal.projectedCompletionDate),
-        createdAt: Timestamp.now(),
-        updatedAt: Timestamp.now()
-      });
-
-      setShowCreateModal(false);
-      await loadGoals();
-    } catch (error) {
-      console.error('Error creating goal:', error);
-      alert('Failed to create goal');
-    }
-  };
-
-  const handleDeleteGoal = async (goalId: string) => {
-    if (confirm('Delete this goal? This cannot be undone.')) {
-      try {
-        await deleteDoc(doc(db, 'users', user.uid, 'goals', goalId));
-        await loadGoals();
-      } catch (error) {
-        console.error('Error deleting goal:', error);
-      }
-    }
-  };
-
-  const handleUpdateGoal = async (goalId: string, updates: Partial<Goal>) => {
-    try {
-      await updateDoc(doc(db, 'users', user.uid, 'goals', goalId), {
-        ...updates,
-        updatedAt: Timestamp.now()
-      });
-      await loadGoals();
-    } catch (error) {
-      console.error('Error updating goal:', error);
     }
   };
 
@@ -214,17 +169,14 @@ export default function GoalTracker() {
                   Define clear objectives and track systematic progress toward your financial goals.
                 </p>
 
-                <button
-                  onClick={() => setShowCreateModal(true)}
-                  className="group relative px-12 py-6 bg-gradient-to-r from-primary via-teal-600 to-primary text-white rounded-2xl font-bold text-2xl shadow-2xl hover:shadow-primary/50 transition-all duration-300 hover:scale-105"
-                >
-                  <span className="relative z-10 flex items-center gap-4">
-                    <span>Create First Goal</span>
-                    <svg className="w-7 h-7 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
-                  </span>
-                </button>
+                <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-8 mb-8">
+                  <p className="text-blue-900 text-lg font-semibold mb-2">
+                    🚧 Goal Creation Coming Soon
+                  </p>
+                  <p className="text-blue-700">
+                    The goal creation interface will be available in the next update. For now, this page displays your existing goals.
+                  </p>
+                </div>
 
                 {/* Example Goals */}
                 <div className="mt-16 grid md:grid-cols-3 gap-6">
@@ -233,7 +185,7 @@ export default function GoalTracker() {
                     { emoji: '🏠', name: 'House Down Payment', amount: '€100K' },
                     { emoji: '🎓', name: 'Education Fund', amount: '€50K' }
                   ].map((item, i) => (
-                    <div key={i} className="bg-gradient-to-br from-slate-50 to-white rounded-2xl p-6 border-2 border-slate-200 hover:border-primary hover:shadow-xl transition-all">
+                    <div key={i} className="bg-gradient-to-br from-slate-50 to-white rounded-2xl p-6 border-2 border-slate-200">
                       <div className="text-5xl mb-4">{item.emoji}</div>
                       <div className="font-bold text-xl text-secondary mb-1">{item.name}</div>
                       <div className="text-primary font-bold text-lg">{item.amount}</div>
@@ -265,45 +217,77 @@ export default function GoalTracker() {
                     </button>
                   ))}
                 </div>
-                <button
-                  onClick={() => setShowCreateModal(true)}
-                  className="px-6 py-3 bg-gradient-to-r from-primary to-teal-600 text-white rounded-xl font-bold hover:shadow-xl transition-all whitespace-nowrap"
-                >
-                  + New Goal
-                </button>
               </div>
 
               {/* Goals Grid */}
               <div className="grid md:grid-cols-2 gap-8">
                 {filteredGoals.map((goal, index) => (
-                  <div key={goal.id} className="animate-fadeInUp" style={{ animationDelay: `${index * 0.1}s` }}>
-                    <GoalCard
-                      goal={goal}
-                      onDelete={handleDeleteGoal}
-                      onUpdate={handleUpdateGoal}
-                    />
+                  <div 
+                    key={goal.id} 
+                    className="bg-white rounded-2xl p-8 border-2 border-slate-200 shadow-lg animate-fadeInUp"
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
+                    <div className="flex items-start justify-between mb-6">
+                      <div className="flex items-center gap-4 flex-1">
+                        <div className="text-5xl">{goal.emoji}</div>
+                        <div>
+                          <h3 className="text-2xl font-bold text-secondary font-crimson">{goal.name}</h3>
+                          <p className="text-sm text-slate-600 mt-1">
+                            {goalTypes.find(t => t.value === goal.type)?.label || 'Custom'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Progress */}
+                    <div className="mb-6">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-semibold text-slate-700">Progress</span>
+                        <span className="text-sm font-bold text-secondary">{goal.progressPercentage.toFixed(0)}%</span>
+                      </div>
+                      <div className="h-4 bg-slate-200 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-primary to-teal-600 transition-all duration-1000"
+                          style={{ width: `${Math.min(100, goal.progressPercentage)}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Amounts */}
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                      <div className="bg-slate-50 rounded-xl p-4">
+                        <div className="text-sm text-slate-600 mb-1">Current</div>
+                        <div className="text-xl font-bold text-secondary font-manrope">
+                          {formatAmount(goal.currentAmount)}
+                        </div>
+                      </div>
+                      <div className="bg-slate-50 rounded-xl p-4">
+                        <div className="text-sm text-slate-600 mb-1">Target</div>
+                        <div className="text-xl font-bold text-secondary font-manrope">
+                          {formatAmount(goal.targetAmount)}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Status */}
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-slate-600">Status:</span>
+                      <span className={`font-semibold ${
+                        goal.status === 'on-track' ? 'text-green-600' :
+                        goal.status === 'ahead' ? 'text-blue-600' :
+                        goal.status === 'completed' ? 'text-purple-600' :
+                        'text-amber-600'
+                      }`}>
+                        {goal.status === 'on-track' ? 'On Track' :
+                         goal.status === 'ahead' ? 'Ahead of Schedule' :
+                         goal.status === 'completed' ? 'Completed' :
+                         'Needs Attention'}
+                      </span>
+                    </div>
                   </div>
                 ))}
               </div>
             </>
-          )}
-
-          {/* Floating Add Button */}
-          {goals.length > 0 && (
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="fixed bottom-10 right-10 w-20 h-20 bg-gradient-to-br from-primary via-teal-600 to-primary text-white rounded-3xl shadow-2xl hover:shadow-primary/60 hover:scale-110 transition-all duration-300 flex items-center justify-center text-4xl font-bold z-50"
-            >
-              +
-            </button>
-          )}
-
-          {/* Create Modal */}
-          {showCreateModal && (
-            <CreateGoalModal
-              onClose={() => setShowCreateModal(false)}
-              onCreate={handleCreateGoal}
-            />
           )}
         </div>
 
