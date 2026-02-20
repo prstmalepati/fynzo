@@ -3,17 +3,18 @@ import { AuthProvider } from './context/AuthContext';
 import { CurrencyProvider } from './context/CurrencyContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
-// Pages
-import LandingPage from './pages/LandingPage';
+// Pages - Import only what exists
 import Dashboard from './pages/Dashboard';
 import Investments from './pages/Investments';
 import LifestyleBasket from './pages/LifestyleBasket';
 import AntiPortfolio from './pages/AntiPortfolio';
-import ScenarioBranching from './pages/ScenarioBranching';  // ← NEW
-import GoalTracker from './pages/GoalTracker';              // ← NEW
-import Projection from './pages/Projection';
+import ScenarioBranching from './pages/ScenarioBranching';
+import GoalTracker from './pages/GoalTracker';
 import Calculators from './pages/Calculators';
 import Settings from './pages/Settings';
+
+// Import Projection if it exists, otherwise comment out
+// import Projection from './pages/Projection';
 
 function App() {
   return (
@@ -21,8 +22,8 @@ function App() {
       <CurrencyProvider>
         <Router>
           <Routes>
-            {/* Public Route */}
-            <Route path="/" element={<LandingPage />} />
+            {/* Root redirects to dashboard */}
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
             {/* Protected Routes */}
             <Route 
@@ -80,14 +81,15 @@ function App() {
               } 
             />
 
-            <Route 
+            {/* Uncomment if you have Projection page */}
+            {/* <Route 
               path="/projection" 
               element={
                 <ProtectedRoute>
                   <Projection />
                 </ProtectedRoute>
               } 
-            />
+            /> */}
 
             <Route 
               path="/calculators" 
@@ -107,8 +109,8 @@ function App() {
               } 
             />
 
-            {/* Catch all - redirect to landing */}
-            <Route path="*" element={<Navigate to="/" replace />} />
+            {/* Catch all - redirect to dashboard */}
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </Router>
       </CurrencyProvider>
