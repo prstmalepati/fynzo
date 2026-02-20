@@ -27,10 +27,11 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
   const handleLogout = async () => {
     try {
       await logout();
-      navigate('/');
+      navigate('/'); // Navigate to landing page
     } catch (error) {
       console.error('Logout error:', error);
-      alert('Failed to log out. Please try again.');
+      // Don't show alert - just navigate anyway
+      navigate('/');
     }
   };
 
