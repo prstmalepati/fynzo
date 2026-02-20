@@ -1,106 +1,121 @@
-import { ReactNode } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 interface SidebarLayoutProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export default function SidebarLayout({ children }: SidebarLayoutProps) {
-  const navigate = useNavigate();
   const location = useLocation();
-  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-const menuItems = [
-  { path: '/dashboard', label: 'Dashboard', icon: '📊' },
-  { path: '/investments', label: 'Investments', icon: '💼' },
-  { path: '/lifestyle-basket', label: 'Lifestyle Basket', icon: '🛒' },
-  { path: '/anti-portfolio', label: 'Anti-Portfolio', icon: '🛡️' },  // ← ADD THIS
-  { path: '/projection', label: 'Projection', icon: '📈' },
-  { path: '/calculators', label: 'Calculators', icon: '🧮' },
-  { path: '/settings', label: 'Settings', icon: '⚙️' }
-];
+  const menuItems = [
+    { path: '/dashboard', label: 'Dashboard', icon: '📊' },
+    { path: '/investments', label: 'Investments', icon: '💼' },
+    { path: '/lifestyle-basket', label: 'Lifestyle Basket', icon: '🛒' },
+    { path: '/anti-portfolio', label: 'Anti-Portfolio', icon: '🛡️' },
+    { path: '/scenario-branching', label: 'Scenario Branching', icon: '🌳' },  // ← NEW
+    { path: '/goal-tracker', label: 'Goal Tracker', icon: '🎯' },              // ← NEW
+    { path: '/projection', label: 'Projection', icon: '📈' },
+    { path: '/calculators', label: 'Calculators', icon: '🧮' },
+    { path: '/settings', label: 'Settings', icon: '⚙️' }
+  ];
 
-  const handleSignOut = async () => {
+  const handleLogout = async () => {
     try {
-      await signOut();
-      navigate('/login');
+      await logout();
+      navigate('/');
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error('Logout error:', error);
     }
   };
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50">
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-lg"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-slate-200 flex flex-col">
+      <div
+        className={`fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
         {/* Logo */}
         <div className="p-6 border-b border-slate-200">
-          <h1 className="text-2xl font-bold text-primary" style={{ fontFamily: "'Crimson Pro', serif" }}>
-            myfynzo
-          </h1>
-          <p className="text-xs text-slate-500 mt-1">Wealth Management</p>
+          <Link to="/dashboard" className="flex items-center gap-3">
+            <span className="text-3xl">💰</span>
+            <span className="text-2xl font-bold text-primary">myfynzo</span>
+          </Link>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4">
-          <ul className="space-y-2">
+        <nav className="p-4 flex-1 overflow-y-auto">
+          <div className="space-y-2">
             {menuItems.map((item) => {
               const isActive = location.pathname === item.path;
               return (
-                <li key={item.path}>
-                  <button
-                    onClick={() => navigate(item.path)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                      isActive
-                        ? 'bg-primary text-white shadow-lg'
-                        : 'text-slate-700 hover:bg-slate-100'
-                    }`}
-                  >
-                    <span className="text-2xl">{item.icon}</span>
-                    <span className="font-semibold">{item.label}</span>
-                  </button>
-                </li>
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => setSidebarOpen(false)}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                    isActive
+                      ? 'bg-primary text-white font-semibold'
+                      : 'text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  <span className="text-xl">{item.icon}</span>
+                  <span>{item.label}</span>
+                </Link>
               );
             })}
-          </ul>
+          </div>
         </nav>
 
         {/* User Section */}
         <div className="p-4 border-t border-slate-200">
-          <div className="flex items-center gap-3 mb-3 px-2">
+          <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 bg-gradient-to-br from-primary to-teal-600 rounded-full flex items-center justify-center text-white font-bold">
-              {user?.email?.charAt(0).toUpperCase()}
+              {user?.email?.[0].toUpperCase() || 'U'}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-semibold text-secondary truncate">
-                {user?.displayName || user?.email}
+              <div className="text-sm font-semibold text-slate-900 truncate">
+                {user?.email || 'User'}
               </div>
-              <div className="text-xs text-slate-500">Free Plan</div>
             </div>
           </div>
-          
           <button
-            onClick={handleSignOut}
-            className="w-full px-4 py-2 text-sm border-2 border-slate-200 rounded-lg hover:bg-slate-50 transition-all font-semibold text-slate-700 flex items-center justify-center gap-2"
+            onClick={handleLogout}
+            className="w-full px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors font-semibold"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
             Sign Out
           </button>
         </div>
-      </aside>
+      </div>
+
+      {/* Overlay for mobile */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto">
+      <div className="lg:pl-64">
         {children}
-      </main>
-
-      {/* Google Fonts */}
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap');
-      `}</style>
+      </div>
     </div>
   );
 }
