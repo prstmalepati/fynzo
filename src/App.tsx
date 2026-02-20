@@ -16,6 +16,10 @@ import Investments from "./pages/Investments";
 import Calculators from "./pages/Calculators";
 import Settings from "./pages/Settings";
 
+// ✅ NEW: Month 3-4 Features
+import ScenarioBranching from './pages/ScenarioBranching';
+import GoalTracker from './pages/GoalTracker';
+
 // Public Route Component (redirects if logged in)
 function PublicRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -67,14 +71,16 @@ export default function App() {
           <Route path="/projection" element={<ProjectionPage />} />
 
           {/* Protected routes - Login required */}
-      // Protected routes
-		<Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-		<Route path="/investments" element={<ProtectedRoute><Investments /></ProtectedRoute>} />
-		<Route path="/lifestyle-basket" element={<ProtectedRoute><LifestyleBasket /></ProtectedRoute>} />
-		<Route path="/projection" element={<ProtectedRoute><ProjectionPage /></ProtectedRoute>} />
-		<Route path="/calculators" element={<ProtectedRoute><Calculators /></ProtectedRoute>} />
-		<Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-		<Route path="/anti-portfolio" element={<ProtectedRoute><AntiPortfolio /></ProtectedRoute>} />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/investments" element={<ProtectedRoute><Investments /></ProtectedRoute>} />
+          <Route path="/lifestyle-basket" element={<ProtectedRoute><LifestyleBasket /></ProtectedRoute>} />
+          <Route path="/calculators" element={<ProtectedRoute><Calculators /></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+          <Route path="/anti-portfolio" element={<ProtectedRoute><AntiPortfolio /></ProtectedRoute>} />
+          
+          {/* ✅ NEW: Month 3-4 Features */}
+          <Route path="/scenario-branching" element={<ProtectedRoute><ScenarioBranching /></ProtectedRoute>} />
+          <Route path="/goal-tracker" element={<ProtectedRoute><GoalTracker /></ProtectedRoute>} />
 
           {/* Catch all - redirect to landing page */}
           <Route path="*" element={<Navigate to="/" replace />} />
