@@ -8,8 +8,8 @@ import Dashboard from './pages/Dashboard';
 import Investments from './pages/Investments';
 import LifestyleBasket from './pages/LifestyleBasket';
 import AntiPortfolio from './pages/AntiPortfolio';
-import ScenarioBranching from './pages/ScenarioBranching';
-import GoalTracker from './pages/GoalTracker';
+// import ScenarioBranching from './pages/ScenarioBranching';
+// import GoalTracker from './pages/GoalTracker';
 import Calculators from './pages/Calculators';
 import Settings from './pages/Settings';
 
@@ -62,24 +62,25 @@ function App() {
               } 
             />
 
-            {/* ✅ NEW: Month 3-4 Features */}
-            <Route 
-              path="/scenario-branching" 
-              element={
-                <ProtectedRoute>
-                  <ScenarioBranching />
-                </ProtectedRoute>
-              } 
-            />
+            {/* Temporary Disabled
+           	 <Route 
+              		path="/scenario-branching" 
+              		element={
+                	<ProtectedRoute>
+                  	<ScenarioBranching />
+                	</ProtectedRoute>
+              		} 
+            	 />
 
-            <Route 
-              path="/goal-tracker" 
-              element={
-                <ProtectedRoute>
-                  <GoalTracker />
-                </ProtectedRoute>
-              } 
-            />
+            	<Route 
+              		path="/goal-tracker" 
+              		element={
+                	<ProtectedRoute>
+                  	<GoalTracker />
+                	</ProtectedRoute>
+              		} 
+            	/>
+	   */}
 
             {/* Uncomment if you have Projection page */}
             {/* <Route 
