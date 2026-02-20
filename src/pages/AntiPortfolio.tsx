@@ -13,11 +13,11 @@ export interface AntiPortfolioItem {
   category: 'crypto' | 'stocks' | 'real-estate' | 'business' | 'other';
   wouldHaveInvested: number;
   dateConsidered: Date;
-  currentValue: number; // What it would be worth now (or lost)
+  currentValue: number;
   reasoning: string;
   emotionalTrigger: 'fomo' | 'greed' | 'fear' | 'hype' | 'peer-pressure' | 'overconfidence';
   lessonsLearned: string;
-  dodgedBullet: boolean; // true if avoided loss, false if missed gain
+  dodgedBullet: boolean;
   createdAt: Date;
 }
 
@@ -90,7 +90,7 @@ export default function AntiPortfolio() {
   const totalMissedGains = items.filter(i => !i.dodgedBullet).length;
   const totalWouldHaveInvested = items.reduce((sum, i) => sum + i.wouldHaveInvested, 0);
   const totalCurrentValue = items.reduce((sum, i) => sum + i.currentValue, 0);
-  const netSaved = totalWouldHaveInvested - totalCurrentValue; // Positive = saved money
+  const netSaved = totalWouldHaveInvested - totalCurrentValue;
 
   const mostCommonTrigger = items.length > 0 
     ? items.reduce((acc, item) => {
@@ -133,19 +133,16 @@ export default function AntiPortfolio() {
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-3">
-            <h1 className="text-4xl font-bold text-secondary" style={{ fontFamily: "'Crimson Pro', serif" }}>
-              🛡️ Anti-Portfolio
-            </h1>
-            <span className="px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full text-sm font-bold">
-              PREMIUM
-            </span>
+            <div className="text-5xl">🛡️</div>
+            <div>
+              <h1 className="text-4xl font-bold text-secondary" style={{ fontFamily: "'Crimson Pro', serif" }}>
+                Anti-Portfolio
+              </h1>
+              <p className="text-slate-600 text-lg">
+                Track the stupid mistakes you <strong>didn't</strong> make
+              </p>
+            </div>
           </div>
-          <p className="text-slate-600 text-lg">
-            Track the stupid mistakes you <strong>didn't</strong> make
-          </p>
-          <p className="text-sm text-slate-500 mt-1">
-            "The best investment is the one you didn't make" - Warren Buffett (paraphrased)
-          </p>
         </div>
 
         {/* Statistics Dashboard */}
@@ -225,18 +222,6 @@ export default function AntiPortfolio() {
                     </p>
                   </div>
                 )}
-
-                {totalWouldHaveInvested > 0 && (
-                  <div className="mt-4 p-4 bg-white rounded-lg border border-blue-200">
-                    <div className="text-sm text-blue-900">
-                      <strong>Capital Preserved:</strong> You considered investing {formatAmount(totalWouldHaveInvested)} total. 
-                      {netSaved > 0 
-                        ? ` You saved ${((netSaved / totalWouldHaveInvested) * 100).toFixed(0)}% by saying no.`
-                        : ` Those investments would now be worth ${formatAmount(totalCurrentValue)}.`
-                      }
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           </div>
@@ -262,14 +247,13 @@ export default function AntiPortfolio() {
           </div>
         )}
 
-        {/* Items List */}
-        {filteredItems.length === 0 ? (
+        {/* Empty State */}
+        {filteredItems.length === 0 && items.length === 0 && (
           <div className="bg-gradient-to-br from-slate-50 to-white rounded-2xl p-12 border-2 border-dashed border-slate-300 text-center">
             <div className="text-6xl mb-4">🛡️</div>
             <h3 className="text-2xl font-bold text-secondary mb-3">Start Your Anti-Portfolio</h3>
             <p className="text-slate-600 mb-6 max-w-lg mx-auto">
-              Track investments you almost made but didn't. Learn from near-misses. 
-              Build discipline and avoid emotional mistakes.
+              Track investments you almost made but didn't. Learn from near-misses. Build discipline.
             </p>
             <button
               onClick={() => setShowAddModal(true)}
@@ -297,7 +281,10 @@ export default function AntiPortfolio() {
               </div>
             </div>
           </div>
-        ) : (
+        )}
+
+        {/* Items List */}
+        {filteredItems.length > 0 && (
           <div className="space-y-4">
             {filteredItems.map(item => (
               <AntiPortfolioCard
@@ -309,11 +296,11 @@ export default function AntiPortfolio() {
           </div>
         )}
 
-        {/* Add Button (Fixed) */}
+        {/* Floating Add Button */}
         {items.length > 0 && (
           <button
             onClick={() => setShowAddModal(true)}
-            className="fixed bottom-8 right-8 w-16 h-16 bg-gradient-to-r from-primary to-teal-600 text-white rounded-full shadow-2xl hover:scale-110 transition-all flex items-center justify-center text-3xl z-50"
+            className="fixed bottom-8 right-8 w-16 h-16 bg-gradient-to-r from-primary to-teal-600 text-white rounded-full shadow-2xl hover:scale-110 transition-all flex items-center justify-center text-3xl font-bold z-50"
           >
             +
           </button>
