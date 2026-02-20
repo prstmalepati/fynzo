@@ -12,17 +12,14 @@ export default function SidebarLayout({ children }: SidebarLayoutProps) {
   const { user, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const menuItems = [
-    { path: '/dashboard', label: 'Dashboard', icon: '📊' },
-    { path: '/investments', label: 'Investments', icon: '💼' },
-    { path: '/lifestyle-basket', label: 'Lifestyle Basket', icon: '🛒' },
-    { path: '/anti-portfolio', label: 'Anti-Portfolio', icon: '🛡️' },
-    { path: '/scenario-branching', label: 'Scenario Branching', icon: '🌳' },  // ← NEW
-    { path: '/goal-tracker', label: 'Goal Tracker', icon: '🎯' },              // ← NEW
-    { path: '/projection', label: 'Projection', icon: '📈' },
-    { path: '/calculators', label: 'Calculators', icon: '🧮' },
-    { path: '/settings', label: 'Settings', icon: '⚙️' }
-  ];
+const menuItems = [
+  { path: '/dashboard', label: 'Dashboard', icon: '📊' },
+  { path: '/investments', label: 'Investments', icon: '💼' },
+  { path: '/lifestyle-basket', label: 'Lifestyle Basket', icon: '🛒' },
+  { path: '/anti-portfolio', label: 'Anti-Portfolio', icon: '🛡️' },
+  { path: '/calculators', label: 'Calculators', icon: '🧮' },
+  { path: '/settings', label: 'Settings', icon: '⚙️' }
+];
 
   const handleLogout = async () => {
     try {
