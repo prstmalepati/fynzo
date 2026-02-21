@@ -89,7 +89,7 @@ export default function GermanTaxCalculator() {
     const effectiveTaxRate = (totalDeductions / income) * 100;
     
     // Marginal tax rate (simplified)
-    let marginalRate = 0;
+    let marginalTaxRate = 0;
     if (taxableIncome <= 10908) marginalRate = 0;
     else if (taxableIncome <= 15999) marginalRate = 14 + ((taxableIncome - 10908) / (15999 - 10908)) * 9.97;
     else if (taxableIncome <= 62809) marginalRate = 23.97 + ((taxableIncome - 15999) / (62809 - 15999)) * 18.03;
