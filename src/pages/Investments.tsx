@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
-import { useToast } from '../context/ToastContext';
 import SidebarLayout from '../components/SidebarLayout';
 import { db } from '../firebase/config';
-import { collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, deleteDoc, doc } from 'firebase/firestore';
 
 interface Investment {
   id: string;
@@ -21,7 +20,6 @@ interface Investment {
 export default function Investments() {
   const { user } = useAuth();
   const { formatAmount, currency } = useCurrency();
-  const { showToast } = useToast();
   
   const [investments, setInvestments] = useState<Investment[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -56,42 +54,34 @@ export default function Investments() {
       setInvestments(investmentsData);
     } catch (error) {
       console.error('Error loading investments:', error);
-      showToast('Failed to load investments', 'error');
+      alert('Error loading investments: ' + (error as Error).message);
     }
   };
 
   const handleAddAsset = async () => {
-    // Validate user is logged in
     if (!user) {
-      showToast('You must be logged in to add investments', 'error');
+      alert('You must be logged in to add investments');
       return;
     }
 
-    // Validate required fields
     if (!assetName || !assetName.trim()) {
-      showToast('Asset name is required', 'error');
+      alert('Asset name is required');
       return;
     }
 
     if (!quantity || Number(quantity) <= 0) {
-      showToast('Quantity must be greater than 0', 'error');
+      alert('Quantity must be greater than 0');
       return;
     }
 
     if (!purchasePrice || Number(purchasePrice) <= 0) {
-      showToast('Purchase price must be greater than 0', 'error');
-      return;
-    }
-
-    if (!purchaseDate) {
-      showToast('Purchase date is required', 'error');
+      alert('Purchase price must be greater than 0');
       return;
     }
 
     setLoading(true);
 
     try {
-      // Prepare data
       const assetData = {
         name: assetName.trim(),
         type: assetType,
@@ -108,20 +98,15 @@ export default function Investments() {
       console.log('Attempting to save investment:', assetData);
       console.log('User ID:', user.uid);
 
-      // Save to Firestore
       const investmentsRef = collection(db, 'users', user.uid, 'investments');
       const docRef = await addDoc(investmentsRef, assetData);
       
       console.log('Investment saved successfully with ID:', docRef.id);
 
-      // Success!
-      showToast(`${assetName} added successfully!`, 'success');
+      alert(`${assetName} added successfully!`);
       
-      // Reset form
       resetForm();
       setShowAddModal(false);
-      
-      // Reload investments
       await loadInvestments();
       
     } catch (error: any) {
@@ -129,18 +114,15 @@ export default function Investments() {
       console.error('Error code:', error.code);
       console.error('Error message:', error.message);
       
-      // Show specific error message
       let errorMessage = 'Failed to add investment';
       
       if (error.code === 'permission-denied') {
-        errorMessage = 'Permission denied. Please check your account permissions.';
-      } else if (error.code === 'unavailable') {
-        errorMessage = 'Database unavailable. Please try again later.';
+        errorMessage = 'Permission denied. Please check Firestore rules.';
       } else if (error.message) {
         errorMessage = `Error: ${error.message}`;
       }
       
-      showToast(errorMessage, 'error');
+      alert(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -149,16 +131,15 @@ export default function Investments() {
   const handleDeleteInvestment = async (id: string, name: string) => {
     if (!user) return;
     
-    // Use custom confirmation instead of browser confirm
     if (!window.confirm(`Are you sure you want to delete ${name}?`)) return;
 
     try {
       await deleteDoc(doc(db, 'users', user.uid, 'investments', id));
-      showToast(`${name} deleted`, 'success');
+      alert(`${name} deleted`);
       await loadInvestments();
     } catch (error) {
       console.error('Error deleting investment:', error);
-      showToast('Failed to delete investment', 'error');
+      alert('Failed to delete investment');
     }
   };
 
@@ -309,7 +290,6 @@ export default function Investments() {
               </div>
 
               <div className="space-y-4">
-                {/* Asset Name */}
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-2">
                     Asset Name *
@@ -318,12 +298,11 @@ export default function Investments() {
                     type="text"
                     value={assetName}
                     onChange={(e) => setAssetName(e.target.value)}
-                    placeholder="e.g., Apple Stock, Bitcoin, S&P 500 ETF"
+                    placeholder="e.g., Apple Stock, Bitcoin"
                     className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                   />
                 </div>
 
-                {/* Asset Type */}
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-2">
                     Asset Type *
@@ -342,7 +321,6 @@ export default function Investments() {
                   </select>
                 </div>
 
-                {/* Purchase Date, Quantity, Currency */}
                 <div className="grid md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-2">
@@ -384,7 +362,6 @@ export default function Investments() {
                   </div>
                 </div>
 
-                {/* Purchase Price & Current Price */}
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-2">
@@ -418,7 +395,6 @@ export default function Investments() {
                   </div>
                 </div>
 
-                {/* Notes */}
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-2">
                     Notes (Optional)
@@ -432,7 +408,6 @@ export default function Investments() {
                   />
                 </div>
 
-                {/* Total Cost Display */}
                 {quantity && purchasePrice && Number(quantity) > 0 && Number(purchasePrice) > 0 && (
                   <div className="bg-blue-50 rounded-xl p-4 border-2 border-blue-200">
                     <div className="flex justify-between items-center">
@@ -444,7 +419,6 @@ export default function Investments() {
                   </div>
                 )}
 
-                {/* Buttons */}
                 <div className="flex gap-3 pt-4">
                   <button
                     onClick={handleAddAsset}
