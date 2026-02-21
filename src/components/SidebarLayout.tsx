@@ -26,16 +26,30 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
           collapsed ? 'w-20' : 'w-64'
         } flex flex-col`}
       >
-        {/* Logo */}
+        {/* Logo - UPDATED WITH GRADIENT BOX */}
         <div className="p-6 border-b border-white/10">
           <div className="flex items-center justify-between">
-            {!collapsed && (
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-teal-400 bg-clip-text text-transparent">
-                [m]yfynzo
-              </h1>
-            )}
-            {collapsed && (
-              <div className="text-2xl font-bold text-primary mx-auto">[m]</div>
+            {!collapsed ? (
+              <div className="flex items-center gap-3">
+                {/* Gradient M Box with Glow */}
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary to-teal-600 rounded-xl blur opacity-75"></div>
+                  <div className="relative w-10 h-10 bg-gradient-to-br from-primary to-teal-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <span className="text-white font-bold text-xl">M</span>
+                  </div>
+                </div>
+                {/* App Name */}
+                <h1 className="text-2xl font-bold text-white" style={{ fontFamily: "'Crimson Pro', serif" }}>
+                  myfynzo
+                </h1>
+              </div>
+            ) : (
+              <div className="relative mx-auto">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary to-teal-600 rounded-xl blur opacity-75"></div>
+                <div className="relative w-10 h-10 bg-gradient-to-br from-primary to-teal-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <span className="text-white font-bold text-xl">M</span>
+                </div>
+              </div>
             )}
             <button
               onClick={() => setCollapsed(!collapsed)}
