@@ -2,15 +2,14 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
-// Your Firebase configuration
-// Get these from Firebase Console > Project Settings > Your apps
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID
+  apiKey: "AIzaSyBIXXj5B2bvmwIwbFOQIAgkxJGpwqCDwrY",
+  authDomain: "myfynzo.firebaseapp.com",
+  projectId: "myfynzo",
+  storageBucket: "myfynzo.firebasestorage.app",
+  messagingSenderId: "722972966832",
+  appId: "1:722972966832:web:f31a649d8d75fee2f32075",
+  measurementId: "G-HXZKYF3EEX"
 };
 
 // Initialize Firebase
@@ -19,7 +18,5 @@ const app = initializeApp(firebaseConfig);
 // Initialize services
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-export const firestore = db; // Export as both 'db' and 'firestore' for compatibility
 
-// Default export
 export default app;
