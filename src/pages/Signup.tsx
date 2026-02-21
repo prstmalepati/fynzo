@@ -1,26 +1,62 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase/config';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth, db } from '../firebase/config';
+import { doc, setDoc } from 'firebase/firestore';
 
-export default function Login() {
+export default function Signup() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // Validate passwords match
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    // Validate password length
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      // Create user account
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      
+      // Create user document in Firestore
+      await setDoc(doc(db, 'users', userCredential.user.uid), {
+        email: email,
+        createdAt: new Date(),
+        currency: 'EUR'
+      });
+
+      // Redirect to dashboard
       navigate('/dashboard');
     } catch (err: any) {
-      console.error('Login error:', err);
-      setError(err.message || 'Failed to log in');
+      console.error('Signup error:', err);
+      
+      let errorMessage = 'Failed to create account';
+      
+      if (err.code === 'auth/email-already-in-use') {
+        errorMessage = 'Email already in use';
+      } else if (err.code === 'auth/invalid-email') {
+        errorMessage = 'Invalid email address';
+      } else if (err.code === 'auth/weak-password') {
+        errorMessage = 'Password is too weak';
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -34,7 +70,7 @@ export default function Login() {
           <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-teal-600 bg-clip-text text-transparent mb-2">
             myfynzo
           </h1>
-          <p className="text-slate-600">Your Financial Control Center</p>
+          <p className="text-slate-600">Create Your Account</p>
         </div>
 
         {/* Error Message */}
@@ -44,8 +80,8 @@ export default function Login() {
           </div>
         )}
 
-        {/* Login Form */}
-        <form onSubmit={handleLogin} className="space-y-4">
+        {/* Signup Form */}
+        <form onSubmit={handleSignup} className="space-y-4">
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">
               Email
@@ -72,6 +108,21 @@ export default function Login() {
               className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
               placeholder="••••••••"
             />
+            <p className="text-xs text-slate-500 mt-1">At least 6 characters</p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+              placeholder="••••••••"
+            />
           </div>
 
           <button
@@ -83,16 +134,16 @@ export default function Login() {
                 : 'bg-primary text-white hover:bg-primary/90'
             }`}
           >
-            {loading ? 'Logging in...' : 'Log In'}
+            {loading ? 'Creating Account...' : 'Sign Up'}
           </button>
         </form>
 
-        {/* Signup Link */}
+        {/* Login Link */}
         <div className="mt-6 text-center">
           <p className="text-slate-600">
-            Don't have an account?{' '}
-            <Link to="/signup" className="text-primary font-semibold hover:underline">
-              Sign Up
+            Already have an account?{' '}
+            <Link to="/login" className="text-primary font-semibold hover:underline">
+              Log In
             </Link>
           </p>
         </div>
