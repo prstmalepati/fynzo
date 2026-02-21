@@ -31,10 +31,10 @@ export default function ScenarioCard({
     <div
       className={`group relative bg-white rounded-2xl p-8 border-2 transition-all duration-300 ${
         scenario.isBaseline
-          ? 'border-slate-300 shadow-lg'
+          ? 'border-secondary-200 shadow-lg'
           : isSelected
           ? 'border-purple-500 shadow-2xl'
-          : 'border-slate-200 shadow-lg hover:shadow-xl hover:border-purple-300'
+          : 'border-secondary-200 shadow-lg hover:shadow-xl hover:border-purple-300'
       }`}
       onClick={() => comparisonMode && onToggleSelect(scenario.id)}
       style={{ cursor: comparisonMode ? 'pointer' : 'default' }}
@@ -45,7 +45,7 @@ export default function ScenarioCard({
           className={`absolute top-4 right-4 w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${
             isSelected
               ? 'bg-purple-600 border-purple-600'
-              : 'bg-white border-slate-300 group-hover:border-purple-400'
+              : 'bg-white border-secondary-200 group-hover:border-purple-400'
           }`}
         >
           {isSelected && (
@@ -66,14 +66,14 @@ export default function ScenarioCard({
             {scenario.emoji}
           </div>
           <div className="flex-1">
-            <h3 className="text-2xl font-bold text-secondary mb-1 font-crimson">
+            <h3 className="text-2xl font-bold text-surface-900 mb-1 font-crimson">
               {scenario.name}
             </h3>
             {scenario.description && (
-              <p className="text-slate-600 text-sm">{scenario.description}</p>
+              <p className="text-surface-900-500 text-sm">{scenario.description}</p>
             )}
             {scenario.isBaseline && (
-              <span className="inline-block px-3 py-1 bg-slate-100 text-slate-700 rounded-lg text-xs font-semibold mt-2">
+              <span className="inline-block px-3 py-1 bg-secondary-100 text-surface-900-700 rounded-lg text-xs font-semibold mt-2">
                 Current Path
               </span>
             )}
@@ -87,7 +87,7 @@ export default function ScenarioCard({
               e.stopPropagation();
               onDelete(scenario.id);
             }}
-            className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
+            className="p-2 text-surface-900-300 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -104,9 +104,9 @@ export default function ScenarioCard({
       {/* Key Metrics Grid */}
       <div className="grid grid-cols-2 gap-4 mb-6">
         {/* FIRE Date */}
-        <div className="bg-gradient-to-br from-slate-50 to-white rounded-xl p-4 border border-slate-200">
-          <div className="text-sm text-slate-600 mb-1 font-semibold">FIRE Date</div>
-          <div className="text-2xl font-bold text-secondary font-manrope">
+        <div className="bg-gradient-to-br from-slate-50 to-white rounded-xl p-4 border border-secondary-200">
+          <div className="text-sm text-surface-900-500 mb-1 font-semibold">FIRE Date</div>
+          <div className="text-2xl font-bold text-surface-900 font-manrope">
             {scenario.fireDate
               ? new Date(scenario.fireDate).getFullYear()
               : 'N/A'}
@@ -142,17 +142,17 @@ export default function ScenarioCard({
         </div>
 
         {/* Savings Rate */}
-        <div className="bg-white rounded-xl p-4 border border-slate-200">
-          <div className="text-sm text-slate-600 mb-1 font-semibold">Savings Rate</div>
-          <div className="text-2xl font-bold text-secondary font-manrope">
+        <div className="bg-white rounded-xl p-4 border border-secondary-200">
+          <div className="text-sm text-surface-900-500 mb-1 font-semibold">Savings Rate</div>
+          <div className="text-2xl font-bold text-surface-900 font-manrope">
             {(scenario.savingsRate * 100).toFixed(0)}%
           </div>
         </div>
 
         {/* Expected Return */}
-        <div className="bg-white rounded-xl p-4 border border-slate-200">
-          <div className="text-sm text-slate-600 mb-1 font-semibold">Expected Return</div>
-          <div className="text-2xl font-bold text-secondary font-manrope">
+        <div className="bg-white rounded-xl p-4 border border-secondary-200">
+          <div className="text-sm text-surface-900-500 mb-1 font-semibold">Expected Return</div>
+          <div className="text-2xl font-bold text-surface-900 font-manrope">
             {(scenario.expectedReturn * 100).toFixed(1)}%
           </div>
         </div>
@@ -161,8 +161,8 @@ export default function ScenarioCard({
       {/* Confidence Score */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-semibold text-slate-700">Confidence Level</span>
-          <span className="text-sm font-bold text-slate-900">{scenario.confidenceScore}%</span>
+          <span className="text-sm font-semibold text-surface-900-700">Confidence Level</span>
+          <span className="text-sm font-bold text-surface-900-900">{scenario.confidenceScore}%</span>
         </div>
         <div className="h-3 bg-slate-200 rounded-full overflow-hidden">
           <div
@@ -180,22 +180,22 @@ export default function ScenarioCard({
 
       {/* Life Events */}
       {scenario.lifeEvents && scenario.lifeEvents.length > 0 && (
-        <div className="border-t border-slate-200 pt-4">
-          <div className="text-sm font-semibold text-slate-700 mb-3">Key Events</div>
+        <div className="border-t border-secondary-200 pt-4">
+          <div className="text-sm font-semibold text-surface-900-700 mb-3">Key Events</div>
           <div className="space-y-2">
             {scenario.lifeEvents.slice(0, 3).map((event) => (
               <div key={event.id} className="flex items-start gap-2 text-sm">
                 <span className="text-purple-600">•</span>
                 <div className="flex-1">
-                  <span className="font-semibold text-slate-700">{event.name}</span>
-                  <span className="text-slate-500 ml-2">
+                  <span className="font-semibold text-surface-900-700">{event.name}</span>
+                  <span className="text-surface-900-400 ml-2">
                     Year {event.year} • {formatCompact(Math.abs(event.amount))}
                   </span>
                 </div>
               </div>
             ))}
             {scenario.lifeEvents.length > 3 && (
-              <div className="text-xs text-slate-500">
+              <div className="text-xs text-surface-900-400">
                 +{scenario.lifeEvents.length - 3} more events
               </div>
             )}

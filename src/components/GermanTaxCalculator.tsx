@@ -171,7 +171,7 @@ export default function GermanTaxCalculator() {
       <div className="bg-gradient-to-r from-red-600 via-yellow-500 to-red-600 rounded-2xl p-8 text-white shadow-2xl">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-4xl font-bold mb-2 flex items-center gap-3">
+            <h2 className="text-3xl lg:text-4xl font-bold mb-2 flex items-center gap-3">
               <span className="text-5xl">🇩🇪</span>
               German Tax Calculator 2024
             </h2>
@@ -191,13 +191,13 @@ export default function GermanTaxCalculator() {
       <div className="grid lg:grid-cols-3 gap-6">
         {/* LEFT: Input Section */}
         <div className="lg:col-span-1 space-y-6">
-          <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-slate-200">
-            <h3 className="text-2xl font-bold text-secondary mb-6">📝 Your Details</h3>
+          <div className="bg-white rounded-2xl shadow-lg p-6 border border-secondary-200">
+            <h3 className="text-2xl font-bold text-surface-900 mb-6">📝 Your Details</h3>
 
             <div className="space-y-4">
               {/* Filing Status */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                <label className="block text-sm font-semibold text-surface-900-700 mb-2">
                   Filing Status
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -206,7 +206,7 @@ export default function GermanTaxCalculator() {
                     className={`py-3 px-4 rounded-xl font-semibold transition-all ${
                       filingStatus === 'single'
                         ? 'bg-primary text-white shadow-lg'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        : 'bg-secondary-100 text-surface-900-500 hover:bg-slate-200'
                     }`}
                   >
                     👤 Single
@@ -216,7 +216,7 @@ export default function GermanTaxCalculator() {
                     className={`py-3 px-4 rounded-xl font-semibold transition-all ${
                       filingStatus === 'married'
                         ? 'bg-primary text-white shadow-lg'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        : 'bg-secondary-100 text-surface-900-500 hover:bg-slate-200'
                     }`}
                   >
                     👫 Married
@@ -226,7 +226,7 @@ export default function GermanTaxCalculator() {
 
               {/* Annual Income */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                <label className="block text-sm font-semibold text-surface-900-700 mb-2">
                   {filingStatus === 'married' ? 'Your Annual Gross Income' : 'Annual Gross Income'}
                 </label>
                 <div className="relative">
@@ -234,16 +234,16 @@ export default function GermanTaxCalculator() {
                     type="number"
                     value={annualIncome}
                     onChange={(e) => setAnnualIncome(Number(e.target.value))}
-                    className="w-full pl-8 pr-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none font-semibold text-lg"
+                    className="w-full pl-8 pr-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none font-semibold text-lg"
                   />
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">€</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-900-400">€</span>
                 </div>
               </div>
 
               {/* Partner Income (if married) */}
               {filingStatus === 'married' && (
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  <label className="block text-sm font-semibold text-surface-900-700 mb-2">
                     Partner's Annual Gross Income
                   </label>
                   <div className="relative">
@@ -251,9 +251,9 @@ export default function GermanTaxCalculator() {
                       type="number"
                       value={partnerIncome}
                       onChange={(e) => setPartnerIncome(Number(e.target.value))}
-                      className="w-full pl-8 pr-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none font-semibold text-lg"
+                      className="w-full pl-8 pr-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none font-semibold text-lg"
                     />
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">€</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-900-400">€</span>
                   </div>
                   {partnerIncome > 0 && (
                     <div className="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
@@ -266,7 +266,7 @@ export default function GermanTaxCalculator() {
 
               {/* Number of Children */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                <label className="block text-sm font-semibold text-surface-900-700 mb-2">
                   👶 Number of Children (Kindergeld)
                 </label>
                 <input
@@ -275,7 +275,7 @@ export default function GermanTaxCalculator() {
                   onChange={(e) => setChildren(Math.max(0, Number(e.target.value)))}
                   min="0"
                   max="10"
-                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none font-semibold text-lg"
+                  className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none font-semibold text-lg"
                 />
                 {children > 0 && (
                   <div className="mt-2 p-3 bg-green-50 rounded-lg border border-green-200">
@@ -288,13 +288,13 @@ export default function GermanTaxCalculator() {
 
               {/* State */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                <label className="block text-sm font-semibold text-surface-900-700 mb-2">
                   State (Bundesland)
                 </label>
                 <select
                   value={state}
                   onChange={(e) => setState(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none font-semibold"
+                  className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none font-semibold"
                 >
                   <option value="Bayern">Bayern</option>
                   <option value="Baden-Württemberg">Baden-Württemberg</option>
@@ -304,13 +304,13 @@ export default function GermanTaxCalculator() {
                   <option value="Nordrhein-Westfalen">Nordrhein-Westfalen</option>
                   <option value="Other">Other</option>
                 </select>
-                <div className="mt-1 text-xs text-slate-500">
+                <div className="mt-1 text-xs text-surface-900-400">
                   Church tax: {state === 'Bayern' || state === 'Baden-Württemberg' ? '8%' : '9%'}
                 </div>
               </div>
 
               {/* Church Tax */}
-              <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-xl">
+              <div className="flex items-center gap-3 p-4 bg-secondary-50 rounded-xl">
                 <input
                   type="checkbox"
                   id="churchTax"
@@ -318,7 +318,7 @@ export default function GermanTaxCalculator() {
                   onChange={(e) => setChurchTaxPayer(e.target.checked)}
                   className="w-5 h-5 text-primary rounded"
                 />
-                <label htmlFor="churchTax" className="text-sm font-semibold text-slate-700 cursor-pointer">
+                <label htmlFor="churchTax" className="text-sm font-semibold text-surface-900-700 cursor-pointer">
                   ⛪ Pay Church Tax (Kirchensteuer)
                 </label>
               </div>
@@ -352,8 +352,8 @@ export default function GermanTaxCalculator() {
           </div>
 
           {/* Tax Breakdown */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-slate-200">
-            <h3 className="text-2xl font-bold text-secondary mb-4 flex items-center gap-2">
+          <div className="bg-white rounded-2xl shadow-lg p-6 border border-secondary-200">
+            <h3 className="text-2xl font-bold text-surface-900 mb-4 flex items-center gap-2">
               📊 Income Tax Breakdown (Einkommensteuer)
             </h3>
             
@@ -370,34 +370,34 @@ export default function GermanTaxCalculator() {
 
             {/* Progressive Tax Rates */}
             <div className="space-y-3">
-              <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+              <div className="flex justify-between items-center p-3 bg-secondary-50 rounded-lg">
                 <div>
-                  <div className="font-semibold text-slate-700">Zone 1: Tax-Free (Nullzone)</div>
-                  <div className="text-xs text-slate-500">€0 - €11,604</div>
+                  <div className="font-semibold text-surface-900-700">Zone 1: Tax-Free (Nullzone)</div>
+                  <div className="text-xs text-surface-900-400">€0 - €11,604</div>
                 </div>
                 <span className="font-bold text-green-600">0%</span>
               </div>
 
-              <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+              <div className="flex justify-between items-center p-3 bg-secondary-50 rounded-lg">
                 <div>
-                  <div className="font-semibold text-slate-700">Zone 2: Progressive (14% → 24%)</div>
-                  <div className="text-xs text-slate-500">€11,605 - €17,005</div>
+                  <div className="font-semibold text-surface-900-700">Zone 2: Progressive (14% → 24%)</div>
+                  <div className="text-xs text-surface-900-400">€11,605 - €17,005</div>
                 </div>
                 <span className="font-bold text-blue-600">14-24%</span>
               </div>
 
-              <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+              <div className="flex justify-between items-center p-3 bg-secondary-50 rounded-lg">
                 <div>
-                  <div className="font-semibold text-slate-700">Zone 3: Progressive (24% → 42%)</div>
-                  <div className="text-xs text-slate-500">€17,006 - €66,760</div>
+                  <div className="font-semibold text-surface-900-700">Zone 3: Progressive (24% → 42%)</div>
+                  <div className="text-xs text-surface-900-400">€17,006 - €66,760</div>
                 </div>
                 <span className="font-bold text-orange-600">24-42%</span>
               </div>
 
-              <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+              <div className="flex justify-between items-center p-3 bg-secondary-50 rounded-lg">
                 <div>
-                  <div className="font-semibold text-slate-700">Zone 4: Proportional</div>
-                  <div className="text-xs text-slate-500">€66,761 - €277,825</div>
+                  <div className="font-semibold text-surface-900-700">Zone 4: Proportional</div>
+                  <div className="text-xs text-surface-900-400">€66,761 - €277,825</div>
                 </div>
                 <span className="font-bold text-red-600">42%</span>
               </div>
@@ -412,74 +412,74 @@ export default function GermanTaxCalculator() {
             </div>
 
             {/* Actual Tax Amounts */}
-            <div className="mt-6 space-y-2 pt-6 border-t-2 border-slate-200">
+            <div className="mt-6 space-y-2 pt-6 border-t-2 border-secondary-200">
               <div className="flex justify-between items-center">
-                <span className="text-slate-700">Income Tax (Einkommensteuer)</span>
-                <span className="font-semibold text-slate-900">{formatEuro(result.incomeTax)}</span>
+                <span className="text-surface-900-700">Income Tax (Einkommensteuer)</span>
+                <span className="font-semibold text-surface-900-900">{formatEuro(result.incomeTax)}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-slate-700">Solidarity Surcharge (Solidaritätszuschlag 5.5%)</span>
-                <span className="font-semibold text-slate-900">{formatEuro(result.solidarityTax)}</span>
+                <span className="text-surface-900-700">Solidarity Surcharge (Solidaritätszuschlag 5.5%)</span>
+                <span className="font-semibold text-surface-900-900">{formatEuro(result.solidarityTax)}</span>
               </div>
               {churchTaxPayer && (
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-700">
+                  <span className="text-surface-900-700">
                     Church Tax (Kirchensteuer {state === 'Bayern' || state === 'Baden-Württemberg' ? '8%' : '9%'})
                   </span>
-                  <span className="font-semibold text-slate-900">{formatEuro(result.churchTax)}</span>
+                  <span className="font-semibold text-surface-900-900">{formatEuro(result.churchTax)}</span>
                 </div>
               )}
-              <div className="border-t-2 border-slate-300 pt-3 flex justify-between items-center">
-                <span className="font-bold text-slate-900 text-lg">Total Taxes</span>
+              <div className="border-t-2 border-secondary-200 pt-3 flex justify-between items-center">
+                <span className="font-bold text-surface-900-900 text-lg">Total Taxes</span>
                 <span className="font-bold text-red-600 text-xl">{formatEuro(result.totalTax)}</span>
               </div>
             </div>
           </div>
 
           {/* Social Security */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-slate-200">
-            <h3 className="text-2xl font-bold text-secondary mb-4 flex items-center gap-2">
+          <div className="bg-white rounded-2xl shadow-lg p-6 border border-secondary-200">
+            <h3 className="text-2xl font-bold text-surface-900 mb-4 flex items-center gap-2">
               🏥 Social Security Contributions (Sozialversicherung)
             </h3>
             <div className="space-y-3">
               <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
                 <div>
-                  <div className="font-semibold text-slate-700">Pension Insurance (Rentenversicherung)</div>
-                  <div className="text-xs text-slate-500">18.6% total (9.3% employee share)</div>
+                  <div className="font-semibold text-surface-900-700">Pension Insurance (Rentenversicherung)</div>
+                  <div className="text-xs text-surface-900-400">18.6% total (9.3% employee share)</div>
                 </div>
-                <span className="font-semibold text-slate-900">{formatEuro(result.pensionInsurance)}</span>
+                <span className="font-semibold text-surface-900-900">{formatEuro(result.pensionInsurance)}</span>
               </div>
 
               <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
                 <div>
-                  <div className="font-semibold text-slate-700">Health Insurance (Krankenversicherung)</div>
-                  <div className="text-xs text-slate-500">~16.3% total (~8.15% employee share)</div>
+                  <div className="font-semibold text-surface-900-700">Health Insurance (Krankenversicherung)</div>
+                  <div className="text-xs text-surface-900-400">~16.3% total (~8.15% employee share)</div>
                 </div>
-                <span className="font-semibold text-slate-900">{formatEuro(result.healthInsurance)}</span>
+                <span className="font-semibold text-surface-900-900">{formatEuro(result.healthInsurance)}</span>
               </div>
 
               <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
                 <div>
-                  <div className="font-semibold text-slate-700">Unemployment Insurance (Arbeitslosenversicherung)</div>
-                  <div className="text-xs text-slate-500">2.6% total (1.3% employee share)</div>
+                  <div className="font-semibold text-surface-900-700">Unemployment Insurance (Arbeitslosenversicherung)</div>
+                  <div className="text-xs text-surface-900-400">2.6% total (1.3% employee share)</div>
                 </div>
-                <span className="font-semibold text-slate-900">{formatEuro(result.unemploymentInsurance)}</span>
+                <span className="font-semibold text-surface-900-900">{formatEuro(result.unemploymentInsurance)}</span>
               </div>
 
               <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
                 <div>
-                  <div className="font-semibold text-slate-700">Care Insurance (Pflegeversicherung)</div>
-                  <div className="text-xs text-slate-500">
+                  <div className="font-semibold text-surface-900-700">Care Insurance (Pflegeversicherung)</div>
+                  <div className="text-xs text-surface-900-400">
                     {children === 0 ? '3.4% base + 0.6% childless surcharge' : 
                      children >= 2 ? `3.4% base - discount for ${children} children` : 
                      '3.4% base rate'}
                   </div>
                 </div>
-                <span className="font-semibold text-slate-900">{formatEuro(result.careInsurance)}</span>
+                <span className="font-semibold text-surface-900-900">{formatEuro(result.careInsurance)}</span>
               </div>
 
               <div className="border-t-2 border-blue-300 pt-3 flex justify-between items-center">
-                <span className="font-bold text-slate-900 text-lg">Total Social Contributions</span>
+                <span className="font-bold text-surface-900-900 text-lg">Total Social Contributions</span>
                 <span className="font-bold text-blue-600 text-xl">{formatEuro(result.totalSocialContributions)}</span>
               </div>
             </div>
@@ -504,11 +504,11 @@ export default function GermanTaxCalculator() {
 
           {/* Monthly Breakdown */}
           <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-green-200">
-            <h3 className="text-2xl font-bold text-secondary mb-4">📅 Monthly Overview</h3>
+            <h3 className="text-2xl font-bold text-surface-900 mb-4">📅 Monthly Overview</h3>
             <div className="grid md:grid-cols-4 gap-4">
-              <div className="text-center p-4 bg-slate-50 rounded-xl">
-                <div className="text-xs text-slate-600 mb-1">Gross</div>
-                <div className="text-2xl font-bold text-slate-900">{formatEuroCompact(result.grossIncome / 12)}</div>
+              <div className="text-center p-4 bg-secondary-50 rounded-xl">
+                <div className="text-xs text-surface-900-500 mb-1">Gross</div>
+                <div className="text-2xl font-bold text-surface-900-900">{formatEuroCompact(result.grossIncome / 12)}</div>
               </div>
               <div className="text-center p-4 bg-red-50 rounded-xl">
                 <div className="text-xs text-red-600 mb-1">Deductions</div>

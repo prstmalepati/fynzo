@@ -120,95 +120,95 @@ export default function FIRECalculator() {
 
   return (
     <div className="bg-white rounded-2xl shadow-lg p-8">
-      <h2 className="text-3xl font-bold text-secondary mb-6 flex items-center gap-3">
+      <h2 className="text-3xl font-bold text-surface-900 mb-6 flex items-center gap-3">
         <span className="text-4xl">🔥</span>
         FIRE Calculator
       </h2>
-      <p className="text-slate-600 mb-8">Financial Independence, Retire Early</p>
+      <p className="text-surface-900-500 mb-8">Financial Independence, Retire Early</p>
 
       {/* Input Section */}
       <div className="grid md:grid-cols-2 gap-6 mb-8">
         {/* Age Inputs */}
         <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-2">Current Age</label>
+          <label className="block text-sm font-semibold text-surface-900-700 mb-2">Current Age</label>
           <input
             type="number"
             value={currentAge}
             onChange={(e) => setCurrentAge(Number(e.target.value))}
-            className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+            className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-2">Target Retirement Age</label>
+          <label className="block text-sm font-semibold text-surface-900-700 mb-2">Target Retirement Age</label>
           <input
             type="number"
             value={targetRetirementAge}
             onChange={(e) => setTargetRetirementAge(Number(e.target.value))}
-            className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+            className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
           />
         </div>
 
         {/* Financial Inputs */}
         <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-2">Current Net Worth</label>
+          <label className="block text-sm font-semibold text-surface-900-700 mb-2">Current Net Worth</label>
           <input
             type="number"
             value={currentNetWorth}
             onChange={(e) => setCurrentNetWorth(Number(e.target.value))}
-            className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+            className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-2">Monthly Savings</label>
+          <label className="block text-sm font-semibold text-surface-900-700 mb-2">Monthly Savings</label>
           <input
             type="number"
             value={monthlySavings}
             onChange={(e) => setMonthlySavings(Number(e.target.value))}
-            className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+            className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-2">Annual Expenses in Retirement</label>
+          <label className="block text-sm font-semibold text-surface-900-700 mb-2">Annual Expenses in Retirement</label>
           <input
             type="number"
             value={annualExpenses}
             onChange={(e) => setAnnualExpenses(Number(e.target.value))}
-            className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+            className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-2">Expected Return (%)</label>
+          <label className="block text-sm font-semibold text-surface-900-700 mb-2">Expected Return (%)</label>
           <input
             type="number"
             value={expectedReturn}
             onChange={(e) => setExpectedReturn(Number(e.target.value))}
             step="0.1"
-            className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+            className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-2">Safe Withdrawal Rate (%)</label>
+          <label className="block text-sm font-semibold text-surface-900-700 mb-2">Safe Withdrawal Rate (%)</label>
           <input
             type="number"
             value={withdrawalRate}
             onChange={(e) => setWithdrawalRate(Number(e.target.value))}
             step="0.1"
-            className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+            className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
           />
         </div>
 
         {/* Country/Inflation */}
         <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-2">Country / Location</label>
+          <label className="block text-sm font-semibold text-surface-900-700 mb-2">Country / Location</label>
           <select
             value={country}
             onChange={(e) => setCountry(e.target.value)}
-            className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+            className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
           >
             <option value="Germany">Germany ({inflationRates.Germany}%)</option>
             <option value="United States">United States ({inflationRates['United States']}%)</option>
@@ -231,13 +231,13 @@ export default function FIRECalculator() {
         {/* Custom Inflation */}
         {country === 'Custom' && (
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Custom Inflation Rate (%)</label>
+            <label className="block text-sm font-semibold text-surface-900-700 mb-2">Custom Inflation Rate (%)</label>
             <input
               type="number"
               value={customInflation}
               onChange={(e) => setCustomInflation(Number(e.target.value))}
               step="0.1"
-              className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+              className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
             />
           </div>
         )}
@@ -299,62 +299,62 @@ export default function FIRECalculator() {
         </div>
 
         {/* Detailed Breakdown */}
-        <div className="bg-slate-50 rounded-xl p-6">
-          <h3 className="text-xl font-bold text-secondary mb-4">FIRE Plan Details</h3>
+        <div className="bg-secondary-50 rounded-xl p-6">
+          <h3 className="text-xl font-bold text-surface-900 mb-4">FIRE Plan Details</h3>
           
           <div className="space-y-4">
-            <div className="flex justify-between items-center py-3 border-b border-slate-200">
+            <div className="flex justify-between items-center py-3 border-b border-secondary-200">
               <div>
-                <div className="font-semibold text-slate-900">Timeline</div>
-                <div className="text-sm text-slate-600">{currentAge} → {targetRetirementAge} years old</div>
+                <div className="font-semibold text-surface-900-900">Timeline</div>
+                <div className="text-sm text-surface-900-500">{currentAge} → {targetRetirementAge} years old</div>
               </div>
               <div className="text-xl font-bold text-primary">{result.yearsToFIRE} years</div>
             </div>
 
-            <div className="flex justify-between items-center py-3 border-b border-slate-200">
+            <div className="flex justify-between items-center py-3 border-b border-secondary-200">
               <div>
-                <div className="font-semibold text-slate-900">Monthly Savings</div>
-                <div className="text-sm text-slate-600">Current contribution</div>
+                <div className="font-semibold text-surface-900-900">Monthly Savings</div>
+                <div className="text-sm text-surface-900-500">Current contribution</div>
               </div>
               <div className="text-xl font-bold text-green-600">{formatAmount(monthlySavings)}</div>
             </div>
 
             {result.monthlyContributionNeeded > 0 && (
-              <div className="flex justify-between items-center py-3 border-b border-slate-200">
+              <div className="flex justify-between items-center py-3 border-b border-secondary-200">
                 <div>
-                  <div className="font-semibold text-slate-900">Additional Savings Needed</div>
-                  <div className="text-sm text-slate-600">To reach target on time</div>
+                  <div className="font-semibold text-surface-900-900">Additional Savings Needed</div>
+                  <div className="text-sm text-surface-900-500">To reach target on time</div>
                 </div>
                 <div className="text-xl font-bold text-orange-600">+{formatAmount(result.monthlyContributionNeeded)}</div>
               </div>
             )}
 
-            <div className="flex justify-between items-center py-3 border-b border-slate-200">
+            <div className="flex justify-between items-center py-3 border-b border-secondary-200">
               <div>
-                <div className="font-semibold text-slate-900">Expected Return</div>
-                <div className="text-sm text-slate-600">Before inflation</div>
+                <div className="font-semibold text-surface-900-900">Expected Return</div>
+                <div className="text-sm text-surface-900-500">Before inflation</div>
               </div>
               <div className="text-xl font-bold text-blue-600">{expectedReturn}%</div>
             </div>
 
-            <div className="flex justify-between items-center py-3 border-b border-slate-200">
+            <div className="flex justify-between items-center py-3 border-b border-secondary-200">
               <div>
-                <div className="font-semibold text-slate-900">Inflation Rate</div>
-                <div className="text-sm text-slate-600">{country}</div>
+                <div className="font-semibold text-surface-900-900">Inflation Rate</div>
+                <div className="text-sm text-surface-900-500">{country}</div>
               </div>
               <div className="text-xl font-bold text-red-600">{inflationRate}%</div>
             </div>
 
-            <div className="flex justify-between items-center py-3 border-b border-slate-200">
+            <div className="flex justify-between items-center py-3 border-b border-secondary-200">
               <div>
-                <div className="font-semibold text-slate-900">Real Return</div>
-                <div className="text-sm text-slate-600">After inflation</div>
+                <div className="font-semibold text-surface-900-900">Real Return</div>
+                <div className="text-sm text-surface-900-500">After inflation</div>
               </div>
               <div className="text-xl font-bold text-teal-600">{(expectedReturn - inflationRate).toFixed(1)}%</div>
             </div>
 
             <div className="flex justify-between items-center py-3 bg-blue-50 rounded-lg px-4">
-              <div className="font-bold text-slate-900">Annual Expenses Covered</div>
+              <div className="font-bold text-surface-900-900">Annual Expenses Covered</div>
               <div className="text-xl font-bold text-blue-700">{formatAmount(annualExpenses)}</div>
             </div>
           </div>
@@ -373,18 +373,6 @@ export default function FIRECalculator() {
           </ul>
         </div>
       </div>
-
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap');
-        
-        .font-crimson {
-          font-family: 'Crimson Pro', serif;
-        }
-        
-        .font-manrope {
-          font-family: 'Manrope', sans-serif;
-        }
-      `}</style>
     </div>
   );
 }

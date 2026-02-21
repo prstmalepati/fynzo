@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useCurrency } from '../context/CurrencyContext';
 import { useAuth } from '../context/AuthContext';
 import SidebarLayout from '../components/SidebarLayout';
+import { useToast } from '../context/ToastContext';
 import { db } from '../firebase/config';
 import { collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 
@@ -18,6 +19,7 @@ interface Goal {
 
 export default function GoalTracker() {
   const { formatAmount, formatCompact } = useCurrency();
+  const { showToast } = useToast();
   const { user } = useAuth();
   
   const [goals, setGoals] = useState<Goal[]>([]);
@@ -40,7 +42,7 @@ export default function GoalTracker() {
     { id: 'education', label: 'Education', icon: '🎓', bgColor: 'bg-teal-100', textColor: 'text-teal-700', progressFrom: 'from-teal-400', progressTo: 'to-teal-600' },
     { id: 'retirement', label: 'Retirement', icon: '🏖️', bgColor: 'bg-red-100', textColor: 'text-red-700', progressFrom: 'from-red-400', progressTo: 'to-red-600' },
     { id: 'debt', label: 'Debt Payoff', icon: '💳', bgColor: 'bg-yellow-100', textColor: 'text-yellow-700', progressFrom: 'from-yellow-400', progressTo: 'to-yellow-600' },
-    { id: 'other', label: 'Other', icon: '🎯', bgColor: 'bg-slate-100', textColor: 'text-slate-700', progressFrom: 'from-slate-400', progressTo: 'to-slate-600' }
+    { id: 'other', label: 'Other', icon: '🎯', bgColor: 'bg-secondary-100', textColor: 'text-surface-900-700', progressFrom: 'from-slate-400', progressTo: 'to-slate-600' }
   ];
 
   useEffect(() => {
@@ -67,7 +69,7 @@ export default function GoalTracker() {
 
   const handleAddGoal = async () => {
     if (!user || !goalName || !targetAmount || !targetDate) {
-      alert('Please fill in all required fields');
+      showToast('Please fill in all required fields', 'error');
       return;
     }
 
@@ -152,31 +154,31 @@ export default function GoalTracker() {
 
   return (
     <SidebarLayout>
-      <div className="p-8 max-w-7xl mx-auto">
+      <div className="p-6 lg:p-8 max-w-7xl mx-auto">
         {/* Header with Stats */}
         <div className="grid md:grid-cols-3 gap-6 mb-8">
           <div className="bg-gradient-to-br from-primary to-teal-600 rounded-2xl p-6 text-white shadow-xl">
             <div className="text-sm opacity-90 mb-2">Total Goal Amount</div>
-            <div className="text-4xl font-bold mb-1">{formatCompact(totalTargetAmount)}</div>
+            <div className="text-3xl lg:text-4xl font-bold mb-1">{formatCompact(totalTargetAmount)}</div>
             <div className="text-xs opacity-75">{formatAmount(totalTargetAmount)}</div>
           </div>
 
           <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl p-6 text-white shadow-xl">
             <div className="text-sm opacity-90 mb-2">Amount Saved</div>
-            <div className="text-4xl font-bold mb-1">{formatCompact(totalCurrentAmount)}</div>
+            <div className="text-3xl lg:text-4xl font-bold mb-1">{formatCompact(totalCurrentAmount)}</div>
             <div className="text-xs opacity-75">{formatAmount(totalCurrentAmount)}</div>
           </div>
 
           <div className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl p-6 text-white shadow-xl">
             <div className="text-sm opacity-90 mb-2">Overall Progress</div>
-            <div className="text-4xl font-bold mb-1">{overallProgress.toFixed(0)}%</div>
+            <div className="text-3xl lg:text-4xl font-bold mb-1">{overallProgress.toFixed(0)}%</div>
             <div className="text-xs opacity-75">{goals.length} active goal{goals.length !== 1 ? 's' : ''}</div>
           </div>
         </div>
 
         {/* Add Goal Button */}
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold text-secondary">Your Financial Goals</h2>
+          <h2 className="text-3xl font-bold text-surface-900">Your Financial Goals</h2>
           <button
             onClick={() => { resetForm(); setShowAddModal(true); }}
             className="px-6 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-colors shadow-lg"
@@ -187,10 +189,10 @@ export default function GoalTracker() {
 
         {/* Goals List */}
         {goals.length === 0 ? (
-          <div className="bg-white rounded-2xl p-16 text-center border-2 border-dashed border-slate-300">
+          <div className="bg-white rounded-2xl p-16 text-center border-2 border-dashed border-secondary-200">
             <div className="text-6xl mb-4">🎯</div>
-            <h3 className="text-2xl font-bold text-secondary mb-2">No Goals Yet</h3>
-            <p className="text-slate-600 mb-6">Start by creating your first financial goal!</p>
+            <h3 className="text-2xl font-bold text-surface-900 mb-2">No Goals Yet</h3>
+            <p className="text-surface-900-500 mb-6">Start by creating your first financial goal!</p>
             <button
               onClick={() => setShowAddModal(true)}
               className="px-6 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-colors"
@@ -208,7 +210,7 @@ export default function GoalTracker() {
               const isNearDeadline = daysRemaining < 30 && daysRemaining >= 0;
 
               return (
-                <div key={goal.id} className="bg-white rounded-2xl p-6 border-2 border-slate-200 hover:border-primary transition-all shadow-sm hover:shadow-xl">
+                <div key={goal.id} className="bg-white rounded-2xl p-6 border border-secondary-200 hover:border-primary transition-all shadow-sm hover:shadow-xl">
                   {/* Goal Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
@@ -216,7 +218,7 @@ export default function GoalTracker() {
                         {categoryInfo.icon}
                       </div>
                       <div>
-                        <h3 className="text-xl font-bold text-secondary mb-1">{goal.name}</h3>
+                        <h3 className="text-xl font-bold text-surface-900 mb-1">{goal.name}</h3>
                         <div className={`text-sm font-semibold ${categoryInfo.textColor}`}>
                           {categoryInfo.label}
                         </div>
@@ -243,7 +245,7 @@ export default function GoalTracker() {
                   {/* Progress */}
                   <div className="mb-4">
                     <div className="flex justify-between text-sm mb-2">
-                      <span className="font-semibold text-slate-700">{formatAmount(goal.currentAmount)}</span>
+                      <span className="font-semibold text-surface-900-700">{formatAmount(goal.currentAmount)}</span>
                       <span className="font-bold text-primary">{formatAmount(goal.targetAmount)}</span>
                     </div>
                     <div className="h-3 bg-slate-200 rounded-full overflow-hidden">
@@ -253,15 +255,15 @@ export default function GoalTracker() {
                       />
                     </div>
                     <div className="text-center mt-2">
-                      <span className="text-sm font-bold text-slate-700">{progress.toFixed(1)}% Complete</span>
+                      <span className="text-sm font-bold text-surface-900-700">{progress.toFixed(1)}% Complete</span>
                     </div>
                   </div>
 
                   {/* Details */}
                   <div className="grid grid-cols-2 gap-3 mb-4">
-                    <div className="bg-slate-50 rounded-lg p-3">
-                      <div className="text-xs text-slate-600 mb-1">Remaining</div>
-                      <div className="text-lg font-bold text-secondary">
+                    <div className="bg-secondary-50 rounded-lg p-3">
+                      <div className="text-xs text-surface-900-500 mb-1">Remaining</div>
+                      <div className="text-lg font-bold text-surface-900">
                         {formatCompact(goal.targetAmount - goal.currentAmount)}
                       </div>
                     </div>
@@ -288,10 +290,10 @@ export default function GoalTracker() {
                   </div>
 
                   {/* Target Date */}
-                  <div className="pt-3 border-t border-slate-200">
+                  <div className="pt-3 border-t border-secondary-200">
                     <div className="flex justify-between items-center text-sm">
-                      <span className="text-slate-600">Target Date:</span>
-                      <span className="font-semibold text-slate-900">
+                      <span className="text-surface-900-500">Target Date:</span>
+                      <span className="font-semibold text-surface-900-900">
                         {new Date(goal.targetDate).toLocaleDateString('en-GB', { 
                           day: '2-digit', 
                           month: '2-digit', 
@@ -303,9 +305,9 @@ export default function GoalTracker() {
 
                   {/* Notes */}
                   {goal.notes && (
-                    <div className="mt-3 pt-3 border-t border-slate-200">
-                      <div className="text-xs text-slate-500 mb-1">Notes:</div>
-                      <div className="text-sm text-slate-700">{goal.notes}</div>
+                    <div className="mt-3 pt-3 border-t border-secondary-200">
+                      <div className="text-xs text-surface-900-400 mb-1">Notes:</div>
+                      <div className="text-sm text-surface-900-700">{goal.notes}</div>
                     </div>
                   )}
                 </div>
@@ -319,12 +321,12 @@ export default function GoalTracker() {
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-secondary">
+                <h2 className="text-2xl font-bold text-surface-900">
                   {editingGoal ? 'Edit Goal' : 'Create New Goal'}
                 </h2>
                 <button
                   onClick={() => { setShowAddModal(false); resetForm(); }}
-                  className="text-slate-400 hover:text-slate-600 text-2xl"
+                  className="text-surface-900-300 hover:text-surface-900-500 text-2xl"
                 >
                   ✕
                 </button>
@@ -333,7 +335,7 @@ export default function GoalTracker() {
               <div className="space-y-4">
                 {/* Goal Name */}
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  <label className="block text-sm font-semibold text-surface-900-700 mb-2">
                     Goal Name *
                   </label>
                   <input
@@ -341,13 +343,13 @@ export default function GoalTracker() {
                     value={goalName}
                     onChange={(e) => setGoalName(e.target.value)}
                     placeholder="e.g., Emergency Fund, Down Payment, Vacation"
-                    className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                    className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                   />
                 </div>
 
                 {/* Category */}
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  <label className="block text-sm font-semibold text-surface-900-700 mb-2">
                     Category
                   </label>
                   <div className="grid grid-cols-2 gap-2">
@@ -358,7 +360,7 @@ export default function GoalTracker() {
                         className={`p-3 rounded-xl border-2 transition-all flex items-center gap-3 ${
                           category === cat.id
                             ? 'border-primary bg-primary/10'
-                            : 'border-slate-200 hover:border-slate-300'
+                            : 'border-secondary-200 hover:border-secondary-200'
                         }`}
                       >
                         <span className="text-2xl">{cat.icon}</span>
@@ -370,7 +372,7 @@ export default function GoalTracker() {
 
                 {/* Target Amount */}
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  <label className="block text-sm font-semibold text-surface-900-700 mb-2">
                     Target Amount (€) *
                   </label>
                   <input
@@ -380,13 +382,13 @@ export default function GoalTracker() {
                     placeholder="25000"
                     min="0"
                     step="100"
-                    className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                    className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                   />
                 </div>
 
                 {/* Current Amount */}
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  <label className="block text-sm font-semibold text-surface-900-700 mb-2">
                     Current Amount (€)
                   </label>
                   <input
@@ -396,26 +398,26 @@ export default function GoalTracker() {
                     placeholder="5000"
                     min="0"
                     step="100"
-                    className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                    className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                   />
                 </div>
 
                 {/* Target Date */}
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  <label className="block text-sm font-semibold text-surface-900-700 mb-2">
                     Target Date *
                   </label>
                   <input
                     type="date"
                     value={targetDate}
                     onChange={(e) => setTargetDate(e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                    className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                   />
                 </div>
 
                 {/* Notes */}
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  <label className="block text-sm font-semibold text-surface-900-700 mb-2">
                     Notes (Optional)
                   </label>
                   <textarea
@@ -423,7 +425,7 @@ export default function GoalTracker() {
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="Add any additional notes..."
                     rows={3}
-                    className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none resize-none"
+                    className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none resize-none"
                   />
                 </div>
 
@@ -452,7 +454,7 @@ export default function GoalTracker() {
                     disabled={!goalName || !targetAmount || !targetDate}
                     className={`flex-1 px-6 py-3 rounded-xl font-semibold transition-colors ${
                       !goalName || !targetAmount || !targetDate
-                        ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                        ? 'bg-secondary-300 text-surface-900-400 cursor-not-allowed'
                         : 'bg-primary text-white hover:bg-primary/90'
                     }`}
                   >
@@ -460,7 +462,7 @@ export default function GoalTracker() {
                   </button>
                   <button
                     onClick={() => { setShowAddModal(false); resetForm(); }}
-                    className="px-6 py-3 border-2 border-slate-300 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 transition-colors"
+                    className="px-6 py-3 border border-secondary-200 text-surface-900-700 rounded-xl font-semibold hover:bg-secondary-50 transition-colors"
                   >
                     Cancel
                   </button>

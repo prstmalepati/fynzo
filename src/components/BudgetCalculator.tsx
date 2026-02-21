@@ -158,14 +158,14 @@ export default function BudgetCalculator() {
 
   return (
     <div className="bg-white rounded-2xl shadow-lg p-8">
-      <h2 className="text-3xl font-bold text-secondary mb-6 flex items-center gap-3">
+      <h2 className="text-3xl font-bold text-surface-900 mb-6 flex items-center gap-3">
         <span className="text-4xl">💰</span>
         Income & Budget Calculator
       </h2>
 
       {/* Country Selection */}
       <div className="mb-8 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 border-2 border-blue-200">
-        <label className="block text-sm font-semibold text-slate-700 mb-2">Country / Region</label>
+        <label className="block text-sm font-semibold text-surface-900-700 mb-2">Country / Region</label>
         <select
           value={country}
           onChange={(e) => setCountry(e.target.value)}
@@ -176,7 +176,7 @@ export default function BudgetCalculator() {
           <option value="United Kingdom">🇬🇧 United Kingdom</option>
           <option value="Switzerland">🇨🇭 Switzerland</option>
         </select>
-        <p className="text-sm text-slate-600 mt-2">Tax calculations based on {country} tax rules</p>
+        <p className="text-sm text-surface-900-500 mt-2">Tax calculations based on {country} tax rules</p>
       </div>
 
       <div className="grid md:grid-cols-3 gap-8">
@@ -415,46 +415,46 @@ export default function BudgetCalculator() {
           {/* Annual Savings */}
           <div className="bg-gradient-to-br from-green-500 to-teal-600 rounded-xl p-6 text-white shadow-xl">
             <h3 className="text-lg font-bold mb-2 opacity-90">Annual Savings</h3>
-            <div className="text-4xl font-bold">{formatAmount(annualSavings)}</div>
+            <div className="text-3xl lg:text-4xl font-bold">{formatAmount(annualSavings)}</div>
             <div className="text-sm opacity-75 mt-2">{formatAmount(monthlySavings)}/month</div>
           </div>
 
           {/* Total Savings */}
-          <div className="bg-white rounded-xl p-6 border-2 border-slate-200">
-            <h3 className="text-xl font-bold text-secondary mb-4">💎 Total Savings</h3>
+          <div className="bg-white rounded-xl p-6 border border-secondary-200">
+            <h3 className="text-xl font-bold text-surface-900 mb-4">💎 Total Savings</h3>
             
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">401k / Pension</label>
+                <label className="block text-xs font-semibold text-surface-900-700 mb-1">401k / Pension</label>
                 <input type="number" value={retirement401k} onChange={(e) => setRetirement401k(Number(e.target.value))}
-                  className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none" />
+                  className="w-full px-3 py-2 border border-secondary-200 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none" />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Cash / Emergency Fund</label>
+                <label className="block text-xs font-semibold text-surface-900-700 mb-1">Cash / Emergency Fund</label>
                 <input type="number" value={cash} onChange={(e) => setCash(Number(e.target.value))}
-                  className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none" />
+                  className="w-full px-3 py-2 border border-secondary-200 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none" />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Other Investments</label>
+                <label className="block text-xs font-semibold text-surface-900-700 mb-1">Other Investments</label>
                 <input type="number" value={otherInvestments} onChange={(e) => setOtherInvestments(Number(e.target.value))}
-                  className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none" />
+                  className="w-full px-3 py-2 border border-secondary-200 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none" />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Home Equity</label>
+                <label className="block text-xs font-semibold text-surface-900-700 mb-1">Home Equity</label>
                 <input type="number" value={homeEquity} onChange={(e) => setHomeEquity(Number(e.target.value))}
-                  className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none" />
+                  className="w-full px-3 py-2 border border-secondary-200 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none" />
               </div>
               
-              <div className="pt-3 border-t-2 border-slate-300 flex justify-between">
-                <span className="font-bold text-secondary">Total Net Worth:</span>
+              <div className="pt-3 border-t-2 border-secondary-200 flex justify-between">
+                <span className="font-bold text-surface-900">Total Net Worth:</span>
                 <span className="font-bold text-primary text-xl">{formatAmount(totalSavings)}</span>
               </div>
             </div>
           </div>
 
           {/* Visual Breakdown */}
-          <div className="bg-slate-50 rounded-xl p-6 border-2 border-slate-200">
-            <h3 className="text-lg font-bold text-secondary mb-4">💡 Spending Breakdown</h3>
+          <div className="bg-secondary-50 rounded-xl p-6 border border-secondary-200">
+            <h3 className="text-lg font-bold text-surface-900 mb-4">💡 Spending Breakdown</h3>
             
             <div className="space-y-3">
               <div>

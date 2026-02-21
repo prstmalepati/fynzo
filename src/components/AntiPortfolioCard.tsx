@@ -72,7 +72,7 @@ export default function AntiPortfolioCard({ item, onDelete }: AntiPortfolioCardP
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-3 text-sm text-slate-600">
+            <div className="flex items-center gap-3 text-sm text-secondary-500">
               <span>{new Date(item.dateConsidered).toLocaleDateString()}</span>
               <span>•</span>
               <span className="capitalize">{item.category.replace('-', ' ')}</span>
@@ -88,7 +88,7 @@ export default function AntiPortfolioCard({ item, onDelete }: AntiPortfolioCardP
         {/* Delete Button */}
         <button
           onClick={() => onDelete(item.id)}
-          className="p-2 text-slate-400 hover:text-red-600 transition-colors"
+          className="p-2 text-secondary-300 hover:text-red-600 transition-colors"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -98,16 +98,16 @@ export default function AntiPortfolioCard({ item, onDelete }: AntiPortfolioCardP
 
       {/* Financial Impact */}
       <div className="grid md:grid-cols-3 gap-4 mb-4">
-        <div className="bg-white rounded-lg p-4 border border-slate-200">
-          <div className="text-xs text-slate-500 mb-1">Would Have Invested</div>
-          <div className="text-xl font-bold text-slate-700">
+        <div className="bg-white rounded-lg p-4 border border-secondary-200">
+          <div className="text-xs text-secondary-400 mb-1">Would Have Invested</div>
+          <div className="text-xl font-bold text-secondary-700">
             {formatAmount(item.wouldHaveInvested)}
           </div>
         </div>
 
-        <div className="bg-white rounded-lg p-4 border border-slate-200">
-          <div className="text-xs text-slate-500 mb-1">Current Value</div>
-          <div className="text-xl font-bold text-slate-700">
+        <div className="bg-white rounded-lg p-4 border border-secondary-200">
+          <div className="text-xs text-secondary-400 mb-1">Current Value</div>
+          <div className="text-xl font-bold text-secondary-700">
             {formatAmount(item.currentValue)}
           </div>
         </div>

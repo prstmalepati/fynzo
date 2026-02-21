@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
 import SidebarLayout from '../components/SidebarLayout';
+import { useToast } from '../context/ToastContext';
 import { db } from '../firebase/config';
 import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 
@@ -31,6 +32,7 @@ interface LifeEvent {
 export default function ScenarioBranching() {
   const { user } = useAuth();
   const { formatAmount, formatCompact } = useCurrency();
+  const { showToast } = useToast();
   
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -97,7 +99,7 @@ export default function ScenarioBranching() {
       await loadScenarios();
     } catch (error) {
       console.error('Error creating scenario:', error);
-      alert('Failed to create scenario');
+      showToast('Failed to create scenario');
     }
   };
 
@@ -159,15 +161,15 @@ export default function ScenarioBranching() {
 
   return (
     <SidebarLayout>
-      <div className="p-8 max-w-7xl mx-auto">
+      <div className="p-6 lg:p-8 max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-start mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-secondary mb-2 flex items-center gap-3">
+            <h1 className="text-3xl lg:text-4xl font-bold text-surface-900 mb-2 flex items-center gap-3">
               <span className="text-5xl">🌳</span>
               Scenario Branching
             </h1>
-            <p className="text-slate-600">
+            <p className="text-surface-900-500">
               Model different life paths and compare financial outcomes
             </p>
           </div>
@@ -183,12 +185,12 @@ export default function ScenarioBranching() {
         <div className="grid md:grid-cols-3 gap-6 mb-8">
           <div className="bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl p-6 text-white shadow-xl">
             <div className="text-sm opacity-90 mb-2">Total Scenarios</div>
-            <div className="text-4xl font-bold">{scenarios.length}</div>
+            <div className="text-3xl lg:text-4xl font-bold">{scenarios.length}</div>
           </div>
 
           <div className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl p-6 text-white shadow-xl">
             <div className="text-sm opacity-90 mb-2">Comparing</div>
-            <div className="text-4xl font-bold">{selectedScenarios.length}/3</div>
+            <div className="text-3xl lg:text-4xl font-bold">{selectedScenarios.length}/3</div>
             <div className="text-xs opacity-75 mt-1">Select up to 3 scenarios</div>
           </div>
 
@@ -208,10 +210,10 @@ export default function ScenarioBranching() {
 
         {/* Scenarios List */}
         {scenarios.length === 0 ? (
-          <div className="bg-white rounded-2xl p-16 text-center border-2 border-dashed border-slate-300">
+          <div className="bg-white rounded-2xl p-16 text-center border-2 border-dashed border-secondary-200">
             <div className="text-6xl mb-4">🌳</div>
-            <h3 className="text-2xl font-bold text-secondary mb-2">No Scenarios Yet</h3>
-            <p className="text-slate-600 mb-6">
+            <h3 className="text-2xl font-bold text-surface-900 mb-2">No Scenarios Yet</h3>
+            <p className="text-surface-900-500 mb-6">
               Create your first scenario to start exploring different financial paths
             </p>
             <button
@@ -235,7 +237,7 @@ export default function ScenarioBranching() {
                     className={`bg-white rounded-2xl p-6 border-2 transition-all cursor-pointer ${
                       isSelected 
                         ? 'border-primary shadow-xl scale-[1.02]' 
-                        : 'border-slate-200 hover:border-slate-300'
+                        : 'border-secondary-200 hover:border-secondary-200'
                     }`}
                     onClick={() => toggleScenarioSelection(scenario.id!)}
                   >
@@ -244,8 +246,8 @@ export default function ScenarioBranching() {
                       <div className="flex items-center gap-3">
                         <div className={`w-3 h-3 rounded-full ${scenario.color}`}></div>
                         <div>
-                          <h3 className="text-xl font-bold text-secondary">{scenario.name}</h3>
-                          <p className="text-sm text-slate-600">
+                          <h3 className="text-xl font-bold text-surface-900">{scenario.name}</h3>
+                          <p className="text-sm text-surface-900-500">
                             Age {scenario.currentAge} → {scenario.targetAge} ({projection.years} years)
                           </p>
                         </div>
@@ -263,20 +265,20 @@ export default function ScenarioBranching() {
 
                     {/* Metrics */}
                     <div className="grid grid-cols-2 gap-4 mb-4">
-                      <div className="bg-slate-50 rounded-xl p-3">
-                        <div className="text-xs text-slate-600 mb-1">Current Savings</div>
-                        <div className="text-lg font-bold text-secondary">
+                      <div className="bg-secondary-50 rounded-xl p-3">
+                        <div className="text-xs text-surface-900-500 mb-1">Current Savings</div>
+                        <div className="text-lg font-bold text-surface-900">
                           {formatCompact(scenario.currentSavings)}
                         </div>
                       </div>
-                      <div className="bg-slate-50 rounded-xl p-3">
-                        <div className="text-xs text-slate-600 mb-1">Monthly Savings</div>
-                        <div className="text-lg font-bold text-secondary">
+                      <div className="bg-secondary-50 rounded-xl p-3">
+                        <div className="text-xs text-surface-900-500 mb-1">Monthly Savings</div>
+                        <div className="text-lg font-bold text-surface-900">
                           {formatCompact(scenario.monthlySavings)}
                         </div>
                       </div>
-                      <div className="bg-slate-50 rounded-xl p-3">
-                        <div className="text-xs text-slate-600 mb-1">Expected Return</div>
+                      <div className="bg-secondary-50 rounded-xl p-3">
+                        <div className="text-xs text-surface-900-500 mb-1">Expected Return</div>
                         <div className="text-lg font-bold text-green-600">
                           {scenario.expectedReturn}%
                         </div>
@@ -305,7 +307,7 @@ export default function ScenarioBranching() {
             {/* Comparison View */}
             {selectedScenarios.length > 1 && (
               <div className="bg-white rounded-2xl p-8 border-2 border-primary">
-                <h2 className="text-2xl font-bold text-secondary mb-6">
+                <h2 className="text-2xl font-bold text-surface-900 mb-6">
                   Scenario Comparison
                 </h2>
                 
@@ -315,29 +317,29 @@ export default function ScenarioBranching() {
                     const projection = calculateProjection(scenario);
 
                     return (
-                      <div key={id} className="border-2 border-slate-200 rounded-xl p-6">
+                      <div key={id} className="border border-secondary-200 rounded-xl p-6">
                         <div className="flex items-center gap-2 mb-4">
                           <div className={`w-4 h-4 rounded-full ${scenario.color}`}></div>
-                          <h3 className="font-bold text-secondary">{scenario.name}</h3>
+                          <h3 className="font-bold text-surface-900">{scenario.name}</h3>
                         </div>
 
                         <div className="space-y-3">
                           <div>
-                            <div className="text-xs text-slate-600">Final Balance</div>
+                            <div className="text-xs text-surface-900-500">Final Balance</div>
                             <div className="text-2xl font-bold text-primary">
                               {formatAmount(projection.finalBalance)}
                             </div>
                           </div>
 
                           <div>
-                            <div className="text-xs text-slate-600">Total Contributions</div>
-                            <div className="text-lg font-semibold text-slate-700">
+                            <div className="text-xs text-surface-900-500">Total Contributions</div>
+                            <div className="text-lg font-semibold text-surface-900-700">
                               {formatAmount(scenario.monthlySavings * projection.years * 12)}
                             </div>
                           </div>
 
                           <div>
-                            <div className="text-xs text-slate-600">Investment Gains</div>
+                            <div className="text-xs text-surface-900-500">Investment Gains</div>
                             <div className="text-lg font-semibold text-green-600">
                               {formatAmount(
                                 projection.finalBalance - 
@@ -348,7 +350,7 @@ export default function ScenarioBranching() {
                           </div>
 
                           <div>
-                            <div className="text-xs text-slate-600">Return Rate</div>
+                            <div className="text-xs text-surface-900-500">Return Rate</div>
                             <div className="text-lg font-semibold text-blue-600">
                               {scenario.expectedReturn}% / year
                             </div>
@@ -393,10 +395,10 @@ export default function ScenarioBranching() {
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-secondary">Create New Scenario</h2>
+                <h2 className="text-2xl font-bold text-surface-900">Create New Scenario</h2>
                 <button
                   onClick={() => { setShowCreateModal(false); resetForm(); }}
-                  className="text-slate-400 hover:text-slate-600 text-2xl"
+                  className="text-surface-900-300 hover:text-surface-900-500 text-2xl"
                 >
                   ✕
                 </button>
@@ -404,7 +406,7 @@ export default function ScenarioBranching() {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  <label className="block text-sm font-semibold text-surface-900-700 mb-2">
                     Scenario Name *
                   </label>
                   <input
@@ -412,77 +414,77 @@ export default function ScenarioBranching() {
                     value={scenarioName}
                     onChange={(e) => setScenarioName(e.target.value)}
                     placeholder="e.g., Conservative Path, Aggressive Growth, Early Retirement"
-                    className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                    className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                   />
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label className="block text-sm font-semibold text-surface-900-700 mb-2">
                       Current Age
                     </label>
                     <input
                       type="number"
                       value={currentAge}
                       onChange={(e) => setCurrentAge(Number(e.target.value))}
-                      className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                      className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label className="block text-sm font-semibold text-surface-900-700 mb-2">
                       Target Age
                     </label>
                     <input
                       type="number"
                       value={targetAge}
                       onChange={(e) => setTargetAge(Number(e.target.value))}
-                      className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                      className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  <label className="block text-sm font-semibold text-surface-900-700 mb-2">
                     Current Savings (€)
                   </label>
                   <input
                     type="number"
                     value={currentSavings}
                     onChange={(e) => setCurrentSavings(Number(e.target.value))}
-                    className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                    className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                   />
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label className="block text-sm font-semibold text-surface-900-700 mb-2">
                       Monthly Income (€)
                     </label>
                     <input
                       type="number"
                       value={monthlyIncome}
                       onChange={(e) => setMonthlyIncome(Number(e.target.value))}
-                      className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                      className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label className="block text-sm font-semibold text-surface-900-700 mb-2">
                       Monthly Savings (€)
                     </label>
                     <input
                       type="number"
                       value={monthlySavings}
                       onChange={(e) => setMonthlySavings(Number(e.target.value))}
-                      className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                      className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                     />
                   </div>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label className="block text-sm font-semibold text-surface-900-700 mb-2">
                       Expected Return (%)
                     </label>
                     <input
@@ -490,12 +492,12 @@ export default function ScenarioBranching() {
                       value={expectedReturn}
                       onChange={(e) => setExpectedReturn(Number(e.target.value))}
                       step="0.1"
-                      className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                      className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label className="block text-sm font-semibold text-surface-900-700 mb-2">
                       Inflation Rate (%)
                     </label>
                     <input
@@ -503,7 +505,7 @@ export default function ScenarioBranching() {
                       value={inflation}
                       onChange={(e) => setInflation(Number(e.target.value))}
                       step="0.1"
-                      className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                      className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                     />
                   </div>
                 </div>
@@ -514,7 +516,7 @@ export default function ScenarioBranching() {
                     disabled={!scenarioName.trim()}
                     className={`flex-1 px-6 py-3 rounded-xl font-semibold transition-colors ${
                       !scenarioName.trim()
-                        ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                        ? 'bg-secondary-300 text-surface-900-400 cursor-not-allowed'
                         : 'bg-primary text-white hover:bg-primary/90'
                     }`}
                   >
@@ -522,7 +524,7 @@ export default function ScenarioBranching() {
                   </button>
                   <button
                     onClick={() => { setShowCreateModal(false); resetForm(); }}
-                    className="px-6 py-3 border-2 border-slate-300 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 transition-colors"
+                    className="px-6 py-3 border border-secondary-200 text-surface-900-700 rounded-xl font-semibold hover:bg-secondary-50 transition-colors"
                   >
                     Cancel
                   </button>

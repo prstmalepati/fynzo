@@ -4,6 +4,7 @@ import { useCurrency } from '../context/CurrencyContext';
 import { db } from '../firebase/config';
 import { collection, addDoc, deleteDoc, doc, query, orderBy, getDocs, Timestamp } from 'firebase/firestore';
 import SidebarLayout from '../components/SidebarLayout';
+import { useToast } from '../context/ToastContext';
 import AntiPortfolioCard from '../components/AntiPortfolioCard';
 import AddMistakeModal from '../components/AddMistakeModal';
 
@@ -24,6 +25,7 @@ export interface AntiPortfolioItem {
 export default function AntiPortfolio() {
   const { user } = useAuth();
   const { formatAmount, formatCompact, currency } = useCurrency();
+  const { showToast } = useToast();
   const [items, setItems] = useState<AntiPortfolioItem[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -69,7 +71,7 @@ export default function AntiPortfolio() {
       loadItems();
     } catch (error) {
       console.error('Error adding item:', error);
-      alert('Failed to add item. Please try again.');
+      showToast('Failed to add item. Please try again.');
     }
   };
 
@@ -80,7 +82,7 @@ export default function AntiPortfolio() {
         loadItems();
       } catch (error) {
         console.error('Error deleting item:', error);
-        alert('Failed to delete item');
+        showToast('Failed to delete item');
       }
     }
   };
@@ -120,7 +122,7 @@ export default function AntiPortfolio() {
         <div className="flex items-center justify-center h-screen">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-slate-600">Loading anti-portfolio...</p>
+            <p className="text-surface-900-500">Loading anti-portfolio...</p>
           </div>
         </div>
       </SidebarLayout>
@@ -129,16 +131,16 @@ export default function AntiPortfolio() {
 
   return (
     <SidebarLayout>
-      <div className="p-8 max-w-7xl mx-auto">
+      <div className="p-6 lg:p-8 max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-3">
             <div className="text-5xl">🛡️</div>
             <div>
-              <h1 className="text-4xl font-bold text-secondary" style={{ fontFamily: "'Crimson Pro', serif" }}>
+              <h1 className="text-3xl lg:text-4xl font-bold text-surface-900" >
                 Anti-Portfolio
               </h1>
-              <p className="text-slate-600 text-lg">
+              <p className="text-surface-900-500 text-lg">
                 Track the stupid mistakes you <strong>didn't</strong> make
               </p>
             </div>
@@ -156,7 +158,7 @@ export default function AntiPortfolio() {
             <div className="text-sm opacity-90 mb-2">
               {netSaved > 0 ? 'Money Saved' : 'Gains Missed'}
             </div>
-            <div className="text-4xl font-bold mb-2">
+            <div className="text-3xl lg:text-4xl font-bold mb-2">
               {formatCompact(Math.abs(netSaved))}
             </div>
             <div className="text-sm opacity-75">
@@ -167,24 +169,24 @@ export default function AntiPortfolio() {
           {/* Dodged Bullets */}
           <div className="bg-white rounded-2xl p-6 border-2 border-green-200 bg-green-50">
             <div className="text-sm text-green-700 mb-2">Dodged Bullets</div>
-            <div className="text-4xl font-bold text-green-600 mb-2">{totalDodgedBullets}</div>
+            <div className="text-3xl lg:text-4xl font-bold text-green-600 mb-2">{totalDodgedBullets}</div>
             <div className="text-sm text-green-600">🎯 Smart Decisions</div>
           </div>
 
           {/* Missed Gains */}
           <div className="bg-white rounded-2xl p-6 border-2 border-amber-200 bg-amber-50">
             <div className="text-sm text-amber-700 mb-2">Missed Gains</div>
-            <div className="text-4xl font-bold text-amber-600 mb-2">{totalMissedGains}</div>
+            <div className="text-3xl lg:text-4xl font-bold text-amber-600 mb-2">{totalMissedGains}</div>
             <div className="text-sm text-amber-600">📊 Learning Moments</div>
           </div>
 
           {/* Top Trigger */}
-          <div className="bg-white rounded-2xl p-6 border-2 border-slate-200">
-            <div className="text-sm text-slate-600 mb-2">Your Weakness</div>
-            <div className="text-2xl font-bold text-secondary mb-2 capitalize">
+          <div className="bg-white rounded-2xl p-6 border border-secondary-200">
+            <div className="text-sm text-surface-900-500 mb-2">Your Weakness</div>
+            <div className="text-2xl font-bold text-surface-900 mb-2 capitalize">
               {topTrigger ? topTrigger[0].replace('-', ' ') : 'None Yet'}
             </div>
-            <div className="text-sm text-slate-500">
+            <div className="text-sm text-surface-900-400">
               {topTrigger ? `${topTrigger[1]} instances` : 'Add items to see'}
             </div>
           </div>
@@ -196,7 +198,7 @@ export default function AntiPortfolio() {
             <div className="flex items-start gap-4">
               <div className="text-5xl">🧠</div>
               <div className="flex-1">
-                <h2 className="text-2xl font-bold text-secondary mb-3">Your Behavioral Insights</h2>
+                <h2 className="text-2xl font-bold text-surface-900 mb-3">Your Behavioral Insights</h2>
                 
                 {netSaved > 0 ? (
                   <div className="space-y-2">
@@ -237,7 +239,7 @@ export default function AntiPortfolio() {
                 className={`px-4 py-2 rounded-xl font-semibold whitespace-nowrap transition-all ${
                   filterCategory === cat.value
                     ? 'bg-primary text-white shadow-lg'
-                    : 'bg-white border-2 border-slate-200 text-slate-700 hover:border-primary'
+                    : 'bg-white border border-secondary-200 text-surface-900-700 hover:border-primary'
                 }`}
               >
                 <span className="mr-2">{cat.icon}</span>
@@ -249,10 +251,10 @@ export default function AntiPortfolio() {
 
         {/* Empty State */}
         {filteredItems.length === 0 && items.length === 0 && (
-          <div className="bg-gradient-to-br from-slate-50 to-white rounded-2xl p-12 border-2 border-dashed border-slate-300 text-center">
+          <div className="bg-gradient-to-br from-slate-50 to-white rounded-2xl p-12 border-2 border-dashed border-secondary-200 text-center">
             <div className="text-6xl mb-4">🛡️</div>
-            <h3 className="text-2xl font-bold text-secondary mb-3">Start Your Anti-Portfolio</h3>
-            <p className="text-slate-600 mb-6 max-w-lg mx-auto">
+            <h3 className="text-2xl font-bold text-surface-900 mb-3">Start Your Anti-Portfolio</h3>
+            <p className="text-surface-900-500 mb-6 max-w-lg mx-auto">
               Track investments you almost made but didn't. Learn from near-misses. Build discipline.
             </p>
             <button
@@ -264,8 +266,8 @@ export default function AntiPortfolio() {
 
             {/* Examples */}
             <div className="mt-8 text-left max-w-2xl mx-auto">
-              <div className="text-sm font-semibold text-slate-700 mb-3">Examples:</div>
-              <div className="space-y-2 text-sm text-slate-600">
+              <div className="text-sm font-semibold text-surface-900-700 mb-3">Examples:</div>
+              <div className="space-y-2 text-sm text-surface-900-500">
                 <div className="flex items-start gap-2">
                   <span>💡</span>
                   <span>"Almost bought Bitcoin at $60K because of FOMO. It's now $35K. Saved $25K."</span>
@@ -313,11 +315,6 @@ export default function AntiPortfolio() {
             onClose={() => setShowAddModal(false)}
           />
         )}
-
-        {/* Google Fonts */}
-        <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap');
-        `}</style>
       </div>
     </SidebarLayout>
   );

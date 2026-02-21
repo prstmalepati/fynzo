@@ -4,6 +4,7 @@ import { useCurrency } from '../context/CurrencyContext';
 import { db } from '../firebase/config';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import SidebarLayout from '../components/SidebarLayout';
+import { useToast } from '../context/ToastContext';
 
 interface UserProfile {
   fullName: string;
@@ -26,6 +27,7 @@ interface UserProfile {
 export default function Settings() {
   const { user } = useAuth();
   const { currency, setCurrency } = useCurrency();
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [profile, setProfile] = useState<UserProfile>({
@@ -105,11 +107,11 @@ export default function Settings() {
         setCurrency(profile.preferredCurrency);
       }
 
-      alert('Settings saved successfully!');
+      showToast('Settings saved successfully!');
       setSaving(false);
     } catch (error) {
       console.error('Error saving profile:', error);
-      alert('Failed to save settings. Please try again.');
+      showToast('Failed to save settings. Please try again.');
       setSaving(false);
     }
   };
@@ -131,7 +133,7 @@ export default function Settings() {
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-slate-600 font-medium">Loading settings...</p>
+            <p className="text-surface-900-500 font-medium">Loading settings...</p>
           </div>
         </div>
       </SidebarLayout>
@@ -144,68 +146,68 @@ export default function Settings() {
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-4xl font-bold text-secondary mb-2">Settings</h1>
-            <p className="text-slate-600">Manage your account preferences and personal information</p>
+            <h1 className="page-title">Settings</h1>
+            <p className="text-surface-900-500">Manage your account preferences and personal information</p>
           </div>
 
           {/* Profile Section */}
           <div className="bg-white rounded-2xl shadow-lg p-8 mb-6">
-            <h2 className="text-2xl font-bold text-secondary mb-6 flex items-center gap-3">
+            <h2 className="text-2xl font-bold text-surface-900 mb-6 flex items-center gap-3">
               <span className="text-3xl">👤</span>
               Personal Information
             </h2>
 
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Full Name</label>
+                <label className="block text-sm font-semibold text-surface-900-700 mb-2">Full Name</label>
                 <input
                   type="text"
                   value={profile.fullName}
                   onChange={(e) => updateProfile('fullName', e.target.value)}
                   placeholder="John Doe"
-                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                  className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Email</label>
+                <label className="block text-sm font-semibold text-surface-900-700 mb-2">Email</label>
                 <input
                   type="email"
                   value={profile.email}
                   disabled
-                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl bg-slate-50 text-slate-500 cursor-not-allowed"
+                  className="w-full px-4 py-3 border border-secondary-200 rounded-xl bg-secondary-50 text-surface-900-400 cursor-not-allowed"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Phone Number</label>
+                <label className="block text-sm font-semibold text-surface-900-700 mb-2">Phone Number</label>
                 <input
                   type="tel"
                   value={profile.phone}
                   onChange={(e) => updateProfile('phone', e.target.value)}
                   placeholder="+49 123 456 7890"
-                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                  className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Date of Birth</label>
+                <label className="block text-sm font-semibold text-surface-900-700 mb-2">Date of Birth</label>
                 <input
                   type="date"
                   value={profile.dateOfBirth}
                   onChange={(e) => updateProfile('dateOfBirth', e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                  className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                 />
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Occupation</label>
+                <label className="block text-sm font-semibold text-surface-900-700 mb-2">Occupation</label>
                 <input
                   type="text"
                   value={profile.occupation}
                   onChange={(e) => updateProfile('occupation', e.target.value)}
                   placeholder="Software Engineer"
-                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                  className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                 />
               </div>
             </div>
@@ -213,51 +215,51 @@ export default function Settings() {
 
           {/* Address Section */}
           <div className="bg-white rounded-2xl shadow-lg p-8 mb-6">
-            <h2 className="text-2xl font-bold text-secondary mb-6 flex items-center gap-3">
+            <h2 className="text-2xl font-bold text-surface-900 mb-6 flex items-center gap-3">
               <span className="text-3xl">🏠</span>
               Address
             </h2>
 
             <div className="grid md:grid-cols-2 gap-6">
               <div className="md:col-span-2">
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Street Address</label>
+                <label className="block text-sm font-semibold text-surface-900-700 mb-2">Street Address</label>
                 <input
                   type="text"
                   value={profile.address}
                   onChange={(e) => updateProfile('address', e.target.value)}
                   placeholder="123 Main Street"
-                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                  className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">City</label>
+                <label className="block text-sm font-semibold text-surface-900-700 mb-2">City</label>
                 <input
                   type="text"
                   value={profile.city}
                   onChange={(e) => updateProfile('city', e.target.value)}
                   placeholder="Munich"
-                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                  className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Postal Code</label>
+                <label className="block text-sm font-semibold text-surface-900-700 mb-2">Postal Code</label>
                 <input
                   type="text"
                   value={profile.postalCode}
                   onChange={(e) => updateProfile('postalCode', e.target.value)}
                   placeholder="80331"
-                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                  className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                 />
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Country</label>
+                <label className="block text-sm font-semibold text-surface-900-700 mb-2">Country</label>
                 <select
                   value={profile.country}
                   onChange={(e) => updateProfile('country', e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                  className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                 >
                   <option value="">Select a country</option>
                   {countries.map(country => (
@@ -270,18 +272,18 @@ export default function Settings() {
 
           {/* Preferences Section */}
           <div className="bg-white rounded-2xl shadow-lg p-8 mb-6">
-            <h2 className="text-2xl font-bold text-secondary mb-6 flex items-center gap-3">
+            <h2 className="text-2xl font-bold text-surface-900 mb-6 flex items-center gap-3">
               <span className="text-3xl">⚙️</span>
               Preferences
             </h2>
 
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Preferred Currency</label>
+                <label className="block text-sm font-semibold text-surface-900-700 mb-2">Preferred Currency</label>
                 <select
                   value={profile.preferredCurrency}
                   onChange={(e) => updateProfile('preferredCurrency', e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                  className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                 >
                   {currencies.map(curr => (
                     <option key={curr} value={curr}>{curr}</option>
@@ -293,16 +295,16 @@ export default function Settings() {
 
           {/* Notifications Section */}
           <div className="bg-white rounded-2xl shadow-lg p-8 mb-6">
-            <h2 className="text-2xl font-bold text-secondary mb-6 flex items-center gap-3">
+            <h2 className="text-2xl font-bold text-surface-900 mb-6 flex items-center gap-3">
               <span className="text-3xl">🔔</span>
               Notifications
             </h2>
 
             <div className="space-y-4">
-              <label className="flex items-center justify-between p-4 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition-colors">
+              <label className="flex items-center justify-between p-4 bg-secondary-50 rounded-xl cursor-pointer hover:bg-secondary-100 transition-colors">
                 <div>
-                  <div className="font-semibold text-slate-900">Email Notifications</div>
-                  <div className="text-sm text-slate-600">Receive updates via email</div>
+                  <div className="font-semibold text-surface-900-900">Email Notifications</div>
+                  <div className="text-sm text-surface-900-500">Receive updates via email</div>
                 </div>
                 <input
                   type="checkbox"
@@ -312,10 +314,10 @@ export default function Settings() {
                 />
               </label>
 
-              <label className="flex items-center justify-between p-4 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition-colors">
+              <label className="flex items-center justify-between p-4 bg-secondary-50 rounded-xl cursor-pointer hover:bg-secondary-100 transition-colors">
                 <div>
-                  <div className="font-semibold text-slate-900">Push Notifications</div>
-                  <div className="text-sm text-slate-600">Receive push notifications on your device</div>
+                  <div className="font-semibold text-surface-900-900">Push Notifications</div>
+                  <div className="text-sm text-surface-900-500">Receive push notifications on your device</div>
                 </div>
                 <input
                   type="checkbox"
@@ -325,10 +327,10 @@ export default function Settings() {
                 />
               </label>
 
-              <label className="flex items-center justify-between p-4 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition-colors">
+              <label className="flex items-center justify-between p-4 bg-secondary-50 rounded-xl cursor-pointer hover:bg-secondary-100 transition-colors">
                 <div>
-                  <div className="font-semibold text-slate-900">Weekly Summary</div>
-                  <div className="text-sm text-slate-600">Get a weekly summary of your portfolio</div>
+                  <div className="font-semibold text-surface-900-900">Weekly Summary</div>
+                  <div className="text-sm text-surface-900-500">Get a weekly summary of your portfolio</div>
                 </div>
                 <input
                   type="checkbox"
@@ -344,7 +346,7 @@ export default function Settings() {
           <div className="flex justify-end gap-4">
             <button
               onClick={loadProfile}
-              className="px-8 py-3 bg-slate-200 text-slate-700 rounded-xl font-semibold hover:bg-slate-300 transition-colors"
+              className="px-8 py-3 bg-slate-200 text-surface-900-700 rounded-xl font-semibold hover:bg-secondary-300 transition-colors"
             >
               Reset
             </button>

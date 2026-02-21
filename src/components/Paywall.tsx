@@ -24,7 +24,7 @@ export default function Paywall({
 
   const handleUpgrade = () => {
     // TODO: Implement Stripe checkout flow
-    alert(`Upgrade to Premium (${billingPeriod}) - Coming soon!`);
+    console.log(`Upgrade to Premium (${billingPeriod}) - Coming soon!`);
   };
 
   return (
@@ -34,7 +34,7 @@ export default function Paywall({
         {showClose && onClose && (
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors"
+            className="absolute top-4 right-4 text-surface-900-300 hover:text-surface-900-500 transition-colors"
             aria-label="Close"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -48,26 +48,26 @@ export default function Paywall({
           <div className="w-20 h-20 bg-gradient-to-br from-primary to-teal-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl">
             <span className="text-white font-bold text-4xl">💎</span>
           </div>
-          <h2 className="text-4xl font-bold text-secondary mb-3" style={{ fontFamily: "'Crimson Pro', serif" }}>
+          <h2 className="page-title mb-3">
             Unlock Premium Features
           </h2>
-          <p className="text-lg text-slate-600">
+          <p className="text-lg text-surface-900-500">
             <span className="font-semibold text-primary">{feature}</span> is a Premium feature
           </p>
           {description && (
-            <p className="text-slate-600 mt-2">{description}</p>
+            <p className="text-surface-900-500 mt-2">{description}</p>
           )}
         </div>
 
         {/* Billing Period Toggle */}
         <div className="flex justify-center mb-8">
-          <div className="inline-flex bg-slate-100 rounded-xl p-1">
+          <div className="inline-flex bg-secondary-100 rounded-xl p-1">
             <button
               onClick={() => setBillingPeriod('monthly')}
               className={`px-6 py-3 rounded-lg font-semibold transition-all ${
                 billingPeriod === 'monthly'
-                  ? 'bg-white text-secondary shadow-md'
-                  : 'text-slate-600 hover:text-secondary'
+                  ? 'bg-white text-surface-900 shadow-md'
+                  : 'text-surface-900-500 hover:text-surface-900'
               }`}
             >
               Monthly
@@ -76,8 +76,8 @@ export default function Paywall({
               onClick={() => setBillingPeriod('annual')}
               className={`px-6 py-3 rounded-lg font-semibold transition-all relative ${
                 billingPeriod === 'annual'
-                  ? 'bg-white text-secondary shadow-md'
-                  : 'text-slate-600 hover:text-secondary'
+                  ? 'bg-white text-surface-900 shadow-md'
+                  : 'text-surface-900-500 hover:text-surface-900'
               }`}
             >
               Annual
@@ -91,23 +91,23 @@ export default function Paywall({
         {/* Pricing Cards */}
         <div className="grid md:grid-cols-2 gap-6 mb-8">
           {/* Free Tier */}
-          <div className="p-6 border-2 border-slate-200 rounded-xl bg-white">
+          <div className="p-6 border border-secondary-200 rounded-xl bg-white">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-2xl font-bold text-secondary">Free</h3>
-              <span className="text-xs bg-slate-100 px-3 py-1 rounded-full text-slate-600 font-semibold">
+              <h3 className="text-2xl font-bold text-surface-900">Free</h3>
+              <span className="text-xs bg-secondary-100 px-3 py-1 rounded-full text-surface-900-500 font-semibold">
                 Current Plan
               </span>
             </div>
             <div className="mb-6">
-              <div className="text-4xl font-bold text-slate-400 mb-1">
+              <div className="text-3xl lg:text-4xl font-bold text-surface-900-300 mb-1">
                 {formatAmount(0, 0)}
               </div>
-              <div className="text-sm text-slate-500">Forever free</div>
+              <div className="text-sm text-surface-900-400">Forever free</div>
             </div>
-            <ul className="space-y-3 text-sm text-slate-600">
+            <ul className="space-y-3 text-sm text-surface-900-500">
               {TIER_FEATURES.free.map((f, i) => (
                 <li key={i} className="flex items-start gap-2">
-                  <span className="text-slate-400 mt-0.5">✓</span>
+                  <span className="text-surface-900-300 mt-0.5">✓</span>
                   <span>{f}</span>
                 </li>
               ))}
@@ -121,17 +121,17 @@ export default function Paywall({
             </div>
             
             <div className="flex items-center justify-between mb-4 mt-2">
-              <h3 className="text-2xl font-bold text-secondary">Premium</h3>
+              <h3 className="text-2xl font-bold text-surface-900">Premium</h3>
               <span className="text-2xl">💎</span>
             </div>
             
             <div className="mb-6">
-              <div className="text-4xl font-bold text-primary mb-1">
+              <div className="text-3xl lg:text-4xl font-bold text-primary mb-1">
                 {billingPeriod === 'monthly' 
                   ? formatAmount(monthlyPrice, 2)
                   : formatAmount(annualPrice, 0)}
               </div>
-              <div className="text-sm text-slate-600">
+              <div className="text-sm text-surface-900-500">
                 {billingPeriod === 'monthly' 
                   ? 'per month'
                   : `per year (${formatAmount(annualPrice / 12, 2)}/month)`}
@@ -143,7 +143,7 @@ export default function Paywall({
               )}
             </div>
 
-            <ul className="space-y-3 text-sm text-slate-700 mb-6">
+            <ul className="space-y-3 text-sm text-surface-900-700 mb-6">
               {TIER_FEATURES.premium.map((f, i) => (
                 <li key={i} className="flex items-start gap-2">
                   <span className="text-primary mt-0.5 font-bold">✓</span>
@@ -163,7 +163,7 @@ export default function Paywall({
 
         {/* Benefits */}
         <div className="bg-gradient-to-br from-blue-50 to-white rounded-xl p-6 border border-blue-200 mb-6">
-          <h4 className="font-bold text-secondary mb-3 flex items-center gap-2">
+          <h4 className="font-bold text-surface-900 mb-3 flex items-center gap-2">
             <svg className="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
             </svg>
@@ -171,22 +171,22 @@ export default function Paywall({
           </h4>
           <div className="grid md:grid-cols-3 gap-4 text-sm">
             <div>
-              <div className="font-semibold text-secondary mb-1">🏦 Auto Bank Sync</div>
-              <div className="text-slate-600">Connect your German banks and automatically track your net worth</div>
+              <div className="font-semibold text-surface-900 mb-1">🏦 Auto Bank Sync</div>
+              <div className="text-surface-900-500">Connect your German banks and automatically track your net worth</div>
             </div>
             <div>
-              <div className="font-semibold text-secondary mb-1">🎯 Advanced Planning</div>
-              <div className="text-slate-600">Create unlimited scenarios and see 50+ year projections</div>
+              <div className="font-semibold text-surface-900 mb-1">🎯 Advanced Planning</div>
+              <div className="text-surface-900-500">Create unlimited scenarios and see 50+ year projections</div>
             </div>
             <div>
-              <div className="font-semibold text-secondary mb-1">👨‍👩‍👧‍👦 Family Sharing</div>
-              <div className="text-slate-600">Track wealth across your household with up to 5 members</div>
+              <div className="font-semibold text-surface-900 mb-1">👨‍👩‍👧‍👦 Family Sharing</div>
+              <div className="text-surface-900-500">Track wealth across your household with up to 5 members</div>
             </div>
           </div>
         </div>
 
         {/* Trust Indicators */}
-        <div className="text-center text-sm text-slate-600 space-y-2">
+        <div className="text-center text-sm text-surface-900-500 space-y-2">
           <div className="flex items-center justify-center gap-6">
             <span className="flex items-center gap-1">
               <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
@@ -207,7 +207,7 @@ export default function Paywall({
               Secure payments
             </span>
           </div>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-surface-900-400">
             Join thousands of users managing their wealth with myfynzo Premium
           </p>
         </div>

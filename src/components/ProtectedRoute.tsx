@@ -6,14 +6,17 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-2xl text-slate-600">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-surface-50">
+        <div className="text-center">
+          <img src="/logo-transparent.png" alt="myfynzo" className="w-12 h-12 mx-auto mb-4 animate-pulse" />
+          <p className="text-slate-400 text-sm">Loading...</p>
+        </div>
       </div>
     );
   }
 
   if (!user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return <>{children}</>;

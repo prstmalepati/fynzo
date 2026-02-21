@@ -132,96 +132,96 @@ export default function WealthProjection() {
 
   return (
     <div className="bg-white rounded-2xl shadow-lg p-8">
-      <h2 className="text-3xl font-bold text-secondary mb-6 flex items-center gap-3">
+      <h2 className="text-3xl font-bold text-surface-900 mb-6 flex items-center gap-3">
         <span className="text-4xl">💰</span>
         Wealth Projection
       </h2>
-      <p className="text-slate-600 mb-8">Multi-scenario wealth projection with life events</p>
+      <p className="text-surface-900-500 mb-8">Multi-scenario wealth projection with life events</p>
 
       <div className="grid md:grid-cols-2 gap-8">
         {/* Left Column - Inputs */}
         <div className="space-y-6">
           {/* Basic Info */}
-          <div className="bg-slate-50 rounded-xl p-6">
-            <h3 className="text-lg font-bold text-secondary mb-4">Basic Information</h3>
+          <div className="bg-secondary-50 rounded-xl p-6">
+            <h3 className="text-lg font-bold text-surface-900 mb-4">Basic Information</h3>
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Current Age</label>
+                <label className="block text-sm font-semibold text-surface-900-700 mb-2">Current Age</label>
                 <input
                   type="number"
                   value={currentAge}
                   onChange={(e) => setCurrentAge(Number(e.target.value))}
-                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                  className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Projection Until Age</label>
+                <label className="block text-sm font-semibold text-surface-900-700 mb-2">Projection Until Age</label>
                 <input
                   type="number"
                   value={projectionAge}
                   onChange={(e) => setProjectionAge(Number(e.target.value))}
-                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                  className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Current Net Worth</label>
+                <label className="block text-sm font-semibold text-surface-900-700 mb-2">Current Net Worth</label>
                 <input
                   type="number"
                   value={currentNetWorth}
                   onChange={(e) => setCurrentNetWorth(Number(e.target.value))}
-                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                  className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Monthly Savings</label>
+                <label className="block text-sm font-semibold text-surface-900-700 mb-2">Monthly Savings</label>
                 <input
                   type="number"
                   value={monthlySavings}
                   onChange={(e) => setMonthlySavings(Number(e.target.value))}
-                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                  className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Annual Income</label>
+                <label className="block text-sm font-semibold text-surface-900-700 mb-2">Annual Income</label>
                 <input
                   type="number"
                   value={annualIncome}
                   onChange={(e) => setAnnualIncome(Number(e.target.value))}
-                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                  className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Income Growth (%/year)</label>
+                <label className="block text-sm font-semibold text-surface-900-700 mb-2">Income Growth (%/year)</label>
                 <input
                   type="number"
                   value={incomeGrowth}
                   onChange={(e) => setIncomeGrowth(Number(e.target.value))}
                   step="0.1"
-                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                  className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Savings Rate (% of income)</label>
+                <label className="block text-sm font-semibold text-surface-900-700 mb-2">Savings Rate (% of income)</label>
                 <input
                   type="number"
                   value={savingsRate}
                   onChange={(e) => setSavingsRate(Number(e.target.value))}
-                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                  className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                 />
               </div>
             </div>
           </div>
 
           {/* Return Scenarios */}
-          <div className="bg-slate-50 rounded-xl p-6">
-            <h3 className="text-lg font-bold text-secondary mb-4">Return Scenarios</h3>
+          <div className="bg-secondary-50 rounded-xl p-6">
+            <h3 className="text-lg font-bold text-surface-900 mb-4">Return Scenarios</h3>
             
             <div className="space-y-4">
               <div>
@@ -260,21 +260,21 @@ export default function WealthProjection() {
           </div>
 
           {/* Life Events */}
-          <div className="bg-slate-50 rounded-xl p-6">
-            <h3 className="text-lg font-bold text-secondary mb-4">Life Events</h3>
+          <div className="bg-secondary-50 rounded-xl p-6">
+            <h3 className="text-lg font-bold text-surface-900 mb-4">Life Events</h3>
             
             {/* Existing Events */}
             <div className="space-y-2 mb-4">
               {lifeEvents.map((event, index) => (
                 <div key={index} className="flex items-center justify-between p-3 bg-white rounded-lg">
                   <div className="flex-1">
-                    <div className="font-semibold text-slate-900">
+                    <div className="font-semibold text-surface-900-900">
                       {event.type === 'expense' && '💸'} 
                       {event.type === 'income' && '💰'} 
                       {event.type === 'windfall' && '🎁'} 
                       {' '}{event.description}
                     </div>
-                    <div className="text-sm text-slate-600">
+                    <div className="text-sm text-surface-900-500">
                       Age {event.age} • {event.impact >= 0 ? '+' : ''}{formatAmount(event.impact)}
                     </div>
                   </div>
@@ -289,23 +289,23 @@ export default function WealthProjection() {
             </div>
 
             {/* Add New Event */}
-            <div className="space-y-3 pt-4 border-t border-slate-200">
+            <div className="space-y-3 pt-4 border-t border-secondary-200">
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Age</label>
+                  <label className="block text-xs font-semibold text-surface-900-700 mb-1">Age</label>
                   <input
                     type="number"
                     value={newEventAge}
                     onChange={(e) => setNewEventAge(Number(e.target.value))}
-                    className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                    className="w-full px-3 py-2 border border-secondary-200 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Type</label>
+                  <label className="block text-xs font-semibold text-surface-900-700 mb-1">Type</label>
                   <select
                     value={newEventType}
                     onChange={(e) => setNewEventType(e.target.value as 'expense' | 'income' | 'windfall')}
-                    className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                    className="w-full px-3 py-2 border border-secondary-200 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                   >
                     <option value="expense">Expense</option>
                     <option value="income">Income Change</option>
@@ -315,18 +315,18 @@ export default function WealthProjection() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Description</label>
+                <label className="block text-xs font-semibold text-surface-900-700 mb-1">Description</label>
                 <input
                   type="text"
                   value={newEventDesc}
                   onChange={(e) => setNewEventDesc(e.target.value)}
                   placeholder="e.g., House purchase"
-                  className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                  className="w-full px-3 py-2 border border-secondary-200 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-surface-900-700 mb-1">
                   {newEventType === 'income' ? 'Annual Income Change' : 'Amount'}
                 </label>
                 <input
@@ -334,7 +334,7 @@ export default function WealthProjection() {
                   value={newEventImpact}
                   onChange={(e) => setNewEventImpact(Number(e.target.value))}
                   placeholder={newEventType === 'expense' ? 'Negative for expense' : 'Positive amount'}
-                  className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                  className="w-full px-3 py-2 border border-secondary-200 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                 />
               </div>
 
@@ -369,8 +369,8 @@ export default function WealthProjection() {
           </div>
 
           {/* Projection Chart */}
-          <div className="bg-slate-50 rounded-xl p-6">
-            <h3 className="text-lg font-bold text-secondary mb-4">
+          <div className="bg-secondary-50 rounded-xl p-6">
+            <h3 className="text-lg font-bold text-surface-900 mb-4">
               Wealth Projection Timeline
             </h3>
             
@@ -382,7 +382,7 @@ export default function WealthProjection() {
                 return (
                   <div key={proj.age}>
                     <div className="flex items-center gap-2 mb-1">
-                      <div className="w-12 text-xs font-semibold text-slate-600">Age {proj.age}</div>
+                      <div className="w-12 text-xs font-semibold text-surface-900-500">Age {proj.age}</div>
                       <div className="flex-1 h-12 relative bg-white rounded-lg overflow-hidden">
                         {/* Worst Case */}
                         <div
@@ -450,8 +450,8 @@ export default function WealthProjection() {
           </div>
 
           {/* Key Milestones */}
-          <div className="bg-slate-50 rounded-xl p-6">
-            <h3 className="text-lg font-bold text-secondary mb-4">Key Milestones</h3>
+          <div className="bg-secondary-50 rounded-xl p-6">
+            <h3 className="text-lg font-bold text-surface-900 mb-4">Key Milestones</h3>
             
             <div className="space-y-3">
               {[500000, 1000000, 2000000, 5000000].map(milestone => {
@@ -461,7 +461,7 @@ export default function WealthProjection() {
                 
                 return (
                   <div key={milestone} className="p-4 bg-white rounded-lg">
-                    <div className="font-bold text-slate-900 mb-2">{formatCompact(milestone)}</div>
+                    <div className="font-bold text-surface-900-900 mb-2">{formatCompact(milestone)}</div>
                     <div className="grid grid-cols-3 gap-2 text-sm">
                       <div className="text-green-700">
                         Best: {bestCaseAge ? `Age ${bestCaseAge}` : 'Not reached'}
@@ -493,18 +493,6 @@ export default function WealthProjection() {
           </div>
         </div>
       </div>
-
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap');
-        
-        .font-crimson {
-          font-family: 'Crimson Pro', serif;
-        }
-        
-        .font-manrope {
-          font-family: 'Manrope', sans-serif;
-        }
-      `}</style>
     </div>
   );
 }

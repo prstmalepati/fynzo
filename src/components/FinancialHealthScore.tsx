@@ -150,9 +150,9 @@ export default function FinancialHealthScore() {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl p-8 border-2 border-slate-200 shadow-lg">
+      <div className="bg-white rounded-2xl p-8 border border-secondary-200 shadow-lg">
         <div className="animate-pulse flex items-center justify-center h-64">
-          <div className="text-slate-400">Calculating your financial health...</div>
+          <div className="text-surface-900-300">Calculating your financial health...</div>
         </div>
       </div>
     );
@@ -163,11 +163,11 @@ export default function FinancialHealthScore() {
   const colors = getScoreColor(healthScore.totalScore);
 
   return (
-    <div className="bg-white rounded-2xl p-8 border-2 border-slate-200 shadow-lg">
+    <div className="bg-white rounded-2xl p-8 border border-secondary-200 shadow-lg">
       {/* Header */}
       <div className="mb-8">
-        <h2 className="text-3xl font-bold text-secondary mb-2 font-crimson">Financial Health Assessment</h2>
-        <p className="text-slate-600">Comprehensive analysis of your financial position</p>
+        <h2 className="text-3xl font-bold text-surface-900 mb-2 font-crimson">Financial Health Assessment</h2>
+        <p className="text-surface-900-500">Comprehensive analysis of your financial position</p>
       </div>
 
       {/* Main Score Display */}
@@ -205,8 +205,8 @@ export default function FinancialHealthScore() {
           </svg>
           {/* Score Text */}
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <div className="text-5xl font-bold text-secondary font-manrope">{healthScore.totalScore}</div>
-            <div className="text-slate-500 text-sm">/100</div>
+            <div className="text-5xl font-bold text-surface-900 font-manrope">{healthScore.totalScore}</div>
+            <div className="text-surface-900-400 text-sm">/100</div>
           </div>
         </div>
 
@@ -218,15 +218,15 @@ export default function FinancialHealthScore() {
           
           <div className="space-y-3">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-slate-600">Your Position:</span>
-              <span className="font-bold text-secondary">{healthScore.percentile}th percentile</span>
+              <span className="text-surface-900-500">Your Position:</span>
+              <span className="font-bold text-surface-900">{healthScore.percentile}th percentile</span>
             </div>
             <div className="flex items-center justify-between text-sm">
-              <span className="text-slate-600">Industry Median:</span>
-              <span className="font-semibold text-slate-700">{healthScore.industryMedian}/100</span>
+              <span className="text-surface-900-500">Industry Median:</span>
+              <span className="font-semibold text-surface-900-700">{healthScore.industryMedian}/100</span>
             </div>
             <div className="flex items-center justify-between text-sm">
-              <span className="text-slate-600">Status:</span>
+              <span className="text-surface-900-500">Status:</span>
               <span className={`font-semibold ${healthScore.totalScore >= healthScore.industryMedian ? 'text-green-600' : 'text-amber-600'}`}>
                 {healthScore.totalScore >= healthScore.industryMedian ? 'Above median' : 'Below median'}
               </span>
@@ -236,8 +236,8 @@ export default function FinancialHealthScore() {
       </div>
 
       {/* Breakdown */}
-      <div className="border-t border-slate-200 pt-6">
-        <h3 className="text-xl font-bold text-secondary mb-4 font-crimson">Component Breakdown</h3>
+      <div className="border-t border-secondary-200 pt-6">
+        <h3 className="text-xl font-bold text-surface-900 mb-4 font-crimson">Component Breakdown</h3>
         <div className="space-y-4">
           {Object.entries(healthScore.breakdown).map(([key, data]) => {
             const maxScore = key === 'savingsRate' ? 25 : key === 'emergencyFund' ? 20 : 15;
@@ -246,10 +246,10 @@ export default function FinancialHealthScore() {
             return (
               <div key={key}>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-semibold text-slate-700 capitalize">
+                  <span className="text-sm font-semibold text-surface-900-700 capitalize">
                     {key.replace(/([A-Z])/g, ' $1').trim()}
                   </span>
-                  <span className="text-sm font-bold text-secondary">{data.score}/{maxScore}</span>
+                  <span className="text-sm font-bold text-surface-900">{data.score}/{maxScore}</span>
                 </div>
                 <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
                   <div
@@ -264,41 +264,35 @@ export default function FinancialHealthScore() {
       </div>
 
       {/* Recommendations */}
-      <div className="mt-6 border-t border-slate-200 pt-6">
-        <h3 className="text-xl font-bold text-secondary mb-3 font-crimson">Priority Actions</h3>
+      <div className="mt-6 border-t border-secondary-200 pt-6">
+        <h3 className="text-xl font-bold text-surface-900 mb-3 font-crimson">Priority Actions</h3>
         <div className="space-y-2">
           {healthScore.breakdown.emergencyFund.score < 15 && (
             <div className="flex items-start gap-2 text-sm">
               <span className="text-amber-600 mt-0.5">→</span>
-              <span className="text-slate-700">Build emergency fund to 6 months of expenses</span>
+              <span className="text-surface-900-700">Build emergency fund to 6 months of expenses</span>
             </div>
           )}
           {healthScore.breakdown.savingsRate.score < 20 && (
             <div className="flex items-start gap-2 text-sm">
               <span className="text-amber-600 mt-0.5">→</span>
-              <span className="text-slate-700">Increase savings rate to 20% or higher</span>
+              <span className="text-surface-900-700">Increase savings rate to 20% or higher</span>
             </div>
           )}
           {healthScore.breakdown.diversification.score < 10 && (
             <div className="flex items-start gap-2 text-sm">
               <span className="text-amber-600 mt-0.5">→</span>
-              <span className="text-slate-700">Diversify across additional asset classes</span>
+              <span className="text-surface-900-700">Diversify across additional asset classes</span>
             </div>
           )}
           {healthScore.breakdown.debtRatio.score < 10 && (
             <div className="flex items-start gap-2 text-sm">
               <span className="text-amber-600 mt-0.5">→</span>
-              <span className="text-slate-700">Reduce debt-to-income ratio below 30%</span>
+              <span className="text-surface-900-700">Reduce debt-to-income ratio below 30%</span>
             </div>
           )}
         </div>
       </div>
-
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@600;700&family=Manrope:wght@700;800&display=swap');
-        .font-crimson { font-family: 'Crimson Pro', serif; }
-        .font-manrope { font-family: 'Manrope', sans-serif; }
-      `}</style>
     </div>
   );
 }

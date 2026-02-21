@@ -269,7 +269,7 @@ function FormSection({ title, description, children }: { title: string; descript
   return (
     <div className="bg-gradient-to-br from-white to-slate-50 rounded-xl p-6 border border-slate-200 shadow-sm">
       <div className="mb-4">
-        <h3 className="text-lg font-bold text-secondary mb-1" style={{ fontFamily: "'Crimson Pro', serif" }}>
+        <h3 className="text-lg font-bold text-secondary mb-1 font-display">
           {title}
         </h3>
         <p className="text-sm text-slate-600">{description}</p>

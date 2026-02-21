@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useCurrency } from '../context/CurrencyContext';
 import { useAuth } from '../context/AuthContext';
 import SidebarLayout from '../components/SidebarLayout';
+import { useToast } from '../context/ToastContext';
 import { db } from '../firebase/config';
 import { collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 
@@ -20,6 +21,7 @@ interface LifestyleItem {
 
 export default function LifestyleBasket() {
   const { formatAmount, formatCompact } = useCurrency();
+  const { showToast } = useToast();
   const { user } = useAuth();
   
   const [items, setItems] = useState<LifestyleItem[]>([]);
@@ -71,7 +73,7 @@ export default function LifestyleBasket() {
 
   const handleAddItem = async () => {
     if (!user || !itemName || !cost) {
-      alert('Please fill in all required fields');
+      showToast('Please fill in all required fields');
       return;
     }
 
@@ -101,7 +103,7 @@ export default function LifestyleBasket() {
       setShowAddModal(false);
     } catch (error) {
       console.error('Error saving item:', error);
-      alert('Failed to save item. Please try again.');
+      showToast('Failed to save item. Please try again.');
     }
   };
 
@@ -116,7 +118,7 @@ export default function LifestyleBasket() {
       }
     } catch (error) {
       console.error('Error deleting item:', error);
-      alert('Failed to delete item.');
+      showToast('Failed to delete item.');
     }
   };
 
@@ -159,13 +161,13 @@ export default function LifestyleBasket() {
 
   return (
     <SidebarLayout>
-      <div className="p-8 max-w-7xl mx-auto">
+      <div className="p-6 lg:p-8 max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-secondary mb-2" style={{ fontFamily: "'Crimson Pro', serif" }}>
+          <h1 className="page-title" >
             Lifestyle Basket
           </h1>
-          <p className="text-slate-600">
+          <p className="text-surface-900-500">
             Plan and track your future lifestyle purchases with inflation projection
           </p>
         </div>
@@ -174,26 +176,26 @@ export default function LifestyleBasket() {
         <div className="grid md:grid-cols-3 gap-6 mb-8">
           <div className="bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl p-6 text-white shadow-xl">
             <div className="text-sm opacity-90 mb-2">Total Items</div>
-            <div className="text-4xl font-bold mb-1">{items.length}</div>
+            <div className="text-3xl lg:text-4xl font-bold mb-1">{items.length}</div>
             <div className="text-xs opacity-75">Lifestyle purchases planned</div>
           </div>
 
           <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl p-6 text-white shadow-xl">
             <div className="text-sm opacity-90 mb-2">Today's Cost</div>
-            <div className="text-4xl font-bold mb-1">{formatCompact(totalCurrentCost)}</div>
+            <div className="text-3xl lg:text-4xl font-bold mb-1">{formatCompact(totalCurrentCost)}</div>
             <div className="text-xs opacity-75">{formatAmount(totalCurrentCost)}</div>
           </div>
 
           <div className="bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl p-6 text-white shadow-xl">
             <div className="text-sm opacity-90 mb-2">Future Value</div>
-            <div className="text-4xl font-bold mb-1">{formatCompact(totalFutureValue)}</div>
+            <div className="text-3xl lg:text-4xl font-bold mb-1">{formatCompact(totalFutureValue)}</div>
             <div className="text-xs opacity-75">With inflation</div>
           </div>
         </div>
 
         {/* Add Item Button */}
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-secondary">Your Basket</h2>
+          <h2 className="text-2xl font-bold text-surface-900">Your Basket</h2>
           <button
             onClick={() => { resetForm(); setShowAddModal(true); }}
             className="px-6 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-colors shadow-lg"
@@ -204,10 +206,10 @@ export default function LifestyleBasket() {
 
         {/* Items Grid */}
         {items.length === 0 ? (
-          <div className="bg-white rounded-2xl p-12 text-center border-2 border-dashed border-slate-300">
+          <div className="bg-white rounded-2xl p-12 text-center border-2 border-dashed border-secondary-200">
             <div className="text-6xl mb-4">🛒</div>
-            <h3 className="text-2xl font-bold text-secondary mb-2">Your Basket is Empty</h3>
-            <p className="text-slate-600 mb-6">Start adding your future lifestyle purchases!</p>
+            <h3 className="text-2xl font-bold text-surface-900 mb-2">Your Basket is Empty</h3>
+            <p className="text-surface-900-500 mb-6">Start adding your future lifestyle purchases!</p>
             <button
               onClick={() => setShowAddModal(true)}
               className="px-6 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-colors"
@@ -229,7 +231,7 @@ export default function LifestyleBasket() {
                 <div 
                   key={item.id}
                   onClick={() => setSelectedItem(item)}
-                  className="bg-white rounded-2xl p-6 border-2 border-slate-200 hover:border-primary transition-all cursor-pointer shadow-sm hover:shadow-lg"
+                  className="bg-white rounded-2xl p-6 border border-secondary-200 hover:border-primary transition-all cursor-pointer shadow-sm hover:shadow-lg"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
@@ -237,7 +239,7 @@ export default function LifestyleBasket() {
                         {item.icon}
                       </div>
                       <div>
-                        <h3 className="font-bold text-secondary">{item.name}</h3>
+                        <h3 className="font-bold text-surface-900">{item.name}</h3>
                         <div className={`text-xs font-semibold text-${categoryInfo.color}-600`}>
                           {categoryInfo.label}
                         </div>
@@ -252,17 +254,17 @@ export default function LifestyleBasket() {
 
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-slate-600">Today:</span>
-                      <span className="font-bold text-slate-900">{formatAmount(item.cost)}</span>
+                      <span className="text-sm text-surface-900-500">Today:</span>
+                      <span className="font-bold text-surface-900-900">{formatAmount(item.cost)}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-slate-600">In {item.targetYear}:</span>
+                      <span className="text-sm text-surface-900-500">In {item.targetYear}:</span>
                       <span className="font-bold text-primary">{formatAmount(futureValue)}</span>
                     </div>
-                    <div className="pt-3 border-t border-slate-200">
+                    <div className="pt-3 border-t border-secondary-200">
                       <div className="flex justify-between items-center text-sm">
                         <span className="text-orange-600">+{percentageIncrease}%</span>
-                        <span className="text-slate-600">{yearsUntilTarget} years</span>
+                        <span className="text-surface-900-500">{yearsUntilTarget} years</span>
                       </div>
                     </div>
                   </div>
@@ -282,13 +284,13 @@ export default function LifestyleBasket() {
                     {selectedItem.icon}
                   </div>
                   <div>
-                    <h2 className="text-3xl font-bold text-secondary">{selectedItem.name}</h2>
-                    <div className="text-slate-600">{getCategoryInfo(selectedItem.category).label}</div>
+                    <h2 className="text-3xl font-bold text-surface-900">{selectedItem.name}</h2>
+                    <div className="text-surface-900-500">{getCategoryInfo(selectedItem.category).label}</div>
                   </div>
                 </div>
                 <button
                   onClick={() => setSelectedItem(null)}
-                  className="text-slate-400 hover:text-slate-600 text-2xl"
+                  className="text-surface-900-300 hover:text-surface-900-500 text-2xl"
                 >
                   ✕
                 </button>
@@ -299,12 +301,12 @@ export default function LifestyleBasket() {
                 {/* Today & Future - Side by Side (COMPACT) */}
                 <div className="grid grid-cols-2 gap-3">
                   {/* Today Card */}
-                  <div className="bg-white rounded-xl p-4 border-2 border-slate-200">
-                    <div className="text-xs font-semibold text-slate-600 mb-1">TODAY</div>
-                    <div className="text-2xl font-bold text-slate-900 mb-1">
+                  <div className="bg-white rounded-xl p-4 border border-secondary-200">
+                    <div className="text-xs font-semibold text-surface-900-500 mb-1">TODAY</div>
+                    <div className="text-2xl font-bold text-surface-900-900 mb-1">
                       {formatCompact(selectedItem.cost)}
                     </div>
-                    <div className="text-xs text-slate-500">
+                    <div className="text-xs text-surface-900-400">
                       {formatAmount(selectedItem.cost)}
                     </div>
                   </div>
@@ -375,20 +377,20 @@ export default function LifestyleBasket() {
                 </div>
 
                 {/* Timeline - Compact */}
-                <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                <div className="bg-secondary-50 rounded-xl p-4 border border-secondary-200">
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-lg">📅</span>
-                        <span className="text-xs text-slate-600">Timeline</span>
+                        <span className="text-xs text-surface-900-500">Timeline</span>
                       </div>
-                      <div className="text-lg font-bold text-secondary">
+                      <div className="text-lg font-bold text-surface-900">
                         {selectedItem.targetYear - new Date().getFullYear()} years
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="flex items-center justify-end gap-2 mb-1">
-                        <span className="text-xs text-slate-600">Target Year</span>
+                        <span className="text-xs text-surface-900-500">Target Year</span>
                         <span className="text-lg">🎯</span>
                       </div>
                       <div className="text-lg font-bold text-primary">
@@ -400,25 +402,25 @@ export default function LifestyleBasket() {
               </div>
 
               {/* Details */}
-              <div className="bg-slate-50 rounded-xl p-6 mb-6">
-                <h3 className="text-lg font-bold text-secondary mb-4">Details</h3>
+              <div className="bg-secondary-50 rounded-xl p-6 mb-6">
+                <h3 className="text-lg font-bold text-surface-900 mb-4">Details</h3>
                 <div className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Category:</span>
+                    <span className="text-surface-900-500">Category:</span>
                     <span className="font-semibold">{getCategoryInfo(selectedItem.category).label}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Frequency:</span>
+                    <span className="text-surface-900-500">Frequency:</span>
                     <span className="font-semibold capitalize">{selectedItem.frequency}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Inflation Rate:</span>
+                    <span className="text-surface-900-500">Inflation Rate:</span>
                     <span className="font-semibold">{selectedItem.inflationRate}% per year</span>
                   </div>
                   {selectedItem.notes && (
-                    <div className="pt-3 border-t border-slate-200">
-                      <div className="text-sm text-slate-600 mb-1">Notes:</div>
-                      <div className="text-slate-900">{selectedItem.notes}</div>
+                    <div className="pt-3 border-t border-secondary-200">
+                      <div className="text-sm text-surface-900-500 mb-1">Notes:</div>
+                      <div className="text-surface-900-900">{selectedItem.notes}</div>
                     </div>
                   )}
                 </div>
@@ -446,7 +448,7 @@ export default function LifestyleBasket() {
                 </button>
                 <button
                   onClick={() => setSelectedItem(null)}
-                  className="px-6 py-3 border-2 border-slate-300 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 transition-colors"
+                  className="px-6 py-3 border border-secondary-200 text-surface-900-700 rounded-xl font-semibold hover:bg-secondary-50 transition-colors"
                 >
                   Close
                 </button>
@@ -460,12 +462,12 @@ export default function LifestyleBasket() {
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-secondary">
+                <h2 className="text-2xl font-bold text-surface-900">
                   {editingItem ? 'Edit Item' : 'Add New Item'}
                 </h2>
                 <button
                   onClick={() => { setShowAddModal(false); resetForm(); }}
-                  className="text-slate-400 hover:text-slate-600 text-2xl"
+                  className="text-surface-900-300 hover:text-surface-900-500 text-2xl"
                 >
                   ✕
                 </button>
@@ -474,7 +476,7 @@ export default function LifestyleBasket() {
               <div className="space-y-4">
                 {/* Item Name */}
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  <label className="block text-sm font-semibold text-surface-900-700 mb-2">
                     Item Name *
                   </label>
                   <input
@@ -482,13 +484,13 @@ export default function LifestyleBasket() {
                     value={itemName}
                     onChange={(e) => setItemName(e.target.value)}
                     placeholder="e.g., Yacht Charter (Week), Tesla Model S, Luxury Watch"
-                    className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                    className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                   />
                 </div>
 
                 {/* Category */}
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  <label className="block text-sm font-semibold text-surface-900-700 mb-2">
                     Category *
                   </label>
                   <div className="grid grid-cols-4 gap-3">
@@ -499,7 +501,7 @@ export default function LifestyleBasket() {
                         className={`p-3 rounded-xl border-2 transition-all ${
                           category === cat.id
                             ? `border-${cat.color}-500 bg-${cat.color}-50`
-                            : 'border-slate-200 hover:border-slate-300'
+                            : 'border-secondary-200 hover:border-secondary-200'
                         }`}
                       >
                         <div className="text-2xl mb-1">{cat.icon}</div>
@@ -512,25 +514,25 @@ export default function LifestyleBasket() {
                 {/* Cost and Frequency */}
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label className="block text-sm font-semibold text-surface-900-700 mb-2">
                       Cost *
                     </label>
                     <input
                       type="number"
                       value={cost}
                       onChange={(e) => setCost(Number(e.target.value))}
-                      className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                      className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label className="block text-sm font-semibold text-surface-900-700 mb-2">
                       Frequency
                     </label>
                     <select
                       value={frequency}
                       onChange={(e) => setFrequency(e.target.value as 'one-time' | 'recurring')}
-                      className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                      className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                     >
                       <option value="one-time">One-time</option>
                       <option value="recurring">Recurring</option>
@@ -541,7 +543,7 @@ export default function LifestyleBasket() {
                 {/* Target Year and Inflation */}
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label className="block text-sm font-semibold text-surface-900-700 mb-2">
                       Target Year
                     </label>
                     <input
@@ -549,12 +551,12 @@ export default function LifestyleBasket() {
                       value={targetYear}
                       onChange={(e) => setTargetYear(Number(e.target.value))}
                       min={new Date().getFullYear()}
-                      className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                      className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label className="block text-sm font-semibold text-surface-900-700 mb-2">
                       Inflation Rate (%)
                     </label>
                     <input
@@ -562,14 +564,14 @@ export default function LifestyleBasket() {
                       value={inflationRate}
                       onChange={(e) => setInflationRate(Number(e.target.value))}
                       step="0.1"
-                      className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                      className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                     />
                   </div>
                 </div>
 
                 {/* Notes */}
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  <label className="block text-sm font-semibold text-surface-900-700 mb-2">
                     Notes (Optional)
                   </label>
                   <textarea
@@ -577,7 +579,7 @@ export default function LifestyleBasket() {
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="Any additional details..."
                     rows={3}
-                    className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none resize-none"
+                    className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none resize-none"
                   />
                 </div>
 
@@ -591,7 +593,7 @@ export default function LifestyleBasket() {
                   </button>
                   <button
                     onClick={() => { setShowAddModal(false); resetForm(); }}
-                    className="px-6 py-3 border-2 border-slate-300 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 transition-colors"
+                    className="px-6 py-3 border border-secondary-200 text-surface-900-700 rounded-xl font-semibold hover:bg-secondary-50 transition-colors"
                   >
                     Cancel
                   </button>
@@ -600,11 +602,6 @@ export default function LifestyleBasket() {
             </div>
           </div>
         )}
-
-        {/* Google Fonts */}
-        <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap');
-        `}</style>
       </div>
     </SidebarLayout>
   );

@@ -84,8 +84,8 @@ export default function ItemPickerModalPremium({ onAdd, onClose, isAdding = fals
 
         <div className="flex h-[calc(90vh-160px)]">
           {/* PREMIUM CATEGORY SIDEBAR */}
-          <div className="w-80 bg-gradient-to-br from-slate-50 to-white border-r-2 border-slate-200 p-6 overflow-y-auto">
-            <div className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Categories</div>
+          <div className="w-80 bg-gradient-to-br from-slate-50 to-white border-r-2 border-secondary-200 p-6 overflow-y-auto">
+            <div className="text-sm font-bold text-secondary-400 uppercase tracking-wider mb-4">Categories</div>
             <div className="space-y-2">
               {categories.map(cat => (
                 <button
@@ -94,7 +94,7 @@ export default function ItemPickerModalPremium({ onAdd, onClose, isAdding = fals
                   className={`w-full flex items-center justify-between px-4 py-4 rounded-2xl transition-all text-left ${
                     selectedCategory === cat.id
                       ? 'bg-gradient-to-r from-primary to-teal-600 text-white shadow-xl scale-105'
-                      : 'bg-white text-slate-700 hover:bg-slate-100 border-2 border-slate-200 hover:border-primary'
+                      : 'bg-white text-secondary-700 hover:bg-secondary-100 border border-secondary-200 hover:border-primary'
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -102,7 +102,7 @@ export default function ItemPickerModalPremium({ onAdd, onClose, isAdding = fals
                     <span className="font-semibold text-lg">{cat.name}</span>
                   </div>
                   <span className={`text-sm font-bold ${
-                    selectedCategory === cat.id ? 'text-white' : 'text-slate-400'
+                    selectedCategory === cat.id ? 'text-white' : 'text-secondary-300'
                   }`}>
                     {cat.count}
                   </span>
@@ -119,7 +119,7 @@ export default function ItemPickerModalPremium({ onAdd, onClose, isAdding = fals
                   <button
                     key={item.id}
                     onClick={() => handleItemClick(item)}
-                    className="group text-left bg-white rounded-2xl p-6 border-2 border-slate-200 hover:border-primary hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 animate-fadeInUp"
+                    className="group text-left bg-white rounded-2xl p-6 border border-secondary-200 hover:border-primary hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 animate-fadeInUp"
                     style={{ animationDelay: `${index * 0.05}s` }}
                   >
                     <div className="flex items-start gap-4 mb-4">
@@ -143,7 +143,7 @@ export default function ItemPickerModalPremium({ onAdd, onClose, isAdding = fals
                       </div>
                     </div>
                     <div className="flex items-baseline gap-2">
-                      <span className="text-sm text-slate-600">Typical:</span>
+                      <span className="text-sm text-secondary-500">Typical:</span>
                       <span className="text-2xl font-bold text-primary font-manrope">
                         {currency}{item.typicalCost.toLocaleString()}
                       </span>
@@ -183,7 +183,7 @@ export default function ItemPickerModalPremium({ onAdd, onClose, isAdding = fals
                 <div className="space-y-8">
                   {/* Cost Input */}
                   <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider">
+                    <label className="block text-sm font-bold text-secondary-700 mb-3 uppercase tracking-wider">
                       Current Cost ({currency})
                     </label>
                     <input
@@ -193,14 +193,14 @@ export default function ItemPickerModalPremium({ onAdd, onClose, isAdding = fals
                       className="w-full px-8 py-5 border-3 border-primary rounded-2xl focus:ring-4 focus:ring-primary/20 outline-none text-3xl font-bold font-manrope shadow-lg"
                       placeholder="Enter amount"
                     />
-                    <p className="mt-3 text-sm text-slate-600">
+                    <p className="mt-3 text-sm text-secondary-500">
                       Typical: {currency}{selectedItem.typicalCost.toLocaleString()}
                     </p>
                   </div>
 
                   {/* Target Year Input */}
                   <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider">
+                    <label className="block text-sm font-bold text-secondary-700 mb-3 uppercase tracking-wider">
                       When do you want this?
                     </label>
                     <input
@@ -258,7 +258,7 @@ export default function ItemPickerModalPremium({ onAdd, onClose, isAdding = fals
                     </button>
                     <button
                       onClick={() => setSelectedItem(null)}
-                      className="px-8 py-6 bg-white border-3 border-slate-300 text-slate-700 rounded-2xl font-bold text-xl hover:bg-slate-50 transition-all"
+                      className="px-8 py-6 bg-white border-3 border-secondary-200 text-secondary-700 rounded-2xl font-bold text-xl hover:bg-secondary-50 transition-all"
                     >
                       ← Back
                     </button>

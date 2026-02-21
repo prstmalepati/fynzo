@@ -1,114 +1,147 @@
-import {
-  signInWithPopup,
-  GoogleAuthProvider,
+import { 
+  signInWithPopup, 
+  GoogleAuthProvider, 
   OAuthProvider,
-  RecaptchaVerifier,
-  signInWithPhoneNumber,
-  signOut,
-  onAuthStateChanged,
-  User,
-  ConfirmationResult
+  signOut as firebaseSignOut 
 } from 'firebase/auth';
-import { auth } from './config';
+import { auth, firestore } from './config';
 
-// Google Sign In
-export const signInWithGoogle = async () => {
-  const provider = new GoogleAuthProvider();
-  provider.addScope('profile');
-  provider.addScope('email');
-  
+/**
+ * Initialize user preferences when they sign up
+ * Called after successful authentication
+ */
+export async function createUserPreferences(userId: string) {
   try {
+    const userRef = firestore.collection('users').doc(userId);
+    
+    // Check if user document already exists
+    const userDoc = await userRef.get();
+    
+    // Only create if doesn't exist (new user)
+    if (!userDoc.exists) {
+      await userRef.set({
+        preferences: {
+          currency: 'EUR', // Default currency
+          locale: navigator.language || 'en-US',
+          dateFormat: 'DD/MM/YYYY',
+          numberFormat: 'european',
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+        },
+        tier: 'free', // All new users start on free tier
+        premiumSince: null,
+        stripeCustomerId: null,
+        subscriptionId: null,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
+      
+      console.log('User preferences initialized for:', userId);
+    } else {
+      // Update timestamp for existing users
+      await userRef.update({
+        updatedAt: new Date()
+      });
+    }
+  } catch (error) {
+    console.error('Error creating user preferences:', error);
+    // Don't throw - auth should still succeed even if preferences fail
+  }
+}
+
+/**
+ * Sign in with Google
+ */
+export async function signInWithGoogle() {
+  try {
+    const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(auth, provider);
+    
+    // Initialize user preferences
+    await createUserPreferences(result.user.uid);
+    
     return { user: result.user, error: null };
   } catch (error: any) {
     console.error('Google sign in error:', error);
     return { user: null, error: error.message };
   }
-};
+}
 
-// Microsoft Sign In
-export const signInWithMicrosoft = async () => {
-  const provider = new OAuthProvider('microsoft.com');
-  provider.addScope('profile');
-  provider.addScope('email');
-  
+/**
+ * Sign in with Microsoft
+ */
+export async function signInWithMicrosoft() {
   try {
+    const provider = new OAuthProvider('microsoft.com');
     const result = await signInWithPopup(auth, provider);
+    
+    // Initialize user preferences
+    await createUserPreferences(result.user.uid);
+    
     return { user: result.user, error: null };
   } catch (error: any) {
     console.error('Microsoft sign in error:', error);
     return { user: null, error: error.message };
   }
-};
+}
 
-// Apple Sign In
-export const signInWithApple = async () => {
-  const provider = new OAuthProvider('apple.com');
-  provider.addScope('email');
-  provider.addScope('name');
-  
+/**
+ * Sign in with Apple
+ */
+export async function signInWithApple() {
   try {
+    const provider = new OAuthProvider('apple.com');
     const result = await signInWithPopup(auth, provider);
+    
+    // Initialize user preferences
+    await createUserPreferences(result.user.uid);
+    
     return { user: result.user, error: null };
   } catch (error: any) {
     console.error('Apple sign in error:', error);
     return { user: null, error: error.message };
   }
-};
+}
 
-// Phone Sign In - Step 1: Send verification code
-export const sendPhoneVerification = async (
-  phoneNumber: string,
-  recaptchaContainerId: string
-): Promise<{ confirmation: ConfirmationResult | null; error: string | null }> => {
+/**
+ * Sign out
+ */
+export async function signOut() {
   try {
-    // Initialize reCAPTCHA
-    const recaptchaVerifier = new RecaptchaVerifier(auth, recaptchaContainerId, {
-      size: 'invisible',
-      callback: () => {
-        // reCAPTCHA solved, allow signInWithPhoneNumber
-      }
-    });
-
-    const confirmation = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
-    return { confirmation, error: null };
-  } catch (error: any) {
-    console.error('Phone verification error:', error);
-    return { confirmation: null, error: error.message };
-  }
-};
-
-// Phone Sign In - Step 2: Verify code
-export const verifyPhoneCode = async (
-  confirmation: ConfirmationResult,
-  code: string
-) => {
-  try {
-    const result = await confirmation.confirm(code);
-    return { user: result.user, error: null };
-  } catch (error: any) {
-    console.error('Code verification error:', error);
-    return { user: null, error: error.message };
-  }
-};
-
-// Sign Out
-export const logout = async () => {
-  try {
-    await signOut(auth);
+    await firebaseSignOut(auth);
     return { error: null };
   } catch (error: any) {
     console.error('Sign out error:', error);
     return { error: error.message };
   }
-};
+}
 
-// Auth State Observer
-export const onAuthChange = (callback: (user: User | null) => void) => {
-  return onAuthStateChanged(auth, callback);
-};
+/**
+ * Get current user's tier
+ */
+export async function getUserTier(userId: string): Promise<'free' | 'premium'> {
+  try {
+    const userDoc = await firestore.collection('users').doc(userId).get();
+    const data = userDoc.data();
+    return data?.tier || 'free';
+  } catch (error) {
+    console.error('Error getting user tier:', error);
+    return 'free';
+  }
+}
 
-// Get Current User
-export const getCurrentUser = () => {
-  return auth.currentUser;
-};
+/**
+ * Update user tier (for admin/backend use)
+ */
+export async function updateUserTier(userId: string, tier: 'free' | 'premium') {
+  try {
+    await firestore.collection('users').doc(userId).update({
+      tier,
+      premiumSince: tier === 'premium' ? new Date() : null,
+      updatedAt: new Date()
+    });
+    return { success: true, error: null };
+  } catch (error: any) {
+    console.error('Error updating user tier:', error);
+    return { success: false, error: error.message };
+  }
+}

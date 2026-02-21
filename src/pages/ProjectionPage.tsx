@@ -59,13 +59,13 @@ export default function ProjectionPage() {
 
   return (
     <SidebarLayout>
-      <div className="p-8 max-w-7xl mx-auto">
+      <div className="p-6 lg:p-8 max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-secondary mb-2" style={{ fontFamily: "'Crimson Pro', serif" }}>
+          <h1 className="page-title">
             Wealth Projection
           </h1>
-          <p className="text-slate-600">
+          <p className="text-secondary-500">
             Model your financial future with compound growth
           </p>
         </div>
@@ -73,34 +73,34 @@ export default function ProjectionPage() {
         {/* Input Cards */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Current Savings */}
-          <div className="bg-white rounded-xl p-6 border-2 border-slate-200">
-            <label className="block text-sm font-semibold text-slate-700 mb-3">
+          <div className="bg-white rounded-xl p-6 border border-secondary-200">
+            <label className="block text-sm font-semibold text-secondary-700 mb-3">
               Current Savings ({currency})
             </label>
             <input
               type="number"
               value={currentSavings}
               onChange={(e) => setCurrentSavings(Number(e.target.value))}
-              className="w-full px-4 py-3 text-2xl font-bold border-2 border-slate-200 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+              className="w-full px-4 py-3 text-2xl font-bold border border-secondary-200 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
             />
           </div>
 
           {/* Monthly Savings */}
-          <div className="bg-white rounded-xl p-6 border-2 border-slate-200">
-            <label className="block text-sm font-semibold text-slate-700 mb-3">
+          <div className="bg-white rounded-xl p-6 border border-secondary-200">
+            <label className="block text-sm font-semibold text-secondary-700 mb-3">
               Monthly Savings ({currency})
             </label>
             <input
               type="number"
               value={monthlySavings}
               onChange={(e) => setMonthlySavings(Number(e.target.value))}
-              className="w-full px-4 py-3 text-2xl font-bold border-2 border-slate-200 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+              className="w-full px-4 py-3 text-2xl font-bold border border-secondary-200 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
             />
           </div>
 
           {/* Expected Return */}
-          <div className="bg-white rounded-xl p-6 border-2 border-slate-200">
-            <label className="block text-sm font-semibold text-slate-700 mb-3">
+          <div className="bg-white rounded-xl p-6 border border-secondary-200">
+            <label className="block text-sm font-semibold text-secondary-700 mb-3">
               Annual Return (%)
             </label>
             <input
@@ -108,13 +108,13 @@ export default function ProjectionPage() {
               value={expectedReturn}
               onChange={(e) => setExpectedReturn(Number(e.target.value))}
               step="0.5"
-              className="w-full px-4 py-3 text-2xl font-bold border-2 border-slate-200 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+              className="w-full px-4 py-3 text-2xl font-bold border border-secondary-200 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
             />
           </div>
 
           {/* Time Horizon */}
-          <div className="bg-white rounded-xl p-6 border-2 border-slate-200">
-            <label className="block text-sm font-semibold text-slate-700 mb-3">
+          <div className="bg-white rounded-xl p-6 border border-secondary-200">
+            <label className="block text-sm font-semibold text-secondary-700 mb-3">
               Years to Project
             </label>
             <input
@@ -123,7 +123,7 @@ export default function ProjectionPage() {
               onChange={(e) => setYears(Math.min(50, Number(e.target.value)))}
               min="1"
               max="50"
-              className="w-full px-4 py-3 text-2xl font-bold border-2 border-slate-200 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+              className="w-full px-4 py-3 text-2xl font-bold border border-secondary-200 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
             />
           </div>
         </div>
@@ -133,7 +133,7 @@ export default function ProjectionPage() {
           {/* Final Value */}
           <div className="bg-gradient-to-br from-primary to-teal-600 rounded-2xl p-6 text-white shadow-xl">
             <div className="text-sm opacity-90 mb-2">Final Value (Nominal)</div>
-            <div className="text-4xl font-bold mb-2">
+            <div className="text-3xl lg:text-4xl font-bold mb-2">
               {formatCompact(finalValue)}
             </div>
             <div className="text-sm opacity-75">
@@ -149,7 +149,7 @@ export default function ProjectionPage() {
             <div className="text-sm text-amber-900 font-semibold mb-2">
               Real Value (Inflation-Adjusted)
             </div>
-            <div className="text-4xl font-bold text-amber-700 mb-2">
+            <div className="text-3xl lg:text-4xl font-bold text-amber-700 mb-2">
               {formatCompact(realValue)}
             </div>
             <div className="text-sm text-amber-600">
@@ -165,7 +165,7 @@ export default function ProjectionPage() {
             <div className="text-sm text-green-900 font-semibold mb-2">
               Investment Growth
             </div>
-            <div className="text-4xl font-bold text-green-700 mb-2">
+            <div className="text-3xl lg:text-4xl font-bold text-green-700 mb-2">
               {formatCompact(totalGrowth)}
             </div>
             <div className="text-sm text-green-600">
@@ -178,7 +178,7 @@ export default function ProjectionPage() {
         </div>
 
         {/* Chart */}
-        <div className="bg-white rounded-2xl p-8 border-2 border-slate-200 mb-8">
+        <div className="bg-white rounded-2xl p-8 border border-secondary-200 mb-8">
           <h2 className="text-2xl font-bold text-secondary mb-6">Projection Chart</h2>
           <div className="h-96">
             <ResponsiveContainer width="100%" height="100%">
@@ -230,33 +230,33 @@ export default function ProjectionPage() {
             <div className="text-4xl">🔥</div>
             <div>
               <h2 className="text-2xl font-bold text-secondary">FIRE Target</h2>
-              <p className="text-slate-600">Financial Independence, Retire Early</p>
+              <p className="text-secondary-500">Financial Independence, Retire Early</p>
             </div>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
             <div>
-              <div className="text-sm text-slate-600 mb-2">Your FIRE Number</div>
+              <div className="text-sm text-secondary-500 mb-2">Your FIRE Number</div>
               <div className="text-3xl font-bold text-orange-600 mb-1">
                 {formatCompact(fireNumber)}
               </div>
-              <div className="text-xs text-slate-600">
+              <div className="text-xs text-secondary-500">
                 Based on 4% withdrawal rule
               </div>
             </div>
 
             <div>
-              <div className="text-sm text-slate-600 mb-2">Projected Value</div>
+              <div className="text-sm text-secondary-500 mb-2">Projected Value</div>
               <div className="text-3xl font-bold text-primary mb-1">
                 {formatCompact(finalValue)}
               </div>
-              <div className="text-xs text-slate-600">
+              <div className="text-xs text-secondary-500">
                 In {years} years
               </div>
             </div>
 
             <div>
-              <div className="text-sm text-slate-600 mb-2">
+              <div className="text-sm text-secondary-500 mb-2">
                 {finalValue >= fireNumber ? 'You\'ll reach FIRE!' : 'Years to FIRE'}
               </div>
               <div className={`text-3xl font-bold mb-1 ${
@@ -264,7 +264,7 @@ export default function ProjectionPage() {
               }`}>
                 {finalValue >= fireNumber ? `✓ ${years} years` : `≈ ${yearsToFIRE} years`}
               </div>
-              <div className="text-xs text-slate-600">
+              <div className="text-xs text-secondary-500">
                 {finalValue >= fireNumber 
                   ? 'Based on current projection' 
                   : 'Keep saving to reach your goal'}
@@ -289,7 +289,7 @@ export default function ProjectionPage() {
               <h3 className="text-xl font-bold text-secondary mb-1">
                 Inflation Adjustment
               </h3>
-              <p className="text-sm text-slate-600">
+              <p className="text-sm text-secondary-500">
                 Account for purchasing power loss over time
               </p>
             </div>
@@ -315,11 +315,6 @@ export default function ProjectionPage() {
             <span>10%</span>
           </div>
         </div>
-
-        {/* Google Fonts */}
-        <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap');
-        `}</style>
       </div>
     </SidebarLayout>
   );

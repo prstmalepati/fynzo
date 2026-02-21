@@ -36,13 +36,8 @@ export default function LandingPageExtended() {
       <nav className="fixed top-0 w-full bg-white/90 backdrop-blur-xl z-50 border-b border-slate-200/50 shadow-lg">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary to-teal-600 rounded-xl blur opacity-75"></div>
-              <div className="relative w-10 h-10 bg-gradient-to-br from-primary to-teal-600 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-xl">M</span>
-              </div>
-            </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-secondary to-slate-700 bg-clip-text text-transparent" style={{ fontFamily: "'Crimson Pro', serif" }}>
+            <img src="/logo-transparent.png" alt="myfynzo" className="w-10 h-10 object-contain" />
+            <span className="text-2xl font-bold text-secondary font-display">
               myfynzo
             </span>
             <span className="ml-2 px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full">
@@ -129,7 +124,7 @@ export default function LandingPageExtended() {
               </div>
 
               <div>
-                <h1 className="text-6xl lg:text-8xl font-bold text-secondary leading-[0.95] mb-6" style={{ fontFamily: "'Crimson Pro', serif" }}>
+                <h1 className="text-6xl lg:text-8xl font-bold text-secondary leading-[0.95] mb-6">
                   Your{' '}
                   <span className="relative inline-block">
                     <span className="relative z-10 bg-gradient-to-r from-primary via-teal-500 to-cyan-500 bg-clip-text text-transparent">
@@ -160,7 +155,7 @@ export default function LandingPageExtended() {
                   <br />
                   Track YOUR real inflation. See YOUR truth score.
                   <br />
-                  <span className="text-slate-500">Plan with reality, not fantasy.</span>
+                  <span className="text-secondary-400">Plan with reality, not fantasy.</span>
                 </p>
               </div>
 
@@ -181,7 +176,7 @@ export default function LandingPageExtended() {
                   </div>
                 </Link>
                 
-                <button className="group px-10 py-5 bg-white border-2 border-slate-300 text-slate-700 rounded-2xl hover:shadow-xl hover:border-primary transition-all font-bold text-xl backdrop-blur-sm">
+                <button className="group px-10 py-5 bg-white border border-secondary-200 text-secondary-700 rounded-2xl hover:shadow-xl hover:border-primary transition-all font-bold text-xl backdrop-blur-sm">
                   <span className="flex items-center gap-3">
                     <svg className="w-6 h-6 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" />
@@ -192,7 +187,7 @@ export default function LandingPageExtended() {
               </div>
 
               {/* Enhanced Trust Indicators */}
-              <div className="flex flex-wrap items-center gap-8 pt-6 border-t border-slate-200">
+              <div className="flex flex-wrap items-center gap-8 pt-6 border-t border-secondary-200">
                 <div className="flex items-center gap-3">
                   <div className="flex -space-x-3">
                     {[1, 2, 3, 4, 5].map(i => (
@@ -203,7 +198,7 @@ export default function LandingPageExtended() {
                   </div>
                   <div>
                     <div className="text-sm font-bold text-secondary">2,147+ users</div>
-                    <div className="text-xs text-slate-500">and growing daily</div>
+                    <div className="text-xs text-secondary-400">and growing daily</div>
                   </div>
                 </div>
                 
@@ -217,7 +212,7 @@ export default function LandingPageExtended() {
                   </div>
                   <div>
                     <div className="text-sm font-bold text-secondary">4.9/5 rating</div>
-                    <div className="text-xs text-slate-500">from 437 reviews</div>
+                    <div className="text-xs text-secondary-400">from 437 reviews</div>
                   </div>
                 </div>
 
@@ -229,7 +224,7 @@ export default function LandingPageExtended() {
                   </div>
                   <div>
                     <div className="text-sm font-bold text-secondary">Bank-level security</div>
-                    <div className="text-xs text-slate-500">256-bit encryption</div>
+                    <div className="text-xs text-secondary-400">256-bit encryption</div>
                   </div>
                 </div>
               </div>
@@ -283,7 +278,7 @@ export default function LandingPageExtended() {
             <div className="inline-block px-4 py-2 bg-primary/10 rounded-full text-primary font-semibold text-sm mb-4">
               Try It Now
             </div>
-            <h2 className="text-5xl lg:text-6xl font-bold text-secondary mb-4" style={{ fontFamily: "'Crimson Pro', serif" }}>
+            <h2 className="text-5xl lg:text-6xl font-bold text-secondary mb-4">
               Calculate Your Truth Score
             </h2>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto">
@@ -305,7 +300,7 @@ export default function LandingPageExtended() {
               </svg>
               The Hidden Inflation Trap
             </div>
-            <h2 className="text-5xl lg:text-6xl font-bold text-secondary mb-6" style={{ fontFamily: "'Crimson Pro', serif" }}>
+            <h2 className="text-5xl lg:text-6xl font-bold text-secondary mb-6">
               You're Planning With
               <br />
               <span className="bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
@@ -334,7 +329,7 @@ export default function LandingPageExtended() {
       <section id="features" className="py-24 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-5xl lg:text-6xl font-bold text-secondary mb-6" style={{ fontFamily: "'Crimson Pro', serif" }}>
+            <h2 className="text-5xl lg:text-6xl font-bold text-secondary mb-6">
               More Than a Calculator.
               <br />
               A <span className="bg-gradient-to-r from-primary to-cyan-500 bg-clip-text text-transparent">Flight Simulator</span> for Life.
@@ -346,7 +341,7 @@ export default function LandingPageExtended() {
 
           {/* Interactive Feature Tabs */}
           <div className="mb-8 flex justify-center">
-            <div className="inline-flex bg-slate-100 rounded-2xl p-2">
+            <div className="inline-flex bg-secondary-100 rounded-2xl p-2">
               {[
                 { id: 'lifestyle', label: '🛒 Lifestyle Basket', badge: 'NEW' },
                 { id: 'fire', label: '🔥 FIRE Calculator' },
@@ -374,7 +369,7 @@ export default function LandingPageExtended() {
           </div>
 
           {/* Tab Content */}
-          <div className="bg-white rounded-3xl p-10 shadow-2xl border-2 border-slate-200">
+          <div className="bg-white rounded-3xl p-10 shadow-2xl border border-secondary-200">
             {activeTab === 'lifestyle' && <LifestyleBasketFeature />}
             {activeTab === 'fire' && <FIRECalculatorFeature />}
             {activeTab === 'tax' && <TaxOptimizerFeature />}
@@ -398,7 +393,7 @@ export default function LandingPageExtended() {
             <div className="inline-block px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white font-semibold text-sm mb-4">
               Simple Process
             </div>
-            <h2 className="text-5xl lg:text-6xl font-bold mb-6" style={{ fontFamily: "'Crimson Pro', serif" }}>
+            <h2 className="text-5xl lg:text-6xl font-bold mb-6">
               From Chaos to Clarity
               <br />
               <span className="bg-gradient-to-r from-primary to-cyan-400 bg-clip-text text-transparent">
@@ -415,7 +410,7 @@ export default function LandingPageExtended() {
       <section className="py-24 px-6 bg-gradient-to-br from-slate-50 to-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-5xl font-bold text-secondary mb-4" style={{ fontFamily: "'Crimson Pro', serif" }}>
+            <h2 className="text-5xl font-bold text-secondary mb-4">
               Loved by Future Retirees
             </h2>
             <p className="text-xl text-slate-600">
@@ -427,12 +422,12 @@ export default function LandingPageExtended() {
 
           {/* Press Mentions */}
           <div className="mt-16 text-center">
-            <div className="text-sm text-slate-500 mb-6">AS FEATURED IN</div>
+            <div className="text-sm text-secondary-400 mb-6">AS FEATURED IN</div>
             <div className="flex flex-wrap justify-center items-center gap-12 opacity-60">
-              <div className="text-2xl font-bold text-slate-400">TechCrunch</div>
-              <div className="text-2xl font-bold text-slate-400">Product Hunt</div>
-              <div className="text-2xl font-bold text-slate-400">Hacker News</div>
-              <div className="text-2xl font-bold text-slate-400">Financial Times</div>
+              <div className="text-2xl font-bold text-secondary-300">TechCrunch</div>
+              <div className="text-2xl font-bold text-secondary-300">Product Hunt</div>
+              <div className="text-2xl font-bold text-secondary-300">Hacker News</div>
+              <div className="text-2xl font-bold text-secondary-300">Financial Times</div>
             </div>
           </div>
         </div>
@@ -445,7 +440,7 @@ export default function LandingPageExtended() {
             <div className="inline-block px-4 py-2 bg-primary/10 rounded-full text-primary font-semibold text-sm mb-4">
               Simple Pricing
             </div>
-            <h2 className="text-5xl lg:text-6xl font-bold text-secondary mb-6" style={{ fontFamily: "'Crimson Pro', serif" }}>
+            <h2 className="text-5xl lg:text-6xl font-bold text-secondary mb-6">
               Start Free.
               <br />
               Upgrade When Ready.
@@ -489,7 +484,7 @@ export default function LandingPageExtended() {
           <div className="inline-block px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full font-semibold text-sm mb-6">
             🎁 Limited Time Offer
           </div>
-          <h2 className="text-5xl lg:text-6xl font-bold mb-6" style={{ fontFamily: "'Crimson Pro', serif" }}>
+          <h2 className="text-5xl lg:text-6xl font-bold mb-6">
             Get the Complete
             <br />
             Truth Score Guide
@@ -513,7 +508,7 @@ export default function LandingPageExtended() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
                   required
-                  className="flex-1 px-6 py-4 rounded-xl text-slate-900 text-lg focus:ring-4 focus:ring-white/50 outline-none"
+                  className="flex-1 px-6 py-4 rounded-xl text-secondary-900 text-lg focus:ring-4 focus:ring-white/50 outline-none"
                 />
                 <button
                   type="submit"
@@ -533,7 +528,7 @@ export default function LandingPageExtended() {
       {/* Final CTA */}
       <section className="py-24 px-6 bg-gradient-to-br from-slate-900 to-slate-800 text-white">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-5xl lg:text-7xl font-bold mb-8" style={{ fontFamily: "'Crimson Pro', serif" }}>
+          <h2 className="text-5xl lg:text-7xl font-bold mb-8">
             Stop Underestimating.
             <br />
             <span className="bg-gradient-to-r from-primary to-cyan-400 bg-clip-text text-transparent">
@@ -557,22 +552,20 @@ export default function LandingPageExtended() {
             </span>
             <div className="absolute inset-0 bg-gradient-to-r from-teal-600 to-cyan-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
           </Link>
-          <p className="text-sm text-slate-400 mt-6">
+          <p className="text-sm text-secondary-300 mt-6">
             No credit card required • 2,147 users started today
           </p>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-16 px-6 bg-slate-900 text-slate-400 border-t border-slate-800">
+      <footer className="py-16 px-6 bg-slate-900 text-secondary-300 border-t border-slate-800">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-12 mb-12">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-primary to-teal-600 rounded-xl flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">M</span>
-                </div>
-                <span className="text-xl font-bold text-white" style={{ fontFamily: "'Crimson Pro', serif" }}>
+                <img src="/logo-transparent.png" alt="myfynzo" className="w-10 h-10 object-contain" />
+                <span className="text-xl font-bold text-white">
                   myfynzo
                 </span>
               </div>
@@ -617,12 +610,12 @@ export default function LandingPageExtended() {
               © 2026 myfynzo. Built with honesty. Stop lying to yourself about inflation.
             </p>
             <div className="flex gap-6">
-              <a href="#" className="text-slate-400 hover:text-primary transition-colors">
+              <a href="#" className="text-secondary-300 hover:text-primary transition-colors">
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
                 </svg>
               </a>
-              <a href="#" className="text-slate-400 hover:text-primary transition-colors">
+              <a href="#" className="text-secondary-300 hover:text-primary transition-colors">
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
                 </svg>
@@ -631,30 +624,6 @@ export default function LandingPageExtended() {
           </div>
         </div>
       </footer>
-
-      {/* Google Fonts */}
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap');
-        
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        .animate-fadeIn {
-          animation: fadeIn 0.8s ease-out;
-        }
-
-        .perspective-1000 {
-          perspective: 1000px;
-        }
-      `}</style>
     </div>
   );
 }
@@ -773,10 +742,10 @@ export function EnhancedTruthScoreDemo() {
       </div>
 
       <div className="grid grid-cols-2 gap-6 mb-8">
-        <div className="group p-6 bg-gradient-to-br from-slate-50 to-white rounded-2xl border-2 border-slate-200 hover:border-slate-300 transition-all">
+        <div className="group p-6 bg-gradient-to-br from-slate-50 to-white rounded-2xl border border-secondary-200 hover:border-secondary-200 transition-all">
           <div className="text-sm text-slate-600 mb-2 font-semibold">What You Think</div>
-          <div className="text-4xl font-bold text-slate-700 mb-1">€2.0M</div>
-          <div className="text-xs text-slate-500">With 2% CPI inflation</div>
+          <div className="text-4xl font-bold text-secondary-700 mb-1">€2.0M</div>
+          <div className="text-xs text-secondary-400">With 2% CPI inflation</div>
         </div>
         <div className="group p-6 bg-gradient-to-br from-primary/10 to-teal-500/10 rounded-2xl border-2 border-primary hover:border-teal-600 transition-all">
           <div className="text-sm text-primary mb-2 font-semibold">What You Need</div>
@@ -790,7 +759,7 @@ export function EnhancedTruthScoreDemo() {
           <span className="text-slate-600 font-semibold">Reality Gap</span>
           <span className="font-bold text-red-600 text-lg">+35%</span>
         </div>
-        <div className="h-4 bg-slate-100 rounded-full overflow-hidden">
+        <div className="h-4 bg-secondary-100 rounded-full overflow-hidden">
           <div 
             className="h-full bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 transition-all duration-1000 ease-out relative overflow-hidden"
             style={{ width: animated ? '35%' : '0%' }}
@@ -816,22 +785,22 @@ export function EnhancedTruthScoreDemo() {
       </div>
 
       <div className="mt-6 grid grid-cols-3 gap-3 text-center">
-        <div className={`p-3 rounded-lg transition-all ${step === 0 ? 'bg-primary/20' : 'bg-slate-50'}`}>
+        <div className={`p-3 rounded-lg transition-all ${step === 0 ? 'bg-primary/20' : 'bg-secondary-50'}`}>
           <div className="text-xs text-slate-600 mb-1">Step 1</div>
           <div className="text-sm font-bold">Add Items</div>
         </div>
-        <div className={`p-3 rounded-lg transition-all ${step === 1 ? 'bg-primary/20' : 'bg-slate-50'}`}>
+        <div className={`p-3 rounded-lg transition-all ${step === 1 ? 'bg-primary/20' : 'bg-secondary-50'}`}>
           <div className="text-xs text-slate-600 mb-1">Step 2</div>
           <div className="text-sm font-bold">See Inflation</div>
         </div>
-        <div className={`p-3 rounded-lg transition-all ${step === 2 ? 'bg-primary/20' : 'bg-slate-50'}`}>
+        <div className={`p-3 rounded-lg transition-all ${step === 2 ? 'bg-primary/20' : 'bg-secondary-50'}`}>
           <div className="text-xs text-slate-600 mb-1">Step 3</div>
           <div className="text-sm font-bold">Adjust Plan</div>
         </div>
       </div>
 
       <div className="mt-6 text-center">
-        <div className="text-xs text-slate-500">
+        <div className="text-xs text-secondary-400">
           *Example: Porsche 911 + 2 kids in private school + London flat
         </div>
       </div>
@@ -874,7 +843,7 @@ export function LiveInflationCalculator() {
   const gapPercent = (gap / totalCost) * 100;
 
   return (
-    <div className="bg-white rounded-3xl p-10 shadow-2xl border-2 border-slate-200">
+    <div className="bg-white rounded-3xl p-10 shadow-2xl border border-secondary-200">
       <div className="grid lg:grid-cols-2 gap-10">
         {/* Left - Controls */}
         <div>
@@ -882,7 +851,7 @@ export function LiveInflationCalculator() {
           
           <div className="space-y-4 mb-8">
             {items.map((item, i) => (
-              <label key={i} className="flex items-center gap-4 p-4 border-2 border-slate-200 rounded-xl cursor-pointer hover:border-primary transition-all">
+              <label key={i} className="flex items-center gap-4 p-4 border border-secondary-200 rounded-xl cursor-pointer hover:border-primary transition-all">
                 <input
                   type="checkbox"
                   checked={item.selected}
@@ -902,7 +871,7 @@ export function LiveInflationCalculator() {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-3">
+            <label className="block text-sm font-semibold text-secondary-700 mb-3">
               Time Horizon: {years} years
             </label>
             <input
@@ -913,7 +882,7 @@ export function LiveInflationCalculator() {
               onChange={(e) => setYears(Number(e.target.value))}
               className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary"
             />
-            <div className="flex justify-between text-xs text-slate-500 mt-1">
+            <div className="flex justify-between text-xs text-secondary-400 mt-1">
               <span>1 year</span>
               <span>30 years</span>
             </div>
@@ -921,7 +890,7 @@ export function LiveInflationCalculator() {
         </div>
 
         {/* Right - Results */}
-        <div className="bg-gradient-to-br from-slate-50 to-white rounded-2xl p-8 border-2 border-slate-200">
+        <div className="bg-gradient-to-br from-slate-50 to-white rounded-2xl p-8 border border-secondary-200">
           <h3 className="text-2xl font-bold text-secondary mb-6">Your Results</h3>
 
           <div className="space-y-6">
@@ -933,7 +902,7 @@ export function LiveInflationCalculator() {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 bg-white rounded-xl border-2 border-slate-200">
+              <div className="p-4 bg-white rounded-xl border border-secondary-200">
                 <div className="text-xs text-slate-600 mb-1">With CPI (2%)</div>
                 <div className="text-2xl font-bold text-slate-600">
                   €{(futureCostCPI / 1000).toFixed(0)}K
@@ -975,9 +944,9 @@ export function ComparisonTable() {
   return (
     <div className="grid md:grid-cols-2 gap-8 mb-12">
       {/* Generic CPI */}
-      <div className="group bg-white rounded-2xl p-8 border-2 border-slate-200 hover:shadow-xl transition-all">
+      <div className="group bg-white rounded-2xl p-8 border border-secondary-200 hover:shadow-xl transition-all">
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
+          <div className="w-16 h-16 bg-secondary-100 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
             📊
           </div>
           <div>
@@ -995,7 +964,7 @@ export function ComparisonTable() {
             'Generic groceries'
           ].map((item, i) => (
             <div key={i} className="flex items-center gap-3 text-slate-600">
-              <svg className="w-5 h-5 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-5 h-5 text-secondary-300" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
               {item}
@@ -1003,9 +972,9 @@ export function ComparisonTable() {
           ))}
         </div>
 
-        <div className="p-6 bg-slate-50 rounded-xl text-center">
+        <div className="p-6 bg-secondary-50 rounded-xl text-center">
           <div className="text-5xl font-bold text-slate-600 mb-2">2.0%</div>
-          <div className="text-sm text-slate-500">Annual inflation</div>
+          <div className="text-sm text-secondary-400">Annual inflation</div>
         </div>
       </div>
 
@@ -1064,9 +1033,9 @@ export function InflationImpactChart() {
           <div key={i} className="text-center">
             <div className="text-sm text-slate-600 mb-4 font-semibold">Year {year}</div>
             <div className="space-y-3">
-              <div className="p-4 bg-slate-100 rounded-xl">
+              <div className="p-4 bg-secondary-100 rounded-xl">
                 <div className="text-xs text-slate-600 mb-1">CPI 2%</div>
-                <div className="text-2xl font-bold text-slate-700">
+                <div className="text-2xl font-bold text-secondary-700">
                   €{cpiValues[i].toFixed(0)}K
                 </div>
               </div>
@@ -1120,7 +1089,7 @@ export function LifestyleBasketFeature() {
             { icon: '🏡', title: 'Prime Real Estate', desc: 'London, Swiss, Miami property at 5.5%' },
             { icon: '⌚', title: 'Luxury Goods', desc: 'Watches, jewelry, art at 8-14% growth' }
           ].map((item, i) => (
-            <div key={i} className="flex items-start gap-4 p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+            <div key={i} className="flex items-start gap-4 p-4 bg-secondary-50 rounded-xl hover:bg-secondary-100 transition-colors">
               <div className="text-3xl">{item.icon}</div>
               <div>
                 <div className="font-bold text-secondary mb-1">{item.title}</div>
@@ -1183,10 +1152,10 @@ export function FIRECalculatorFeature() {
             { type: 'Fat FIRE', amount: '€3M+', desc: 'Luxury lifestyle' },
             { type: 'Barista FIRE', amount: '€800K', desc: 'Part-time work' }
           ].map((item, i) => (
-            <div key={i} className="p-4 bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200 rounded-xl">
+            <div key={i} className="p-4 bg-gradient-to-br from-slate-50 to-white border border-secondary-200 rounded-xl">
               <div className="text-xs text-slate-600 mb-1">{item.type}</div>
               <div className="text-2xl font-bold text-primary mb-1">{item.amount}</div>
-              <div className="text-xs text-slate-500">{item.desc}</div>
+              <div className="text-xs text-secondary-400">{item.desc}</div>
             </div>
           ))}
         </div>
@@ -1240,7 +1209,7 @@ export function TaxOptimizerFeature() {
               <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
-              <span className="text-slate-700">{item}</span>
+              <span className="text-secondary-700">{item}</span>
             </div>
           ))}
         </div>
@@ -1290,7 +1259,7 @@ export function ScenariosFeature() {
       <div className="inline-block px-6 py-3 bg-amber-100 border-2 border-amber-300 rounded-xl text-amber-900 font-bold">
         🎯 Coming Q2 2026
       </div>
-      <p className="text-sm text-slate-500 mt-4">
+      <p className="text-sm text-secondary-400 mt-4">
         Join waitlist to get early access
       </p>
     </div>
@@ -1466,7 +1435,7 @@ export function TestimonialGrid() {
   return (
     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
       {testimonials.map((t, i) => (
-        <div key={i} className="group bg-white rounded-2xl p-6 border-2 border-slate-200 hover:shadow-2xl hover:border-primary/50 transition-all">
+        <div key={i} className="group bg-white rounded-2xl p-6 border border-secondary-200 hover:shadow-2xl hover:border-primary/50 transition-all">
           {/* Header */}
           <div className="flex items-center gap-4 mb-4">
             <div className={`w-14 h-14 bg-gradient-to-br ${t.color} rounded-full flex items-center justify-center text-2xl group-hover:scale-110 transition-transform`}>
@@ -1475,7 +1444,7 @@ export function TestimonialGrid() {
             <div className="flex-1">
               <div className="font-bold text-secondary">{t.name}</div>
               <div className="text-sm text-slate-600">{t.role}</div>
-              <div className="text-xs text-slate-500">{t.company}</div>
+              <div className="text-xs text-secondary-400">{t.company}</div>
             </div>
           </div>
 
@@ -1489,7 +1458,7 @@ export function TestimonialGrid() {
           </div>
 
           {/* Quote */}
-          <p className="text-slate-700 leading-relaxed mb-4 italic">
+          <p className="text-secondary-700 leading-relaxed mb-4 italic">
             "{t.quote}"
           </p>
 
@@ -1508,10 +1477,10 @@ export function EnhancedPricingCards() {
   return (
     <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
       {/* Free Tier */}
-      <div className="group bg-white rounded-3xl p-10 border-2 border-slate-200 shadow-xl hover:shadow-2xl transition-all">
+      <div className="group bg-white rounded-3xl p-10 border border-secondary-200 shadow-xl hover:shadow-2xl transition-all">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-3xl font-bold text-secondary">Free</h3>
-          <div className="px-4 py-1 bg-slate-100 rounded-full text-slate-600 text-sm font-semibold">
+          <div className="px-4 py-1 bg-secondary-100 rounded-full text-slate-600 text-sm font-semibold">
             Forever
           </div>
         </div>
@@ -1539,14 +1508,14 @@ export function EnhancedPricingCards() {
               <svg className="w-6 h-6 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
-              <span className="text-slate-700">{feature}</span>
+              <span className="text-secondary-700">{feature}</span>
             </li>
           ))}
         </ul>
 
         <Link
           to="/login"
-          className="block w-full px-8 py-4 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 transition-all font-bold text-center text-lg"
+          className="block w-full px-8 py-4 bg-secondary-100 text-secondary-700 rounded-xl hover:bg-slate-200 transition-all font-bold text-center text-lg"
         >
           Get Started Free
         </Link>
@@ -1556,7 +1525,7 @@ export function EnhancedPricingCards() {
       <div className="relative group bg-gradient-to-br from-primary to-teal-600 rounded-3xl p-10 shadow-2xl text-white overflow-hidden">
         {/* Popular Badge */}
         <div className="absolute -top-4 right-10 z-10">
-          <div className="bg-amber-400 text-slate-900 px-6 py-2 rounded-full text-sm font-bold shadow-xl flex items-center gap-2">
+          <div className="bg-amber-400 text-secondary-900 px-6 py-2 rounded-full text-sm font-bold shadow-xl flex items-center gap-2">
             <span className="text-lg">⭐</span>
             MOST POPULAR
           </div>
@@ -1608,7 +1577,7 @@ export function EnhancedPricingCards() {
 
           <Link
             to="/login"
-            className="block w-full px-8 py-4 bg-white text-primary rounded-xl hover:bg-slate-50 transition-all font-bold text-center text-lg shadow-xl group-hover:shadow-2xl"
+            className="block w-full px-8 py-4 bg-white text-primary rounded-xl hover:bg-secondary-50 transition-all font-bold text-center text-lg shadow-xl group-hover:shadow-2xl"
           >
             Start 30-Day Trial
           </Link>
@@ -1668,7 +1637,7 @@ export function FAQSection() {
           <div className="inline-block px-4 py-2 bg-primary/10 rounded-full text-primary font-semibold text-sm mb-4">
             FAQ
           </div>
-          <h2 className="text-5xl font-bold text-secondary mb-4" style={{ fontFamily: "'Crimson Pro', serif" }}>
+          <h2 className="text-5xl font-bold text-secondary mb-4">
             Questions? Answered.
           </h2>
           <p className="text-xl text-slate-600">
@@ -1678,10 +1647,10 @@ export function FAQSection() {
 
         <div className="space-y-4">
           {faqs.map((faq, i) => (
-            <div key={i} className="bg-white rounded-2xl border-2 border-slate-200 overflow-hidden hover:border-primary/50 transition-all">
+            <div key={i} className="bg-white rounded-2xl border border-secondary-200 overflow-hidden hover:border-primary/50 transition-all">
               <button
                 onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                className="w-full px-8 py-6 flex items-center justify-between text-left hover:bg-slate-50 transition-colors"
+                className="w-full px-8 py-6 flex items-center justify-between text-left hover:bg-secondary-50 transition-colors"
               >
                 <span className="text-lg font-bold text-secondary pr-8">{faq.question}</span>
                 <svg 
@@ -1696,8 +1665,8 @@ export function FAQSection() {
               
               {openIndex === i && (
                 <div className="px-8 pb-6">
-                  <div className="pt-4 border-t border-slate-200">
-                    <p className="text-slate-700 leading-relaxed">{faq.answer}</p>
+                  <div className="pt-4 border-t border-secondary-200">
+                    <p className="text-secondary-700 leading-relaxed">{faq.answer}</p>
                   </div>
                 </div>
               )}

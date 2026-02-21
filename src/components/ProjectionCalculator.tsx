@@ -89,97 +89,97 @@ export default function ProjectionCalculator() {
 
   return (
     <div className="bg-white rounded-2xl shadow-lg p-8">
-      <h2 className="text-3xl font-bold text-secondary mb-6 flex items-center gap-3">
+      <h2 className="text-3xl font-bold text-surface-900 mb-6 flex items-center gap-3">
         <span className="text-4xl">📈</span>
         Investment Projection Calculator
       </h2>
-      <p className="text-slate-600 mb-8">Project your portfolio growth over time</p>
+      <p className="text-surface-900-500 mb-8">Project your portfolio growth over time</p>
 
       {/* Input Section */}
       <div className="grid md:grid-cols-2 gap-6 mb-8">
         {/* Basic Inputs */}
         <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-2">Current Age</label>
+          <label className="block text-sm font-semibold text-surface-900-700 mb-2">Current Age</label>
           <input
             type="number"
             value={currentAge}
             onChange={(e) => setCurrentAge(Number(e.target.value))}
-            className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+            className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-2">Starting Amount</label>
+          <label className="block text-sm font-semibold text-surface-900-700 mb-2">Starting Amount</label>
           <input
             type="number"
             value={startingAmount}
             onChange={(e) => setStartingAmount(Number(e.target.value))}
-            className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+            className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-2">Monthly Contribution</label>
+          <label className="block text-sm font-semibold text-surface-900-700 mb-2">Monthly Contribution</label>
           <input
             type="number"
             value={monthlyContribution}
             onChange={(e) => setMonthlyContribution(Number(e.target.value))}
-            className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+            className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-2">Annual Contribution (bonus, etc.)</label>
+          <label className="block text-sm font-semibold text-surface-900-700 mb-2">Annual Contribution (bonus, etc.)</label>
           <input
             type="number"
             value={annualContribution}
             onChange={(e) => setAnnualContribution(Number(e.target.value))}
-            className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+            className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-2">Expected Annual Return (%)</label>
+          <label className="block text-sm font-semibold text-surface-900-700 mb-2">Expected Annual Return (%)</label>
           <input
             type="number"
             value={expectedReturn}
             onChange={(e) => setExpectedReturn(Number(e.target.value))}
             step="0.1"
-            className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+            className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-2">Time Horizon (years)</label>
+          <label className="block text-sm font-semibold text-surface-900-700 mb-2">Time Horizon (years)</label>
           <input
             type="number"
             value={years}
             onChange={(e) => setYears(Number(e.target.value))}
             max="50"
-            className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+            className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-2">Contribution Growth (%/year)</label>
+          <label className="block text-sm font-semibold text-surface-900-700 mb-2">Contribution Growth (%/year)</label>
           <input
             type="number"
             value={contributionGrowth}
             onChange={(e) => setContributionGrowth(Number(e.target.value))}
             step="0.1"
-            className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+            className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-2">Inflation Rate (%)</label>
+          <label className="block text-sm font-semibold text-surface-900-700 mb-2">Inflation Rate (%)</label>
           <input
             type="number"
             value={inflationRate}
             onChange={(e) => setInflationRate(Number(e.target.value))}
             step="0.1"
             disabled={!inflationAdjusted}
-            className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none disabled:bg-slate-100"
+            className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none disabled:bg-secondary-100"
           />
         </div>
 
@@ -191,7 +191,7 @@ export default function ProjectionCalculator() {
               onChange={(e) => setInflationAdjusted(e.target.checked)}
               className="w-5 h-5 text-primary rounded focus:ring-2 focus:ring-primary"
             />
-            <span className="text-sm font-semibold text-slate-700">
+            <span className="text-sm font-semibold text-surface-900-700">
               Adjust for inflation (show real purchasing power)
             </span>
           </label>
@@ -222,17 +222,17 @@ export default function ProjectionCalculator() {
         </div>
 
         {/* Chart */}
-        <div className="bg-slate-50 rounded-xl p-6">
-          <h3 className="text-xl font-bold text-secondary mb-4">Growth Timeline</h3>
+        <div className="bg-secondary-50 rounded-xl p-6">
+          <h3 className="text-xl font-bold text-surface-900 mb-4">Growth Timeline</h3>
           
           <div className="space-y-3">
             {projections.filter((_, i) => i % Math.ceil(projections.length / 10) === 0 || i === projections.length - 1).map((proj) => (
               <div key={proj.year} className="flex items-center gap-4">
-                <div className="w-16 text-sm font-semibold text-slate-600">Year {proj.year}</div>
+                <div className="w-16 text-sm font-semibold text-surface-900-500">Year {proj.year}</div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <div className="text-sm font-semibold">Age {proj.age}</div>
-                    <div className="text-sm text-slate-600">•</div>
+                    <div className="text-sm text-surface-900-500">•</div>
                     <div className="text-sm font-bold text-primary">{formatCompact(proj.balance)}</div>
                   </div>
                   <div className="h-8 bg-white rounded-lg overflow-hidden flex">
@@ -269,12 +269,12 @@ export default function ProjectionCalculator() {
         </div>
 
         {/* Detailed Table */}
-        <div className="bg-slate-50 rounded-xl p-6 overflow-x-auto">
-          <h3 className="text-xl font-bold text-secondary mb-4">Year-by-Year Breakdown</h3>
+        <div className="bg-secondary-50 rounded-xl p-6 overflow-x-auto">
+          <h3 className="text-xl font-bold text-surface-900 mb-4">Year-by-Year Breakdown</h3>
           
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b-2 border-slate-300">
+              <tr className="border-b-2 border-secondary-200">
                 <th className="text-left py-3 px-2 font-semibold">Year</th>
                 <th className="text-left py-3 px-2 font-semibold">Age</th>
                 <th className="text-right py-3 px-2 font-semibold">Contributions</th>
@@ -284,9 +284,9 @@ export default function ProjectionCalculator() {
             </thead>
             <tbody>
               {projections.slice(0, 11).map((proj) => (
-                <tr key={proj.year} className="border-b border-slate-200 hover:bg-white transition-colors">
+                <tr key={proj.year} className="border-b border-secondary-200 hover:bg-white transition-colors">
                   <td className="py-3 px-2 font-semibold">{proj.year}</td>
-                  <td className="py-3 px-2 text-slate-600">{proj.age}</td>
+                  <td className="py-3 px-2 text-surface-900-500">{proj.age}</td>
                   <td className="py-3 px-2 text-right text-purple-600 font-semibold">
                     {proj.contributions > 0 ? formatAmount(proj.contributions) : '-'}
                   </td>
@@ -300,15 +300,15 @@ export default function ProjectionCalculator() {
               ))}
               {projections.length > 11 && (
                 <tr>
-                  <td colSpan={5} className="py-3 px-2 text-center text-slate-500">
+                  <td colSpan={5} className="py-3 px-2 text-center text-surface-900-400">
                     ... {projections.length - 11} more years ...
                   </td>
                 </tr>
               )}
               {projections.length > 11 && (
-                <tr className="border-t-2 border-slate-300 bg-white">
+                <tr className="border-t-2 border-secondary-200 bg-white">
                   <td className="py-3 px-2 font-bold">{finalProjection.year}</td>
-                  <td className="py-3 px-2 font-semibold text-slate-600">{finalProjection.age}</td>
+                  <td className="py-3 px-2 font-semibold text-surface-900-500">{finalProjection.age}</td>
                   <td className="py-3 px-2 text-right text-purple-700 font-bold">
                     {formatAmount(finalProjection.contributions)}
                   </td>
@@ -326,19 +326,19 @@ export default function ProjectionCalculator() {
 
         {/* Summary Stats */}
         <div className="grid md:grid-cols-2 gap-4">
-          <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-6 border-2 border-slate-200">
-            <h4 className="font-bold text-slate-900 mb-4">Contribution Summary</h4>
+          <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-6 border border-secondary-200">
+            <h4 className="font-bold text-surface-900-900 mb-4">Contribution Summary</h4>
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span className="text-slate-600">Total Contributed:</span>
-                <span className="font-bold text-slate-900">{formatAmount(finalProjection.totalContributed)}</span>
+                <span className="text-surface-900-500">Total Contributed:</span>
+                <span className="font-bold text-surface-900-900">{formatAmount(finalProjection.totalContributed)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-600">Starting Amount:</span>
+                <span className="text-surface-900-500">Starting Amount:</span>
                 <span className="font-semibold">{formatAmount(startingAmount)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-600">Monthly × {years} years:</span>
+                <span className="text-surface-900-500">Monthly × {years} years:</span>
                 <span className="font-semibold">{formatAmount(monthlyContribution * 12 * years)}</span>
               </div>
             </div>
@@ -375,18 +375,6 @@ export default function ProjectionCalculator() {
           </ul>
         </div>
       </div>
-
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap');
-        
-        .font-crimson {
-          font-family: 'Crimson Pro', serif;
-        }
-        
-        .font-manrope {
-          font-family: 'Manrope', sans-serif;
-        }
-      `}</style>
     </div>
   );
 }

@@ -14,13 +14,13 @@ export default function Calculators() {
 
   return (
     <SidebarLayout>
-      <div className="p-8 max-w-7xl mx-auto">
+      <div className="p-6 lg:p-8 max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-secondary mb-2" style={{ fontFamily: "'Crimson Pro', serif" }}>
+          <h1 className="page-title" >
             Financial Calculators
           </h1>
-          <p className="text-slate-600">
+          <p className="text-surface-900-500">
             Professional tools to plan your financial future
           </p>
         </div>
@@ -41,7 +41,7 @@ export default function Calculators() {
               className={`px-6 py-3 rounded-xl font-semibold transition-all ${
                 activeCalculator === calc.id
                   ? 'bg-primary text-white shadow-lg scale-105'
-                  : 'bg-white border-2 border-slate-200 text-slate-700 hover:border-primary'
+                  : 'bg-white border border-secondary-200 text-surface-900-700 hover:border-primary'
               }`}
             >
               {calc.label}
@@ -58,26 +58,6 @@ export default function Calculators() {
           {activeCalculator === 'retirement' && <RetirementCalculator formatAmount={formatAmount} formatCompact={formatCompact} currency={currency} />}
           {activeCalculator === 'debt' && <DebtPayoffCalculator formatAmount={formatAmount} currency={currency} />}
         </div>
-
-        {/* Google Fonts */}
-        <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap');
-          
-          @keyframes fadeIn {
-            from {
-              opacity: 0;
-              transform: translateY(10px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-          
-          .animate-fadeIn {
-            animation: fadeIn 0.3s ease-out;
-          }
-        `}</style>
       </div>
     </SidebarLayout>
   );
@@ -118,55 +98,55 @@ function RetirementCalculator({ formatAmount, formatCompact, currency }: any) {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-2xl p-8 border-2 border-slate-200">
-        <h2 className="text-2xl font-bold text-secondary mb-6">Your Retirement Plan</h2>
+      <div className="bg-white rounded-2xl p-8 border border-secondary-200">
+        <h2 className="text-2xl font-bold text-surface-900 mb-6">Your Retirement Plan</h2>
         <div className="grid md:grid-cols-3 gap-6">
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">
+            <label className="block text-sm font-semibold text-surface-900-700 mb-2">
               Current Age
             </label>
             <input
               type="number"
               value={currentAge}
               onChange={(e) => setCurrentAge(Number(e.target.value))}
-              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
+              className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">
+            <label className="block text-sm font-semibold text-surface-900-700 mb-2">
               Retirement Age
             </label>
             <input
               type="number"
               value={retirementAge}
               onChange={(e) => setRetirementAge(Number(e.target.value))}
-              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
+              className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">
+            <label className="block text-sm font-semibold text-surface-900-700 mb-2">
               Current Savings ({currency})
             </label>
             <input
               type="number"
               value={currentSavings}
               onChange={(e) => setCurrentSavings(Number(e.target.value))}
-              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
+              className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">
+            <label className="block text-sm font-semibold text-surface-900-700 mb-2">
               Monthly Contribution ({currency})
             </label>
             <input
               type="number"
               value={monthlyContribution}
               onChange={(e) => setMonthlyContribution(Number(e.target.value))}
-              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
+              className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">
+            <label className="block text-sm font-semibold text-surface-900-700 mb-2">
               Expected Return (%)
             </label>
             <input
@@ -174,11 +154,11 @@ function RetirementCalculator({ formatAmount, formatCompact, currency }: any) {
               value={expectedReturn}
               onChange={(e) => setExpectedReturn(Number(e.target.value))}
               step="0.5"
-              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
+              className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">
+            <label className="block text-sm font-semibold text-surface-900-700 mb-2">
               Inflation Rate (%)
             </label>
             <input
@@ -186,7 +166,7 @@ function RetirementCalculator({ formatAmount, formatCompact, currency }: any) {
               value={inflationRate}
               onChange={(e) => setInflationRate(Number(e.target.value))}
               step="0.1"
-              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
+              className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
             />
           </div>
         </div>
@@ -209,45 +189,45 @@ function RetirementCalculator({ formatAmount, formatCompact, currency }: any) {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-8 border-2 border-slate-200 space-y-6">
+        <div className="bg-white rounded-2xl p-8 border border-secondary-200 space-y-6">
           <div>
-            <div className="text-sm text-slate-600 mb-2">Monthly Retirement Income (4% rule)</div>
-            <div className="text-4xl font-bold text-secondary">{formatAmount(monthlyIncome)}</div>
-            <div className="text-sm text-slate-500 mt-1">{formatAmount(annualWithdrawal)}/year</div>
+            <div className="text-sm text-surface-900-500 mb-2">Monthly Retirement Income (4% rule)</div>
+            <div className="text-3xl lg:text-4xl font-bold text-surface-900">{formatAmount(monthlyIncome)}</div>
+            <div className="text-sm text-surface-900-400 mt-1">{formatAmount(annualWithdrawal)}/year</div>
           </div>
           
           <div className="pt-4 border-t space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-slate-600">Total Contributed</span>
+              <span className="text-surface-900-500">Total Contributed</span>
               <span className="font-bold text-primary">{formatCompact(totalContributed)}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-slate-600">Investment Gains</span>
+              <span className="text-surface-900-500">Investment Gains</span>
               <span className="font-bold text-green-600">+{formatCompact(investmentGains)}</span>
             </div>
             <div className="flex justify-between items-center pt-3 border-t">
-              <span className="font-bold text-secondary">Total Savings</span>
-              <span className="font-bold text-secondary text-xl">{formatCompact(retirementSavings)}</span>
+              <span className="font-bold text-surface-900">Total Savings</span>
+              <span className="font-bold text-surface-900 text-xl">{formatCompact(retirementSavings)}</span>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl p-8 border-2 border-slate-200">
-        <h3 className="text-xl font-bold text-secondary mb-6">Your Journey to Retirement</h3>
+      <div className="bg-white rounded-2xl p-8 border border-secondary-200">
+        <h3 className="text-xl font-bold text-surface-900 mb-6">Your Journey to Retirement</h3>
         <div className="space-y-4">
           <div className="flex items-center gap-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
             <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
               {currentAge}
             </div>
             <div className="flex-1">
-              <div className="font-bold text-secondary">Today</div>
-              <div className="text-sm text-slate-600">Starting Savings: {formatAmount(currentSavings)}</div>
+              <div className="font-bold text-surface-900">Today</div>
+              <div className="text-sm text-surface-900-500">Starting Savings: {formatAmount(currentSavings)}</div>
             </div>
           </div>
           <div className="flex items-center gap-4 pl-6">
             <div className="w-1 h-16 bg-gradient-to-b from-blue-500 to-green-500"></div>
-            <div className="text-sm text-slate-600">
+            <div className="text-sm text-surface-900-500">
               Contributing {formatAmount(monthlyContribution)}/month for {yearsToRetirement} years
             </div>
           </div>
@@ -256,8 +236,8 @@ function RetirementCalculator({ formatAmount, formatCompact, currency }: any) {
               {retirementAge}
             </div>
             <div className="flex-1">
-              <div className="font-bold text-secondary">Retirement</div>
-              <div className="text-sm text-slate-600">Total Savings: {formatAmount(retirementSavings)}</div>
+              <div className="font-bold text-surface-900">Retirement</div>
+              <div className="text-sm text-surface-900-500">Total Savings: {formatAmount(retirementSavings)}</div>
             </div>
           </div>
         </div>
@@ -319,35 +299,35 @@ function DebtPayoffCalculator({ formatAmount, currency }: any) {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-2xl p-8 border-2 border-slate-200">
-        <h2 className="text-2xl font-bold text-secondary mb-6">Debt Information</h2>
+      <div className="bg-white rounded-2xl p-8 border border-secondary-200">
+        <h2 className="text-2xl font-bold text-surface-900 mb-6">Debt Information</h2>
         <div className="grid md:grid-cols-3 gap-6">
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Total Debt ({currency})</label>
+            <label className="block text-sm font-semibold text-surface-900-700 mb-2">Total Debt ({currency})</label>
             <input
               type="number"
               value={debtAmount}
               onChange={(e) => setDebtAmount(Number(e.target.value))}
-              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
+              className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Annual Interest Rate (%)</label>
+            <label className="block text-sm font-semibold text-surface-900-700 mb-2">Annual Interest Rate (%)</label>
             <input
               type="number"
               value={interestRate}
               onChange={(e) => setInterestRate(Number(e.target.value))}
               step="0.5"
-              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
+              className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Monthly Payment ({currency})</label>
+            <label className="block text-sm font-semibold text-surface-900-700 mb-2">Monthly Payment ({currency})</label>
             <input
               type="number"
               value={monthlyPayment}
               onChange={(e) => setMonthlyPayment(Number(e.target.value))}
-              className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
+              className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-semibold text-lg"
             />
           </div>
         </div>
@@ -367,27 +347,27 @@ function DebtPayoffCalculator({ formatAmount, currency }: any) {
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-gradient-to-br from-primary to-teal-600 rounded-2xl p-6 text-white shadow-xl">
               <div className="text-sm opacity-90 mb-2">Time to Payoff</div>
-              <div className="text-4xl font-bold mb-2">{years}y {remainingMonths}m</div>
+              <div className="text-3xl lg:text-4xl font-bold mb-2">{years}y {remainingMonths}m</div>
               <div className="text-sm opacity-75">{payoff.months} months total</div>
             </div>
             <div className="bg-white rounded-2xl p-6 border-2 border-red-200 bg-red-50">
               <div className="text-sm text-red-900 mb-2">Total Amount Paid</div>
-              <div className="text-4xl font-bold text-red-700 mb-2">{formatAmount(payoff.totalPaid)}</div>
+              <div className="text-3xl lg:text-4xl font-bold text-red-700 mb-2">{formatAmount(payoff.totalPaid)}</div>
               <div className="text-sm text-red-600">Principal + Interest</div>
             </div>
             <div className="bg-white rounded-2xl p-6 border-2 border-orange-200 bg-orange-50">
               <div className="text-sm text-orange-900 mb-2">Total Interest</div>
-              <div className="text-4xl font-bold text-orange-700 mb-2">{formatAmount(payoff.totalInterest)}</div>
+              <div className="text-3xl lg:text-4xl font-bold text-orange-700 mb-2">{formatAmount(payoff.totalInterest)}</div>
               <div className="text-sm text-orange-600">Extra cost of debt</div>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-8 border-2 border-slate-200">
-            <h3 className="text-xl font-bold text-secondary mb-6">Payment Breakdown</h3>
+          <div className="bg-white rounded-2xl p-8 border border-secondary-200">
+            <h3 className="text-xl font-bold text-surface-900 mb-6">Payment Breakdown</h3>
             <div className="space-y-3">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
-                <span className="text-slate-700">Original Debt</span>
-                <span className="font-bold text-secondary">{formatAmount(debtAmount)}</span>
+              <div className="flex items-center justify-between p-4 bg-secondary-50 rounded-lg">
+                <span className="text-surface-900-700">Original Debt</span>
+                <span className="font-bold text-surface-900">{formatAmount(debtAmount)}</span>
               </div>
               <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg border border-orange-200">
                 <span className="text-orange-900">Total Interest</span>
@@ -400,11 +380,11 @@ function DebtPayoffCalculator({ formatAmount, currency }: any) {
             </div>
 
             <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <h4 className="font-bold text-secondary mb-3">💡 Pay More, Save More</h4>
-              <div className="text-sm text-slate-700 space-y-2">
+              <h4 className="font-bold text-surface-900 mb-3">💡 Pay More, Save More</h4>
+              <div className="text-sm text-surface-900-700 space-y-2">
                 <div>
                   If you increase payment to {formatAmount(monthlyPayment + 100)}:
-                  <ul className="list-disc list-inside ml-4 mt-1 text-slate-600">
+                  <ul className="list-disc list-inside ml-4 mt-1 text-surface-900-500">
                     <li>Save approximately {formatAmount((payoff.totalInterest * 0.15))} in interest</li>
                     <li>Pay off {Math.floor(payoff.months * 0.15)} months faster</li>
                   </ul>

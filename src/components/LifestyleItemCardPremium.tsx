@@ -35,7 +35,7 @@ export default function LifestyleItemCardPremium({ item, onRemove, onUpdate }: L
   };
 
   return (
-    <div className="group relative bg-white rounded-3xl p-8 border-2 border-slate-200 shadow-xl hover:shadow-2xl hover:border-primary transition-all duration-300 hover:-translate-y-2 animate-fadeInUp">
+    <div className="group relative bg-white rounded-3xl p-8 border border-secondary-200 shadow-xl hover:shadow-2xl hover:border-primary transition-all duration-300 hover:-translate-y-2 animate-fadeInUp">
       {/* Premium Gradient Accent Bar */}
       <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-primary via-teal-500 to-primary rounded-t-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
@@ -57,7 +57,7 @@ export default function LifestyleItemCardPremium({ item, onRemove, onUpdate }: L
               {item.name}
             </h3>
             <div className="flex items-center gap-3">
-              <span className="px-3 py-1 bg-slate-100 text-slate-700 rounded-lg text-sm font-semibold capitalize">
+              <span className="px-3 py-1 bg-secondary-100 text-secondary-700 rounded-lg text-sm font-semibold capitalize">
                 {item.category.replace('-', ' ')}
               </span>
               {item.isRecurring && (
@@ -72,7 +72,7 @@ export default function LifestyleItemCardPremium({ item, onRemove, onUpdate }: L
         {/* Delete Button */}
         <button
           onClick={() => onRemove(item.id)}
-          className="p-3 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
+          className="p-3 text-secondary-300 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -86,12 +86,12 @@ export default function LifestyleItemCardPremium({ item, onRemove, onUpdate }: L
           {/* Current vs Future Cost */}
           <div className="grid md:grid-cols-2 gap-6">
             {/* Current Cost */}
-            <div className="bg-gradient-to-br from-slate-50 to-white rounded-2xl p-6 border border-slate-200">
-              <div className="text-sm text-slate-600 font-semibold uppercase tracking-wider mb-2">Today</div>
+            <div className="bg-gradient-to-br from-slate-50 to-white rounded-2xl p-6 border border-secondary-200">
+              <div className="text-sm text-secondary-500 font-semibold uppercase tracking-wider mb-2">Today</div>
               <div className="text-4xl font-bold text-secondary font-manrope mb-1">
                 {formatCompact(item.currentCost)}
               </div>
-              <div className="text-sm text-slate-500">{formatAmount(item.currentCost)}</div>
+              <div className="text-sm text-secondary-400">{formatAmount(item.currentCost)}</div>
             </div>
 
             {/* Future Cost - PREMIUM GRADIENT */}
@@ -144,19 +144,19 @@ export default function LifestyleItemCardPremium({ item, onRemove, onUpdate }: L
           </div>
 
           {/* Timeline */}
-          <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200">
+          <div className="bg-secondary-50 rounded-2xl p-6 border border-secondary-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <span className="text-3xl">📅</span>
                 <div>
-                  <div className="text-sm text-slate-600 mb-1">Timeline</div>
+                  <div className="text-sm text-secondary-500 mb-1">Timeline</div>
                   <div className="text-2xl font-bold text-secondary font-manrope">
                     {yearsUntilTarget} years
                   </div>
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-sm text-slate-600 mb-1">Target Year</div>
+                <div className="text-sm text-secondary-500 mb-1">Target Year</div>
                 <div className="text-2xl font-bold text-primary font-manrope">
                   {item.targetYear}
                 </div>
@@ -167,7 +167,7 @@ export default function LifestyleItemCardPremium({ item, onRemove, onUpdate }: L
           {/* Edit Button */}
           <button
             onClick={() => setIsEditing(true)}
-            className="w-full px-6 py-4 bg-white border-2 border-slate-300 text-slate-700 rounded-2xl font-bold text-lg hover:bg-slate-50 hover:border-primary transition-all"
+            className="w-full px-6 py-4 bg-white border border-secondary-200 text-secondary-700 rounded-2xl font-bold text-lg hover:bg-secondary-50 hover:border-primary transition-all"
           >
             ✏️ Edit Details
           </button>
@@ -177,7 +177,7 @@ export default function LifestyleItemCardPremium({ item, onRemove, onUpdate }: L
         <div className="space-y-6">
           {/* Edit Cost */}
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-3 uppercase tracking-wider">
+            <label className="block text-sm font-semibold text-secondary-700 mb-3 uppercase tracking-wider">
               Current Cost
             </label>
             <input
@@ -190,7 +190,7 @@ export default function LifestyleItemCardPremium({ item, onRemove, onUpdate }: L
 
           {/* Edit Target Year */}
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-3 uppercase tracking-wider">
+            <label className="block text-sm font-semibold text-secondary-700 mb-3 uppercase tracking-wider">
               Target Year
             </label>
             <input
@@ -213,7 +213,7 @@ export default function LifestyleItemCardPremium({ item, onRemove, onUpdate }: L
             </button>
             <button
               onClick={handleCancelEdit}
-              className="flex-1 px-6 py-4 bg-white border-3 border-slate-300 text-slate-700 rounded-2xl font-bold text-lg hover:bg-slate-50 transition-all"
+              className="flex-1 px-6 py-4 bg-white border-3 border-secondary-200 text-secondary-700 rounded-2xl font-bold text-lg hover:bg-secondary-50 transition-all"
             >
               Cancel
             </button>

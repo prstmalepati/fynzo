@@ -77,11 +77,6 @@ export default function LandingPage() {
           </div>
         </div>
       </div>
-
-      {/* Google Fonts */}
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap');
-      `}</style>
     </div>
   );
 }

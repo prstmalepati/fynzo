@@ -73,18 +73,18 @@ export default function TruthScoreCardPremium({
             <h2 className="text-4xl font-bold text-secondary mb-2 font-crimson" style={{ letterSpacing: '-0.01em' }}>
               Your Truth Score
             </h2>
-            <p className="text-slate-700 text-lg">
+            <p className="text-secondary-700 text-lg">
               The real cost of your lifestyle vs generic inflation
             </p>
           </div>
         </div>
         <div className="text-right">
-          <div className="text-sm font-semibold text-slate-600 uppercase tracking-wider mb-2">Your Inflation</div>
+          <div className="text-sm font-semibold text-secondary-500 uppercase tracking-wider mb-2">Your Inflation</div>
           <div className="text-6xl font-bold text-primary font-manrope mb-1">
             {(weightedInflation * 100).toFixed(1)}%
           </div>
-          <div className="text-lg text-slate-600">
-            vs CPI: <span className="line-through text-slate-400">2.0%</span>
+          <div className="text-lg text-secondary-500">
+            vs CPI: <span className="line-through text-secondary-300">2.0%</span>
           </div>
         </div>
       </div>
@@ -92,18 +92,18 @@ export default function TruthScoreCardPremium({
       {/* PREMIUM COMPARISON CARDS */}
       <div className="grid md:grid-cols-2 gap-8 mb-8">
         {/* What You Think (Subtle) */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border-2 border-slate-300 shadow-lg hover:shadow-xl transition-all">
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-secondary-200 shadow-lg hover:shadow-xl transition-all">
           <div className="flex items-center gap-3 mb-4">
             <span className="text-4xl">🤔</span>
             <h3 className="text-2xl font-bold text-secondary font-crimson">What You Think</h3>
           </div>
-          <div className="text-sm text-slate-600 mb-3 font-semibold uppercase tracking-wide">
+          <div className="text-sm text-secondary-500 mb-3 font-semibold uppercase tracking-wide">
             (Based on 2% CPI inflation)
           </div>
-          <div className="text-5xl font-bold text-slate-700 mb-3 font-manrope">
+          <div className="text-5xl font-bold text-secondary-700 mb-3 font-manrope">
             {formatCompact(expectedCost)}
           </div>
-          <div className="text-sm text-slate-600">
+          <div className="text-sm text-secondary-500">
             In ~{Math.round(avgYearsToTarget)} years
           </div>
         </div>
@@ -129,7 +129,7 @@ export default function TruthScoreCardPremium({
       </div>
 
       {/* PREMIUM GAP ANALYSIS */}
-      <div className="bg-white rounded-2xl p-8 border-2 border-slate-200 mb-8 shadow-lg">
+      <div className="bg-white rounded-2xl p-8 border border-secondary-200 mb-8 shadow-lg">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-3xl font-bold text-secondary font-crimson">The Reality Gap</h3>
           <div className="flex items-center gap-3">
@@ -156,8 +156,8 @@ export default function TruthScoreCardPremium({
 
         {/* Premium Stats Grid */}
         <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-gradient-to-br from-slate-50 to-white rounded-xl p-6 border border-slate-200">
-            <div className="text-sm text-slate-600 mb-2 font-semibold uppercase tracking-wide">Underestimating By:</div>
+          <div className="bg-gradient-to-br from-slate-50 to-white rounded-xl p-6 border border-secondary-200">
+            <div className="text-sm text-secondary-500 mb-2 font-semibold uppercase tracking-wide">Underestimating By:</div>
             <div className="text-4xl font-bold text-secondary font-manrope">
               {formatAmount(gap)}
             </div>
@@ -192,12 +192,12 @@ export default function TruthScoreCardPremium({
 
       {/* PREMIUM IMPACT EXAMPLES */}
       {gapPercentage > 15 && (
-        <div className="mt-8 bg-white rounded-2xl p-8 border-2 border-slate-200 shadow-lg">
+        <div className="mt-8 bg-white rounded-2xl p-8 border border-secondary-200 shadow-lg">
           <div className="flex items-center gap-3 mb-4">
             <span className="text-4xl">💭</span>
             <div className="font-bold text-2xl text-secondary font-crimson">What This Really Means:</div>
           </div>
-          <div className="space-y-3 text-lg text-slate-700">
+          <div className="space-y-3 text-lg text-secondary-700">
             <div className="flex items-start gap-3">
               <span className="text-primary font-bold text-2xl">→</span>
               <span>If you thought you needed €2M to retire, you actually need <strong className="text-primary">€{((2000000 * (1 + gapPercentage/100)) / 1000000).toFixed(2)}M</strong></span>
@@ -220,7 +220,7 @@ export default function TruthScoreCardPremium({
           <button className="flex-1 px-8 py-5 bg-gradient-to-r from-primary to-teal-600 text-white rounded-2xl hover:shadow-2xl hover:shadow-primary/50 transition-all font-bold text-lg hover:scale-102">
             Adjust My Projections
           </button>
-          <button className="flex-1 px-8 py-5 bg-white border-3 border-slate-300 rounded-2xl hover:bg-slate-50 hover:shadow-xl transition-all font-bold text-lg text-slate-700 hover:scale-102">
+          <button className="flex-1 px-8 py-5 bg-white border-3 border-secondary-200 rounded-2xl hover:bg-secondary-50 hover:shadow-xl transition-all font-bold text-lg text-secondary-700 hover:scale-102">
             Optimize My Basket
           </button>
         </div>
