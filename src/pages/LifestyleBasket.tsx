@@ -1,375 +1,609 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
-import { db } from '../firebase/config';
-import { collection, addDoc, deleteDoc, doc, query, orderBy, getDocs, Timestamp, updateDoc } from 'firebase/firestore';
+import { useAuth } from '../context/AuthContext';
 import SidebarLayout from '../components/SidebarLayout';
-import TruthScoreCardPremium from '../components/TruthScoreCardPremium';
-import LifestyleItemCardPremium from '../components/LifestyleItemCardPremium';
-import ItemPickerModalPremium from '../components/ItemPickerModalPremium';
+import { db } from '../firebase/config';
+import { collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 
-export interface UserLifestyleItem {
+interface LifestyleItem {
   id: string;
-  templateId: string;
   name: string;
   category: string;
-  currentCost: number;
-  inflationRate: number;
+  cost: number;
+  frequency: 'one-time' | 'recurring';
   targetYear: number;
-  emoji: string;
-  isRecurring: boolean;
+  inflationRate: number;
+  icon: string;
+  notes: string;
+  createdAt: Date;
 }
 
-export default function LifestyleBasketPremium() {
+export default function LifestyleBasket() {
+  const { formatAmount, formatCompact } = useCurrency();
   const { user } = useAuth();
-  const { formatAmount, formatCompact, currency } = useCurrency();
-  const [items, setItems] = useState<UserLifestyleItem[]>([]);
-  const [showPicker, setShowPicker] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [isAdding, setIsAdding] = useState(false);
+  
+  const [items, setItems] = useState<LifestyleItem[]>([]);
+  const [selectedItem, setSelectedItem] = useState<LifestyleItem | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [editingItem, setEditingItem] = useState<LifestyleItem | null>(null);
+  
+  // Form fields
+  const [itemName, setItemName] = useState('');
+  const [category, setCategory] = useState('travel');
+  const [cost, setCost] = useState(0);
+  const [frequency, setFrequency] = useState<'one-time' | 'recurring'>('one-time');
+  const [targetYear, setTargetYear] = useState(2030);
+  const [inflationRate, setInflationRate] = useState(3);
+  const [notes, setNotes] = useState('');
+
+  const categories = [
+    { id: 'travel', label: 'Travel', icon: '✈️', color: 'blue' },
+    { id: 'home', label: 'Home & Property', icon: '🏠', color: 'green' },
+    { id: 'car', label: 'Vehicle', icon: '🚗', color: 'red' },
+    { id: 'education', label: 'Education', icon: '🎓', color: 'purple' },
+    { id: 'hobby', label: 'Hobby', icon: '🎨', color: 'orange' },
+    { id: 'health', label: 'Health & Wellness', icon: '💪', color: 'teal' },
+    { id: 'luxury', label: 'Luxury', icon: '💎', color: 'pink' },
+    { id: 'other', label: 'Other', icon: '🎯', color: 'slate' }
+  ];
 
   useEffect(() => {
-    if (user) {
-      loadItems();
-    }
+    loadItems();
   }, [user]);
 
   const loadItems = async () => {
+    if (!user) return;
+    
     try {
-      setLoading(true);
-      const itemsRef = collection(db, 'users', user.uid, 'lifestyle_basket');
-      const q = query(itemsRef, orderBy('addedAt', 'desc'));
-      const snapshot = await getDocs(q);
-
-      const loadedItems = snapshot.docs.map(doc => ({
+      const itemsRef = collection(db, 'users', user.uid, 'lifestyleBasket');
+      const snapshot = await getDocs(itemsRef);
+      const itemsData = snapshot.docs.map(doc => ({
         id: doc.id,
-        ...doc.data()
-      })) as UserLifestyleItem[];
-
-      setItems(loadedItems);
-      setLoading(false);
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate() || new Date()
+      })) as LifestyleItem[];
+      
+      setItems(itemsData);
     } catch (error) {
       console.error('Error loading items:', error);
-      setLoading(false);
     }
   };
 
-  const handleAddItem = async (item: Omit<UserLifestyleItem, 'id'>) => {
+  const handleAddItem = async () => {
+    if (!user || !itemName || !cost) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
     try {
-      setIsAdding(true);
-      const itemsRef = collection(db, 'users', user.uid, 'lifestyle_basket');
-      await addDoc(itemsRef, {
-        ...item,
-        addedAt: Timestamp.now()
-      });
+      const categoryInfo = categories.find(c => c.id === category);
       
-      // IMPORTANT: Reload items after adding
-      await loadItems();
-      
-      setShowPicker(false);
-      setIsAdding(false);
-    } catch (error) {
-      console.error('Error adding item:', error);
-      alert('Failed to add item');
-      setIsAdding(false);
-    }
-  };
+      const itemData = {
+        name: itemName,
+        category,
+        cost: Number(cost),
+        frequency,
+        targetYear: Number(targetYear),
+        inflationRate: Number(inflationRate),
+        icon: categoryInfo?.icon || '🎯',
+        notes,
+        createdAt: new Date()
+      };
 
-  const handleRemoveItem = async (itemId: string) => {
-    if (confirm('Remove this item from your basket?')) {
-      try {
-        await deleteDoc(doc(db, 'users', user.uid, 'lifestyle_basket', itemId));
-        await loadItems(); // Reload after delete
-      } catch (error) {
-        console.error('Error removing item:', error);
+      if (editingItem) {
+        await updateDoc(doc(db, 'users', user.uid, 'lifestyleBasket', editingItem.id), itemData);
+      } else {
+        await addDoc(collection(db, 'users', user.uid, 'lifestyleBasket'), itemData);
       }
-    }
-  };
 
-  const handleUpdateItem = async (itemId: string, updates: Partial<UserLifestyleItem>) => {
-    try {
-      await updateDoc(doc(db, 'users', user.uid, 'lifestyle_basket', itemId), updates);
-      await loadItems(); // Reload after update
+      resetForm();
+      loadItems();
+      setShowAddModal(false);
     } catch (error) {
-      console.error('Error updating item:', error);
+      console.error('Error saving item:', error);
+      alert('Failed to save item. Please try again.');
     }
   };
 
-  // Calculate statistics
-  const totalCurrentCost = items.reduce((sum, item) => sum + item.currentCost, 0);
-  const totalFutureCost = items.reduce((sum, item) => {
-    const years = item.targetYear - new Date().getFullYear();
-    return sum + (item.currentCost * Math.pow(1 + item.inflationRate, years));
-  }, 0);
+  const handleDeleteItem = async (itemId: string) => {
+    if (!user || !confirm('Are you sure you want to delete this item?')) return;
 
-  const weightedInflation = items.length > 0
-    ? items.reduce((sum, item) => sum + (item.inflationRate * item.currentCost), 0) / totalCurrentCost
-    : 0;
-
-  const itemsByCategory = items.reduce((acc, item) => {
-    if (!acc[item.category]) {
-      acc[item.category] = [];
+    try {
+      await deleteDoc(doc(db, 'users', user.uid, 'lifestyleBasket', itemId));
+      loadItems();
+      if (selectedItem?.id === itemId) {
+        setSelectedItem(null);
+      }
+    } catch (error) {
+      console.error('Error deleting item:', error);
+      alert('Failed to delete item.');
     }
-    acc[item.category].push(item);
-    return acc;
-  }, {} as Record<string, UserLifestyleItem[]>);
+  };
 
-  if (loading) {
-    return (
-      <SidebarLayout>
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-teal-50 to-slate-100">
-          <div className="text-center">
-            <div className="relative w-24 h-24 mx-auto mb-6">
-              <div className="absolute inset-0 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
-              <div className="absolute inset-2 border-4 border-teal-400/30 border-t-teal-500 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
-            </div>
-            <p className="text-slate-700 font-semibold text-xl">Loading your lifestyle...</p>
-          </div>
-        </div>
-      </SidebarLayout>
-    );
-  }
+  const handleEditItem = (item: LifestyleItem) => {
+    setEditingItem(item);
+    setItemName(item.name);
+    setCategory(item.category);
+    setCost(item.cost);
+    setFrequency(item.frequency);
+    setTargetYear(item.targetYear);
+    setInflationRate(item.inflationRate);
+    setNotes(item.notes);
+    setShowAddModal(true);
+  };
+
+  const resetForm = () => {
+    setEditingItem(null);
+    setItemName('');
+    setCategory('travel');
+    setCost(0);
+    setFrequency('one-time');
+    setTargetYear(2030);
+    setInflationRate(3);
+    setNotes('');
+  };
+
+  const getCategoryInfo = (categoryId: string) => {
+    return categories.find(c => c.id === categoryId) || categories[categories.length - 1];
+  };
+
+  const calculateFutureValue = (currentCost: number, years: number, inflationRate: number) => {
+    return currentCost * Math.pow(1 + inflationRate / 100, years);
+  };
+
+  const totalCurrentCost = items.reduce((sum, item) => sum + item.cost, 0);
+  const totalFutureValue = items.reduce((sum, item) => {
+    const years = item.targetYear - new Date().getFullYear();
+    return sum + calculateFutureValue(item.cost, years, item.inflationRate);
+  }, 0);
 
   return (
     <SidebarLayout>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50 to-slate-100">
-        {/* PREMIUM HERO SECTION */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-secondary via-slate-800 to-secondary py-20 px-8">
-          {/* Animated Background Elements */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-primary rounded-full blur-3xl animate-pulse"></div>
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-teal-400 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+      <div className="p-8 max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-secondary mb-2" style={{ fontFamily: "'Crimson Pro', serif" }}>
+            Lifestyle Basket
+          </h1>
+          <p className="text-slate-600">
+            Plan and track your future lifestyle purchases with inflation projection
+          </p>
+        </div>
+
+        {/* Summary Cards */}
+        <div className="grid md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl p-6 text-white shadow-xl">
+            <div className="text-sm opacity-90 mb-2">Total Items</div>
+            <div className="text-4xl font-bold mb-1">{items.length}</div>
+            <div className="text-xs opacity-75">Lifestyle purchases planned</div>
           </div>
 
-          {/* Subtle Pattern Overlay */}
-          <div className="absolute inset-0 opacity-5" style={{
-            backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 20px)`
-          }}></div>
+          <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl p-6 text-white shadow-xl">
+            <div className="text-sm opacity-90 mb-2">Today's Cost</div>
+            <div className="text-4xl font-bold mb-1">{formatCompact(totalCurrentCost)}</div>
+            <div className="text-xs opacity-75">{formatAmount(totalCurrentCost)}</div>
+          </div>
 
-          {/* Content */}
-          <div className="relative z-10 max-w-7xl mx-auto">
-            <div className="flex items-center gap-6 mb-6 animate-fadeInUp">
-              <div className="text-7xl animate-float">🛒</div>
-              <div>
-                <div className="flex items-center gap-4 mb-3">
-                  <h1 className="text-6xl font-bold text-white" style={{ fontFamily: "'Crimson Pro', serif", letterSpacing: '-0.02em' }}>
-                    Lifestyle Basket
-                  </h1>
-                  <span className="px-4 py-2 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-amber-900 rounded-full text-sm font-bold uppercase tracking-wider shadow-xl">
-                    💎 Premium
-                  </span>
-                </div>
-                <p className="text-teal-200 text-2xl font-medium">
-                  Track the <strong className="text-white">real</strong> inflation of YOUR lifestyle
-                </p>
-              </div>
-            </div>
-
-            {/* Premium Stats Bar */}
-            {items.length > 0 && (
-              <div className="mt-10 grid md:grid-cols-3 gap-6 animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
-                <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all">
-                  <div className="text-teal-300 text-sm font-semibold uppercase tracking-wider mb-2">Items Tracked</div>
-                  <div className="text-5xl font-bold text-white font-manrope">{items.length}</div>
-                </div>
-                <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all">
-                  <div className="text-teal-300 text-sm font-semibold uppercase tracking-wider mb-2">Your Inflation</div>
-                  <div className="text-5xl font-bold text-white font-manrope">{(weightedInflation * 100).toFixed(1)}%</div>
-                  <div className="text-teal-200 text-sm mt-1">vs CPI: 2.0%</div>
-                </div>
-                <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all">
-                  <div className="text-teal-300 text-sm font-semibold uppercase tracking-wider mb-2">Future Cost</div>
-                  <div className="text-5xl font-bold text-white font-manrope">{formatCompact(totalFutureCost)}</div>
-                </div>
-              </div>
-            )}
+          <div className="bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl p-6 text-white shadow-xl">
+            <div className="text-sm opacity-90 mb-2">Future Value</div>
+            <div className="text-4xl font-bold mb-1">{formatCompact(totalFutureValue)}</div>
+            <div className="text-xs opacity-75">With inflation</div>
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="max-w-7xl mx-auto px-8 py-16">
-          {/* Truth Score (Premium) */}
-          {items.length > 0 && (
-            <div className="mb-16 animate-fadeInUp">
-              <TruthScoreCardPremium
-                items={items}
-                totalCurrentCost={totalCurrentCost}
-                totalFutureCost={totalFutureCost}
-                weightedInflation={weightedInflation}
-              />
-            </div>
-          )}
+        {/* Add Item Button */}
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold text-secondary">Your Basket</h2>
+          <button
+            onClick={() => { resetForm(); setShowAddModal(true); }}
+            className="px-6 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-colors shadow-lg"
+          >
+            + Add Item
+          </button>
+        </div>
 
-          {/* PREMIUM EMPTY STATE */}
-          {items.length === 0 && (
-            <div className="relative">
-              {/* Decorative Background Blobs */}
-              <div className="absolute inset-0 -z-10 overflow-hidden">
-                <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-primary/20 to-teal-300/20 rounded-full blur-3xl animate-pulse"></div>
-                <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-teal-300/20 to-emerald-300/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1.5s' }}></div>
-              </div>
-
-              <div className="relative bg-white rounded-3xl p-20 border-2 border-slate-200 shadow-2xl text-center animate-fadeInUp">
-                <div className="text-9xl mb-8 animate-float">🛒</div>
-                <h2 className="text-5xl font-bold text-secondary mb-6" style={{ fontFamily: "'Crimson Pro', serif", letterSpacing: '-0.02em' }}>
-                  Your Lifestyle Journey Starts Here
-                </h2>
-                <p className="text-2xl text-slate-600 mb-10 max-w-3xl mx-auto leading-relaxed">
-                  Stop using generic <span className="text-slate-400 line-through">2%</span> inflation. 
-                  Track what <strong className="text-primary">YOU</strong> actually want to buy—
-                  <span className="font-semibold">Porsches, private schools, prime real estate</span>—
-                  and see the <strong className="text-primary">real</strong> cost of your lifestyle.
-                </p>
-
-                <button
-                  onClick={() => setShowPicker(true)}
-                  className="group relative px-12 py-6 bg-gradient-to-r from-primary via-teal-600 to-primary text-white rounded-2xl font-bold text-2xl shadow-2xl hover:shadow-primary/50 transition-all duration-300 hover:scale-105 overflow-hidden"
-                >
-                  <span className="relative z-10 flex items-center gap-4">
-                    <span>Add Your First Item</span>
-                    <svg className="w-7 h-7 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
-                  </span>
-                  {/* Animated Shine Effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent transform -skew-x-12 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></div>
-                  {/* Animated Background Pulse */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary to-teal-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </button>
-
-                {/* Premium Example Items */}
-                <div className="mt-16 text-left max-w-4xl mx-auto">
-                  <div className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-6 text-center">Popular Luxury Items:</div>
-                  <div className="grid md:grid-cols-3 gap-6">
-                    {[
-                      { emoji: '🏎️', name: 'Porsche 911 Turbo', inflation: '8%/yr', cost: '€180K' },
-                      { emoji: '🎓', name: 'Private School (UK)', inflation: '15%/yr', cost: '€30K/yr' },
-                      { emoji: '🏠', name: 'Prime London Flat', inflation: '7%/yr', cost: '€2M' }
-                    ].map((item, i) => (
-                      <div 
-                        key={i} 
-                        className="group bg-gradient-to-br from-slate-50 to-white rounded-2xl p-6 border-2 border-slate-200 hover:border-primary hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-                      >
-                        <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">{item.emoji}</div>
-                        <div className="font-bold text-xl text-secondary mb-1">{item.name}</div>
-                        <div className="text-primary font-bold text-lg mb-1">{item.inflation}</div>
-                        <div className="text-slate-600 text-sm">{item.cost}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* PREMIUM ITEMS DISPLAY */}
-          {items.length > 0 && (
-            <div className="space-y-12">
-              {Object.entries(itemsByCategory).map(([category, categoryItems], categoryIndex) => (
-                <div 
-                  key={category} 
-                  className="animate-fadeInUp"
-                  style={{ animationDelay: `${categoryIndex * 0.15}s` }}
-                >
-                  {/* Premium Category Header */}
-                  <div className="flex items-center gap-6 mb-8">
-                    <div className="text-6xl animate-float" style={{ animationDelay: `${categoryIndex * 0.3}s` }}>
-                      {categoryItems[0].emoji}
-                    </div>
-                    <div>
-                      <h2 className="text-4xl font-bold text-secondary capitalize mb-2" style={{ fontFamily: "'Crimson Pro', serif", letterSpacing: '-0.01em' }}>
-                        {category.replace('-', ' ')}
-                      </h2>
-                      <div className="flex items-center gap-4 text-slate-600">
-                        <span className="font-semibold">{categoryItems.length} item{categoryItems.length !== 1 ? 's' : ''}</span>
-                        <span className="text-slate-400">•</span>
-                        <span className="font-bold text-primary">{formatCompact(categoryItems.reduce((sum, item) => sum + item.currentCost, 0))} total</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Premium Item Cards */}
-                  <div className="grid md:grid-cols-2 gap-8">
-                    {categoryItems.map((item, itemIndex) => (
-                      <div 
-                        key={item.id}
-                        className="animate-fadeInUp"
-                        style={{ animationDelay: `${(categoryIndex * 0.15) + (itemIndex * 0.1)}s` }}
-                      >
-                        <LifestyleItemCardPremium
-                          item={item}
-                          onRemove={handleRemoveItem}
-                          onUpdate={handleUpdateItem}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* PREMIUM FLOATING ADD BUTTON */}
-          {items.length > 0 && (
+        {/* Items Grid */}
+        {items.length === 0 ? (
+          <div className="bg-white rounded-2xl p-12 text-center border-2 border-dashed border-slate-300">
+            <div className="text-6xl mb-4">🛒</div>
+            <h3 className="text-2xl font-bold text-secondary mb-2">Your Basket is Empty</h3>
+            <p className="text-slate-600 mb-6">Start adding your future lifestyle purchases!</p>
             <button
-              onClick={() => setShowPicker(true)}
-              className="fixed bottom-10 right-10 w-20 h-20 bg-gradient-to-br from-primary via-teal-600 to-primary text-white rounded-3xl shadow-2xl hover:shadow-primary/60 hover:scale-110 transition-all duration-300 flex items-center justify-center text-4xl font-bold z-50 group animate-float"
-              style={{ animationDuration: '3s' }}
+              onClick={() => setShowAddModal(true)}
+              className="px-6 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-colors"
             >
-              <span className="group-hover:rotate-90 transition-transform duration-300">+</span>
+              Add Your First Item
             </button>
-          )}
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {items.map(item => {
+              const categoryInfo = getCategoryInfo(item.category);
+              const currentYear = new Date().getFullYear();
+              const yearsUntilTarget = item.targetYear - currentYear;
+              const futureValue = calculateFutureValue(item.cost, yearsUntilTarget, item.inflationRate);
+              const increase = futureValue - item.cost;
+              const percentageIncrease = ((increase / item.cost) * 100).toFixed(0);
 
-          {/* Item Picker Modal */}
-          {showPicker && (
-            <ItemPickerModalPremium
-              onAdd={handleAddItem}
-              onClose={() => setShowPicker(false)}
-              isAdding={isAdding}
-            />
-          )}
-        </div>
+              return (
+                <div 
+                  key={item.id}
+                  onClick={() => setSelectedItem(item)}
+                  className="bg-white rounded-2xl p-6 border-2 border-slate-200 hover:border-primary transition-all cursor-pointer shadow-sm hover:shadow-lg"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-12 h-12 bg-${categoryInfo.color}-100 rounded-xl flex items-center justify-center text-2xl`}>
+                        {item.icon}
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-secondary">{item.name}</h3>
+                        <div className={`text-xs font-semibold text-${categoryInfo.color}-600`}>
+                          {categoryInfo.label}
+                        </div>
+                      </div>
+                    </div>
+                    {item.frequency === 'recurring' && (
+                      <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
+                        🔄 Recurring
+                      </span>
+                    )}
+                  </div>
 
-        {/* Premium Styles */}
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-slate-600">Today:</span>
+                      <span className="font-bold text-slate-900">{formatAmount(item.cost)}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-slate-600">In {item.targetYear}:</span>
+                      <span className="font-bold text-primary">{formatAmount(futureValue)}</span>
+                    </div>
+                    <div className="pt-3 border-t border-slate-200">
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-orange-600">+{percentageIncrease}%</span>
+                        <span className="text-slate-600">{yearsUntilTarget} years</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Item Detail Modal */}
+        {selectedItem && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="flex justify-between items-start mb-6">
+                <div className="flex items-center gap-4">
+                  <div className={`w-16 h-16 bg-${getCategoryInfo(selectedItem.category).color}-100 rounded-xl flex items-center justify-center text-3xl`}>
+                    {selectedItem.icon}
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-bold text-secondary">{selectedItem.name}</h2>
+                    <div className="text-slate-600">{getCategoryInfo(selectedItem.category).label}</div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSelectedItem(null)}
+                  className="text-slate-400 hover:text-slate-600 text-2xl"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* COMPACT PROJECTION CARDS - THE FIX! */}
+              <div className="space-y-4 mb-6">
+                {/* Today & Future - Side by Side (COMPACT) */}
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Today Card */}
+                  <div className="bg-white rounded-xl p-4 border-2 border-slate-200">
+                    <div className="text-xs font-semibold text-slate-600 mb-1">TODAY</div>
+                    <div className="text-2xl font-bold text-slate-900 mb-1">
+                      {formatCompact(selectedItem.cost)}
+                    </div>
+                    <div className="text-xs text-slate-500">
+                      {formatAmount(selectedItem.cost)}
+                    </div>
+                  </div>
+
+                  {/* Future Card */}
+                  <div className="bg-gradient-to-br from-primary to-teal-600 rounded-xl p-4 shadow-md">
+                    <div className="text-xs font-semibold text-white/80 mb-1">
+                      IN {selectedItem.targetYear}
+                    </div>
+                    <div className="text-2xl font-bold text-white mb-1">
+                      {formatCompact(calculateFutureValue(
+                        selectedItem.cost,
+                        selectedItem.targetYear - new Date().getFullYear(),
+                        selectedItem.inflationRate
+                      ))}
+                    </div>
+                    <div className="text-xs text-white/70">
+                      {formatAmount(calculateFutureValue(
+                        selectedItem.cost,
+                        selectedItem.targetYear - new Date().getFullYear(),
+                        selectedItem.inflationRate
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Inflation Impact - Compact */}
+                <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-4 border border-orange-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-orange-900">
+                      INFLATION IMPACT
+                    </span>
+                    <span className="text-xl font-bold text-orange-700">
+                      {selectedItem.inflationRate}%/yr
+                    </span>
+                  </div>
+                  
+                  {/* Progress Bar */}
+                  <div className="h-2 bg-orange-200 rounded-full overflow-hidden mb-3">
+                    <div 
+                      className="h-full bg-gradient-to-r from-yellow-400 to-orange-500" 
+                      style={{
+                        width: `${(
+                          (calculateFutureValue(selectedItem.cost, selectedItem.targetYear - new Date().getFullYear(), selectedItem.inflationRate) - selectedItem.cost) / 
+                          calculateFutureValue(selectedItem.cost, selectedItem.targetYear - new Date().getFullYear(), selectedItem.inflationRate)
+                        ) * 100}%`
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Stats Grid */}
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <div className="text-xs text-orange-700">Total Increase</div>
+                      <div className="font-bold text-orange-900">
+                        +{formatCompact(
+                          calculateFutureValue(selectedItem.cost, selectedItem.targetYear - new Date().getFullYear(), selectedItem.inflationRate) - selectedItem.cost
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xs text-orange-700">Percentage</div>
+                      <div className="font-bold text-orange-900">
+                        +{(((calculateFutureValue(selectedItem.cost, selectedItem.targetYear - new Date().getFullYear(), selectedItem.inflationRate) - selectedItem.cost) / selectedItem.cost) * 100).toFixed(0)}%
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Timeline - Compact */}
+                <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-lg">📅</span>
+                        <span className="text-xs text-slate-600">Timeline</span>
+                      </div>
+                      <div className="text-lg font-bold text-secondary">
+                        {selectedItem.targetYear - new Date().getFullYear()} years
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="flex items-center justify-end gap-2 mb-1">
+                        <span className="text-xs text-slate-600">Target Year</span>
+                        <span className="text-lg">🎯</span>
+                      </div>
+                      <div className="text-lg font-bold text-primary">
+                        {selectedItem.targetYear}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Details */}
+              <div className="bg-slate-50 rounded-xl p-6 mb-6">
+                <h3 className="text-lg font-bold text-secondary mb-4">Details</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Category:</span>
+                    <span className="font-semibold">{getCategoryInfo(selectedItem.category).label}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Frequency:</span>
+                    <span className="font-semibold capitalize">{selectedItem.frequency}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Inflation Rate:</span>
+                    <span className="font-semibold">{selectedItem.inflationRate}% per year</span>
+                  </div>
+                  {selectedItem.notes && (
+                    <div className="pt-3 border-t border-slate-200">
+                      <div className="text-sm text-slate-600 mb-1">Notes:</div>
+                      <div className="text-slate-900">{selectedItem.notes}</div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setSelectedItem(null);
+                    handleEditItem(selectedItem);
+                  }}
+                  className="flex-1 px-6 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-colors"
+                >
+                  ✏️ Edit
+                </button>
+                <button
+                  onClick={() => {
+                    handleDeleteItem(selectedItem.id);
+                    setSelectedItem(null);
+                  }}
+                  className="px-6 py-3 border-2 border-red-300 text-red-700 rounded-xl font-semibold hover:bg-red-50 transition-colors"
+                >
+                  🗑️ Delete
+                </button>
+                <button
+                  onClick={() => setSelectedItem(null)}
+                  className="px-6 py-3 border-2 border-slate-300 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Add/Edit Item Modal */}
+        {showAddModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-secondary">
+                  {editingItem ? 'Edit Item' : 'Add New Item'}
+                </h2>
+                <button
+                  onClick={() => { setShowAddModal(false); resetForm(); }}
+                  className="text-slate-400 hover:text-slate-600 text-2xl"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                {/* Item Name */}
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    Item Name *
+                  </label>
+                  <input
+                    type="text"
+                    value={itemName}
+                    onChange={(e) => setItemName(e.target.value)}
+                    placeholder="e.g., Yacht Charter (Week), Tesla Model S, Luxury Watch"
+                    className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                  />
+                </div>
+
+                {/* Category */}
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    Category *
+                  </label>
+                  <div className="grid grid-cols-4 gap-3">
+                    {categories.map(cat => (
+                      <button
+                        key={cat.id}
+                        onClick={() => setCategory(cat.id)}
+                        className={`p-3 rounded-xl border-2 transition-all ${
+                          category === cat.id
+                            ? `border-${cat.color}-500 bg-${cat.color}-50`
+                            : 'border-slate-200 hover:border-slate-300'
+                        }`}
+                      >
+                        <div className="text-2xl mb-1">{cat.icon}</div>
+                        <div className="text-xs font-semibold">{cat.label}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Cost and Frequency */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Cost *
+                    </label>
+                    <input
+                      type="number"
+                      value={cost}
+                      onChange={(e) => setCost(Number(e.target.value))}
+                      className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Frequency
+                    </label>
+                    <select
+                      value={frequency}
+                      onChange={(e) => setFrequency(e.target.value as 'one-time' | 'recurring')}
+                      className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                    >
+                      <option value="one-time">One-time</option>
+                      <option value="recurring">Recurring</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Target Year and Inflation */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Target Year
+                    </label>
+                    <input
+                      type="number"
+                      value={targetYear}
+                      onChange={(e) => setTargetYear(Number(e.target.value))}
+                      min={new Date().getFullYear()}
+                      className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Inflation Rate (%)
+                    </label>
+                    <input
+                      type="number"
+                      value={inflationRate}
+                      onChange={(e) => setInflationRate(Number(e.target.value))}
+                      step="0.1"
+                      className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                    />
+                  </div>
+                </div>
+
+                {/* Notes */}
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    Notes (Optional)
+                  </label>
+                  <textarea
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Any additional details..."
+                    rows={3}
+                    className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none resize-none"
+                  />
+                </div>
+
+                {/* Buttons */}
+                <div className="flex gap-3 pt-4">
+                  <button
+                    onClick={handleAddItem}
+                    className="flex-1 px-6 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-colors"
+                  >
+                    {editingItem ? 'Update Item' : 'Add Item'}
+                  </button>
+                  <button
+                    onClick={() => { setShowAddModal(false); resetForm(); }}
+                    className="px-6 py-3 border-2 border-slate-300 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Google Fonts */}
         <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700;800&family=Manrope:wght@400;500;600;700;800;900&display=swap');
-          
-          @keyframes fadeInUp {
-            from {
-              opacity: 0;
-              transform: translateY(40px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-          
-          @keyframes float {
-            0%, 100% {
-              transform: translateY(0px);
-            }
-            50% {
-              transform: translateY(-15px);
-            }
-          }
-          
-          .animate-fadeInUp {
-            animation: fadeInUp 0.8s ease-out;
-            animation-fill-mode: both;
-          }
-          
-          .animate-float {
-            animation: float 3s ease-in-out infinite;
-          }
-          
-          .font-crimson {
-            font-family: 'Crimson Pro', serif;
-          }
-          
-          .font-manrope {
-            font-family: 'Manrope', sans-serif;
-          }
+          @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap');
         `}</style>
       </div>
     </SidebarLayout>
