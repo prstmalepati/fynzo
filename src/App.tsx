@@ -5,7 +5,7 @@ import { CurrencyProvider } from './context/CurrencyContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
 // Pages
-import LandingPage from './pages/LandingPage';
+import LandingPageExtended from './pages/LandingPageExtended';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
@@ -25,7 +25,7 @@ export default function App() {
           <BrowserRouter>
             <Routes>
               {/* Public Routes */}
-              <Route path="/" element={<LandingPage />} />
+              <Route path="/" element={<LandingPageExtended />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
 
