@@ -1,18 +1,10 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { 
-  User,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged
-} from 'firebase/auth';
+import { User, onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '../firebase/config';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -31,38 +23,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return unsubscribe;
   }, []);
 
-  const login = async (email: string, password: string) => {
-    await signInWithEmailAndPassword(auth, email, password);
-  };
-
-  const signup = async (email: string, password: string) => {
-    await createUserWithEmailAndPassword(auth, email, password);
-  };
-
   const logout = async () => {
     try {
       await signOut(auth);
-      // Clear any local storage
-      localStorage.clear();
-      // Force navigation to home - using window.location for hard redirect
+      // Hard redirect to login page
       window.location.href = '/';
     } catch (error) {
       console.error('Logout error:', error);
-      // Even if error, try to go home
-      window.location.href = '/';
     }
   };
 
-  const value = {
-    user,
-    loading,
-    login,
-    signup,
-    logout
-  };
-
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, loading, logout }}>
       {children}
     </AuthContext.Provider>
   );
