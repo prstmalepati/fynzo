@@ -7,6 +7,9 @@ import FIRECalculator from '../components/FIRECalculator';
 import ProjectionCalculator from '../components/ProjectionCalculator';
 import WealthProjection from '../components/WealthProjection';
 import GermanTaxCalculator from '../components/GermanTaxCalculator';
+import USTaxCalculator from '../components/USTaxCalculator';
+import CanadaTaxCalculator from '../components/CanadaTaxCalculator';
+import IndiaTaxCalculator from '../components/IndiaTaxCalculator';
 
 export default function Calculators() {
   const { formatAmount, formatCompact, currency } = useCurrency();
@@ -17,34 +20,37 @@ export default function Calculators() {
       <div className="p-6 lg:p-8 max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="page-title" >
+          <h1 className="text-3xl lg:text-4xl font-bold text-secondary font-display" >
             Financial Calculators
           </h1>
-          <p className="text-surface-900-500">
+          <p className="text-slate-500 mt-1">
             Professional tools to plan your financial future
           </p>
         </div>
 
         {/* Calculator Tabs */}
-        <div className="mb-8 flex flex-wrap gap-3">
+        <div className="mb-8 flex flex-wrap gap-2">
           {[
-            { id: 'fire', label: '🔥 FIRE Calculator', color: 'orange' },
-            { id: 'projection', label: '📈 Investment Projection', color: 'blue' },
-            { id: 'wealth', label: '💰 Wealth Scenarios', color: 'purple' },
-            { id: 'tax', label: '🇩🇪 German Tax', color: 'red' },
-            { id: 'retirement', label: '👴 Retirement', color: 'green' },
-            { id: 'debt', label: '💳 Debt Payoff', color: 'orange' }
+            { id: 'fire', label: 'FIRE Calculator', icon: '🔥' },
+            { id: 'projection', label: 'Investment Projection', icon: '📈' },
+            { id: 'wealth', label: 'Wealth Scenarios', icon: '💰' },
+            { id: 'tax-de', label: 'German Tax', icon: '🇩🇪' },
+            { id: 'tax-us', label: 'US Tax', icon: '🇺🇸' },
+            { id: 'tax-ca', label: 'Canada Tax', icon: '🇨🇦' },
+            { id: 'tax-in', label: 'India Tax', icon: '🇮🇳' },
+            { id: 'retirement', label: 'Retirement', icon: '👴' },
+            { id: 'debt', label: 'Debt Payoff', icon: '💳' }
           ].map(calc => (
             <button
               key={calc.id}
               onClick={() => setActiveCalculator(calc.id)}
-              className={`px-6 py-3 rounded-xl font-semibold transition-all ${
+              className={`px-5 py-2.5 rounded-xl font-semibold transition-all text-sm ${
                 activeCalculator === calc.id
-                  ? 'bg-primary text-white shadow-lg scale-105'
-                  : 'bg-white border border-secondary-200 text-surface-900-700 hover:border-primary'
+                  ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                  : 'bg-white border border-slate-200 text-slate-600 hover:border-primary/30'
               }`}
             >
-              {calc.label}
+              <span className="mr-1.5">{calc.icon}</span>{calc.label}
             </button>
           ))}
         </div>
@@ -54,7 +60,10 @@ export default function Calculators() {
           {activeCalculator === 'fire' && <FIRECalculator />}
           {activeCalculator === 'projection' && <ProjectionCalculator />}
           {activeCalculator === 'wealth' && <WealthProjection />}
-          {activeCalculator === 'tax' && <GermanTaxCalculator />}
+          {activeCalculator === 'tax-de' && <GermanTaxCalculator />}
+          {activeCalculator === 'tax-us' && <USTaxCalculator />}
+          {activeCalculator === 'tax-ca' && <CanadaTaxCalculator />}
+          {activeCalculator === 'tax-in' && <IndiaTaxCalculator />}
           {activeCalculator === 'retirement' && <RetirementCalculator formatAmount={formatAmount} formatCompact={formatCompact} currency={currency} />}
           {activeCalculator === 'debt' && <DebtPayoffCalculator formatAmount={formatAmount} currency={currency} />}
         </div>

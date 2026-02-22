@@ -1,625 +1,380 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+
+// Country-specific financial profiles
+const COUNTRY_PROFILES = [
+  {
+    flag: '🇩🇪', country: 'Germany', currency: '€', goal: '€1.2M',
+    tagline: 'Ehegattensplitting, Riester, 42% Spitzensteuersatz — we calculate it all.',
+    features: ['German tax optimizer (2025)', 'Kirchensteuer by Bundesland', 'Grundfreibetrag tracking', 'ETF Sparplan projections'],
+  },
+  {
+    flag: '🇺🇸', country: 'United States', currency: '$', goal: '$1.5M',
+    tagline: '401(k), Roth IRA, state taxes — plan your path to financial independence.',
+    features: ['Federal + State tax calculator', '401(k) & HSA optimization', 'FIRE number projections', 'Social Security integration'],
+  },
+  {
+    flag: '🇨🇦', country: 'Canada', currency: 'C$', goal: 'C$1.8M',
+    tagline: 'RRSP, TFSA, CPP — maximize every registered account.',
+    features: ['Federal + Provincial tax', 'RRSP contribution optimizer', 'CPP & EI breakdowns', 'TFSA growth projections'],
+  },
+  {
+    flag: '🇮🇳', country: 'India', currency: '₹', goal: '₹8Cr',
+    tagline: 'New vs Old regime, 80C, NPS — see your true take-home.',
+    features: ['New & Old regime comparison', 'Section 80C/80D optimizer', 'NPS tax benefit calculator', 'EPF & gratuity projections'],
+  },
+  {
+    flag: '🇪🇺', country: 'Europe', currency: '€', goal: '€1M',
+    tagline: 'Multi-currency portfolio tracking for expats and Europeans.',
+    features: ['Live exchange rates (XE)', 'Multi-currency portfolios', 'Cross-border tax awareness', 'EUR/GBP/CHF support'],
+  },
+];
 
 export default function LandingPageExtended() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [scrollY, setScrollY] = useState(0);
-  const [activeTab, setActiveTab] = useState('lifestyle');
-  const [email, setEmail] = useState('');
-  const [showEmailSuccess, setShowEmailSuccess] = useState(false);
+  const [activeCountry, setActiveCountry] = useState(0);
+  const [scrolled, setScrolled] = useState(false);
 
+  useEffect(() => { if (user) navigate('/dashboard'); }, [user, navigate]);
   useEffect(() => {
-    if (user) {
-      navigate('/dashboard');
-    }
-  }, [user, navigate]);
-
-  useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const handleEmailSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: Send to email service
-    setShowEmailSuccess(true);
-    setTimeout(() => setShowEmailSuccess(false), 3000);
-    setEmail('');
-  };
+  // Auto-rotate country profiles
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveCountry(prev => (prev + 1) % COUNTRY_PROFILES.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const profile = COUNTRY_PROFILES[activeCountry];
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Floating Navigation */}
-      <nav className="fixed top-0 w-full bg-white/90 backdrop-blur-xl z-50 border-b border-slate-200/50 shadow-lg">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+    <div className="min-h-screen bg-white antialiased">
+      {/* ─── Navbar ─────────────────────────────────────────── */}
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+        scrolled ? 'bg-white/95 backdrop-blur-xl shadow-sm border-b border-slate-100' : 'bg-transparent'
+      }`}>
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <img src="/logo-transparent.png" alt="myfynzo" className="w-9 h-9 object-contain" />
+            <span className="text-xl font-bold text-secondary tracking-tight font-display">myfynzo</span>
+          </div>
+          <div className="hidden md:flex items-center gap-8 text-sm">
+            <a href="#features" className="text-slate-500 hover:text-secondary transition-colors font-medium">Features</a>
+            <a href="#countries" className="text-slate-500 hover:text-secondary transition-colors font-medium">Countries</a>
+            <a href="#pricing" className="text-slate-500 hover:text-secondary transition-colors font-medium">Pricing</a>
+          </div>
           <div className="flex items-center gap-3">
-            <img src="/logo-transparent.png" alt="myfynzo" className="w-10 h-10 object-contain" />
-            <span className="text-2xl font-bold text-secondary font-display">
-              myfynzo
-            </span>
-            <span className="ml-2 px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full">
-              BETA
-            </span>
-          </div>
-          
-          <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-slate-600 hover:text-primary transition-colors font-medium group">
-              Features
-              <div className="h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform"></div>
-            </a>
-            <a href="#calculator" className="text-slate-600 hover:text-primary transition-colors font-medium group">
-              Calculator
-              <div className="h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform"></div>
-            </a>
-            <a href="#how-it-works" className="text-slate-600 hover:text-primary transition-colors font-medium group">
-              How It Works
-              <div className="h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform"></div>
-            </a>
-            <a href="#pricing" className="text-slate-600 hover:text-primary transition-colors font-medium group">
-              Pricing
-              <div className="h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform"></div>
-            </a>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <Link to="/login" className="px-6 py-2 text-primary hover:text-teal-700 font-semibold transition-colors">
-              Sign In
-            </Link>
-            <Link 
-              to="/login"
-              className="group px-6 py-2 bg-gradient-to-r from-primary to-teal-600 text-white rounded-xl hover:shadow-2xl transition-all font-semibold relative overflow-hidden"
-            >
-              <span className="relative z-10">Get Started Free</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-teal-600 to-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <Link to="/login" className="text-sm text-slate-600 hover:text-secondary font-medium transition-colors">Sign In</Link>
+            <Link to="/signup" className="px-5 py-2 bg-secondary text-white text-sm font-semibold rounded-lg hover:bg-secondary/90 transition-colors">
+              Get Started
             </Link>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section with 3D Effects */}
-      <section className="relative pt-32 pb-20 px-6 overflow-hidden">
-        {/* Animated Gradient Mesh Background */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute w-full h-full">
-            <div 
-              className="absolute w-[500px] h-[500px] bg-primary/20 rounded-full blur-3xl -top-48 -left-48 animate-pulse"
-              style={{ 
-                transform: `translate(${scrollY * 0.3}px, ${scrollY * 0.5}px)`,
-                animationDuration: '8s'
-              }}
-            />
-            <div 
-              className="absolute w-[600px] h-[600px] bg-teal-400/15 rounded-full blur-3xl top-1/3 -right-48 animate-pulse"
-              style={{ 
-                transform: `translate(${-scrollY * 0.2}px, ${scrollY * 0.3}px)`,
-                animationDuration: '10s'
-              }}
-            />
-            <div 
-              className="absolute w-[400px] h-[400px] bg-blue-400/10 rounded-full blur-3xl bottom-0 left-1/3 animate-pulse"
-              style={{ 
-                transform: `translate(${scrollY * 0.15}px, ${-scrollY * 0.2}px)`,
-                animationDuration: '12s'
-              }}
-            />
-          </div>
-        </div>
+      {/* ─── Hero ──────────────────────────────────────────── */}
+      <section className="relative pt-28 pb-20 lg:pt-36 lg:pb-28 px-6 overflow-hidden">
+        {/* Subtle gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-teal-50/30 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/[0.03] rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
 
-        <div className="max-w-7xl mx-auto relative">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* Left Column - Enhanced Copy */}
-            <div className="space-y-8 animate-fadeIn">
-              <div className="flex flex-wrap gap-3">
-                <div className="group px-4 py-2 bg-gradient-to-r from-primary/10 to-teal-500/10 border border-primary/20 rounded-full text-primary font-semibold text-sm backdrop-blur-sm hover:scale-105 transition-transform cursor-pointer">
-                  <span className="flex items-center gap-2">
-                    ⚡ Lightning Fast Setup
-                  </span>
-                </div>
-                <div className="px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full text-green-700 font-semibold text-sm backdrop-blur-sm">
-                  ✓ 2,147 Users Already Saved
-                </div>
-              </div>
-
-              <div>
-                <h1 className="text-6xl lg:text-8xl font-bold text-secondary leading-[0.95] mb-6">
-                  Your{' '}
-                  <span className="relative inline-block">
-                    <span className="relative z-10 bg-gradient-to-r from-primary via-teal-500 to-cyan-500 bg-clip-text text-transparent">
-                      €2M Goal
-                    </span>
-                    <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 200 12" fill="none">
-                      <path d="M2 10C67.3333 4 132.667 4 198 10" stroke="url(#gradient)" strokeWidth="3" strokeLinecap="round"/>
-                      <defs>
-                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                          <stop offset="0%" stopColor="#14B8A6" />
-                          <stop offset="100%" stopColor="#06B6D4" />
-                        </linearGradient>
-                      </defs>
-                    </svg>
-                  </span>
-                  <br />
-                  Is Actually{' '}
-                  <span className="relative">
-                    <span className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">
-                      €2.7M
-                    </span>
-                    <span className="absolute -top-6 -right-12 text-2xl animate-bounce">🚨</span>
-                  </span>
-                </h1>
-
-                <p className="text-2xl text-slate-600 leading-relaxed font-light">
-                  <strong className="font-bold text-primary">Luxury lifestyles inflate 3x faster</strong> than CPI. 
-                  <br />
-                  Track YOUR real inflation. See YOUR truth score.
-                  <br />
-                  <span className="text-secondary-400">Plan with reality, not fantasy.</span>
-                </p>
-              </div>
-
-              <div className="flex flex-wrap gap-4">
-                <Link
-                  to="/login"
-                  className="group relative px-10 py-5 bg-gradient-to-r from-primary to-teal-600 text-white rounded-2xl hover:shadow-2xl transition-all font-bold text-xl overflow-hidden"
-                >
-                  <span className="relative z-10 flex items-center gap-3">
-                    Start Free Trial
-                    <svg className="w-6 h-6 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
-                  </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-teal-600 to-cyan-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  <div className="absolute inset-0 opacity-30">
-                    <div className="absolute inset-0 bg-white transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                  </div>
-                </Link>
-                
-                <button className="group px-10 py-5 bg-white border border-secondary-200 text-secondary-700 rounded-2xl hover:shadow-xl hover:border-primary transition-all font-bold text-xl backdrop-blur-sm">
-                  <span className="flex items-center gap-3">
-                    <svg className="w-6 h-6 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" />
-                    </svg>
-                    Watch 2-Min Demo
-                  </span>
-                </button>
-              </div>
-
-              {/* Enhanced Trust Indicators */}
-              <div className="flex flex-wrap items-center gap-8 pt-6 border-t border-secondary-200">
-                <div className="flex items-center gap-3">
-                  <div className="flex -space-x-3">
-                    {[1, 2, 3, 4, 5].map(i => (
-                      <div key={i} className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-teal-600 border-3 border-white shadow-md flex items-center justify-center text-white text-xs font-bold">
-                        {String.fromCharCode(64 + i)}
-                      </div>
-                    ))}
-                  </div>
-                  <div>
-                    <div className="text-sm font-bold text-secondary">2,147+ users</div>
-                    <div className="text-xs text-secondary-400">and growing daily</div>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4, 5].map(i => (
-                      <svg key={i} className="w-5 h-5 text-amber-400 drop-shadow-sm" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                    ))}
-                  </div>
-                  <div>
-                    <div className="text-sm font-bold text-secondary">4.9/5 rating</div>
-                    <div className="text-xs text-secondary-400">from 437 reviews</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <div className="w-10 h-10 bg-green-500/10 rounded-full flex items-center justify-center">
-                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <div className="text-sm font-bold text-secondary">Bank-level security</div>
-                    <div className="text-xs text-secondary-400">256-bit encryption</div>
-                  </div>
-                </div>
-              </div>
+        <div className="max-w-6xl mx-auto relative">
+          <div className="max-w-3xl">
+            {/* Country pill — dynamic */}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-full text-sm text-slate-600 mb-6 shadow-sm">
+              <span className="text-base">{profile.flag}</span>
+              <span className="font-medium">Built for {profile.country}</span>
+              <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
             </div>
 
-            {/* Right Column - 3D Interactive Demo */}
-            <div className="relative animate-fadeIn" style={{ animationDelay: '0.2s' }}>
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-teal-400/30 rounded-[3rem] blur-3xl transform rotate-6"></div>
-              <div className="relative perspective-1000">
-                <div className="bg-white/80 backdrop-blur-xl rounded-[3rem] shadow-2xl p-10 border border-white/20 transform hover:scale-[1.02] transition-all duration-500">
-                  <EnhancedTruthScoreDemo />
-                </div>
-              </div>
-              
-              {/* Floating Stats */}
-              <FloatingStatCard 
-                icon="📈" 
-                value="+6%" 
-                label="Luxury inflation" 
-                position="top-4 -left-12"
-                delay={0.5}
-              />
-              <FloatingStatCard 
-                icon="💰" 
-                value="€700K" 
-                label="Avg gap found" 
-                position="bottom-8 -right-12"
-                delay={0.7}
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Animated Stats Counter */}
-      <section className="py-16 px-6 bg-gradient-to-br from-slate-900 to-slate-800 text-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8">
-            <AnimatedStat end={2147} label="Active Users" prefix="" suffix="+" duration={2000} />
-            <AnimatedStat end={35} label="Avg Gap Found" prefix="" suffix="%" duration={2500} />
-            <AnimatedStat end={740000} label="Total Saved" prefix="€" suffix="" duration={3000} />
-            <AnimatedStat end={4.9} label="User Rating" prefix="" suffix="/5" duration={2000} decimals={1} />
-          </div>
-        </div>
-      </section>
-
-      {/* Interactive Live Calculator */}
-      <section id="calculator" className="py-24 px-6 bg-gradient-to-br from-white to-slate-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <div className="inline-block px-4 py-2 bg-primary/10 rounded-full text-primary font-semibold text-sm mb-4">
-              Try It Now
-            </div>
-            <h2 className="text-5xl lg:text-6xl font-bold text-secondary mb-4">
-              Calculate Your Truth Score
-            </h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              See the real cost of your lifestyle in 30 seconds
-            </p>
-          </div>
-
-          <LiveInflationCalculator />
-        </div>
-      </section>
-
-      {/* Problem Section - Enhanced */}
-      <section className="py-24 px-6 bg-gradient-to-br from-red-50 via-orange-50 to-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-500/10 rounded-full text-red-600 font-semibold text-sm mb-4">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
-              The Hidden Inflation Trap
-            </div>
-            <h2 className="text-5xl lg:text-6xl font-bold text-secondary mb-6">
-              You're Planning With
+            <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-bold text-secondary leading-[1.1] tracking-tight mb-6 font-display">
+              Know your real numbers.
               <br />
-              <span className="bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
-                The Wrong Numbers
-              </span>
-            </h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-              Most retirement calculators use generic 2% CPI inflation. But that's for average people buying milk and bread. 
-              <strong className="text-red-600"> You're not average.</strong>
+              <span className="text-primary">Plan with clarity.</span>
+            </h1>
+
+            <p className="text-lg lg:text-xl text-slate-500 leading-relaxed mb-8 max-w-2xl">
+              myfynzo is a wealth management platform for people who take their money seriously.
+              Track investments, calculate taxes, model scenarios, and build your path to financial independence — tailored to your country.
             </p>
-          </div>
 
-          <ComparisonTable />
+            <div className="flex flex-wrap gap-3 mb-10">
+              <Link to="/signup"
+                className="px-7 py-3.5 bg-secondary text-white rounded-xl font-semibold hover:bg-secondary/90 transition-all shadow-lg shadow-secondary/10">
+                Start Free — No Card Required
+              </Link>
+              <a href="#features"
+                className="px-7 py-3.5 border border-slate-200 text-slate-700 rounded-xl font-semibold hover:border-slate-300 hover:bg-slate-50 transition-all">
+                See Features
+              </a>
+            </div>
 
-          {/* Visual Impact Chart */}
-          <div className="mt-16 bg-white rounded-3xl p-10 border-2 border-red-200 shadow-xl">
-            <h3 className="text-3xl font-bold text-center text-secondary mb-10">
-              What This Means Over Time
-            </h3>
-            <InflationImpactChart />
-          </div>
-        </div>
-      </section>
-
-      {/* Features Deep Dive - Interactive Tabs */}
-      <section id="features" className="py-24 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl lg:text-6xl font-bold text-secondary mb-6">
-              More Than a Calculator.
-              <br />
-              A <span className="bg-gradient-to-r from-primary to-cyan-500 bg-clip-text text-transparent">Flight Simulator</span> for Life.
-            </h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              Don't just track wealth. Model every decision before you make it.
-            </p>
-          </div>
-
-          {/* Interactive Feature Tabs */}
-          <div className="mb-8 flex justify-center">
-            <div className="inline-flex bg-secondary-100 rounded-2xl p-2">
-              {[
-                { id: 'lifestyle', label: '🛒 Lifestyle Basket', badge: 'NEW' },
-                { id: 'fire', label: '🔥 FIRE Calculator' },
-                { id: 'tax', label: '🇩🇪 Tax Optimizer' },
-                { id: 'scenarios', label: '🎯 Scenarios', badge: 'SOON' }
-              ].map(tab => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`relative px-6 py-3 rounded-xl font-semibold transition-all ${
-                    activeTab === tab.id
-                      ? 'bg-white text-primary shadow-lg'
-                      : 'text-slate-600 hover:text-primary'
-                  }`}
-                >
-                  {tab.label}
-                  {tab.badge && (
-                    <span className="absolute -top-2 -right-2 px-2 py-0.5 bg-primary text-white text-xs rounded-full">
-                      {tab.badge}
-                    </span>
-                  )}
-                </button>
+            {/* Trust — honest, minimal */}
+            <div className="flex flex-wrap items-center gap-6 text-sm text-slate-400">
+              {['Free forever tier', 'Bank-level encryption', 'GDPR compliant', 'EU-hosted data'].map((t, i) => (
+                <span key={i} className="flex items-center gap-1.5">
+                  <svg className="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/></svg>
+                  {t}
+                </span>
               ))}
             </div>
           </div>
-
-          {/* Tab Content */}
-          <div className="bg-white rounded-3xl p-10 shadow-2xl border border-secondary-200">
-            {activeTab === 'lifestyle' && <LifestyleBasketFeature />}
-            {activeTab === 'fire' && <FIRECalculatorFeature />}
-            {activeTab === 'tax' && <TaxOptimizerFeature />}
-            {activeTab === 'scenarios' && <ScenariosFeature />}
-          </div>
         </div>
       </section>
 
-      {/* How It Works - Timeline */}
-      <section id="how-it-works" className="py-24 px-6 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white relative overflow-hidden">
-        {/* Animated Grid Background */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: 'linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)',
-            backgroundSize: '40px 40px'
-          }}></div>
-        </div>
-
-        <div className="max-w-7xl mx-auto relative">
-          <div className="text-center mb-16">
-            <div className="inline-block px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white font-semibold text-sm mb-4">
-              Simple Process
-            </div>
-            <h2 className="text-5xl lg:text-6xl font-bold mb-6">
-              From Chaos to Clarity
-              <br />
-              <span className="bg-gradient-to-r from-primary to-cyan-400 bg-clip-text text-transparent">
-                In 3 Simple Steps
-              </span>
+      {/* ─── Modules Grid ──────────────────────────────────── */}
+      <section id="features" className="py-20 lg:py-28 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-14">
+            <p className="text-sm font-semibold text-primary tracking-wide uppercase mb-3">What you get</p>
+            <h2 className="text-3xl lg:text-4xl font-bold text-secondary tracking-tight font-display">
+              Eight modules. One platform.
             </h2>
+            <p className="text-slate-500 mt-3 max-w-xl">Every tool a serious wealth builder needs — from daily tracking to decade-long projections.</p>
           </div>
 
-          <TimelineSteps />
-        </div>
-      </section>
-
-      {/* Social Proof Wall */}
-      <section className="py-24 px-6 bg-gradient-to-br from-slate-50 to-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl font-bold text-secondary mb-4">
-              Loved by Future Retirees
-            </h2>
-            <p className="text-xl text-slate-600">
-              Join thousands who discovered their real financial needs
-            </p>
-          </div>
-
-          <TestimonialGrid />
-
-          {/* Press Mentions */}
-          <div className="mt-16 text-center">
-            <div className="text-sm text-secondary-400 mb-6">AS FEATURED IN</div>
-            <div className="flex flex-wrap justify-center items-center gap-12 opacity-60">
-              <div className="text-2xl font-bold text-secondary-300">TechCrunch</div>
-              <div className="text-2xl font-bold text-secondary-300">Product Hunt</div>
-              <div className="text-2xl font-bold text-secondary-300">Hacker News</div>
-              <div className="text-2xl font-bold text-secondary-300">Financial Times</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing - Enhanced */}
-      <section id="pricing" className="py-24 px-6 bg-gradient-to-br from-white to-slate-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <div className="inline-block px-4 py-2 bg-primary/10 rounded-full text-primary font-semibold text-sm mb-4">
-              Simple Pricing
-            </div>
-            <h2 className="text-5xl lg:text-6xl font-bold text-secondary mb-6">
-              Start Free.
-              <br />
-              Upgrade When Ready.
-            </h2>
-            <p className="text-xl text-slate-600">
-              No credit card required. Cancel anytime.
-            </p>
-          </div>
-
-          <EnhancedPricingCards />
-
-          {/* Money Back Guarantee */}
-          <div className="mt-16 text-center">
-            <div className="inline-flex items-center gap-3 px-8 py-4 bg-green-50 border-2 border-green-200 rounded-2xl">
-              <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white text-2xl">
-                ✓
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5" /></svg>, title: 'Dashboard', desc: 'Portfolio overview with live market data and performance tracking.' },
+              { icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" /></svg>, title: 'Investments', desc: 'Track stocks, ETFs, crypto with live prices via Twelve Data.' },
+              { icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z" /></svg>, title: 'FIRE Calculator', desc: 'Financial independence projections with real inflation rates.' },
+              { icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" /></svg>, title: 'Tax Calculators', desc: 'Country-specific: DE, US, CA, IN — updated for 2025.' },
+              { icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>, title: 'Lifestyle Basket', desc: 'Track luxury inflation — Porsche, private school, real estate.' },
+              { icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>, title: 'Scenario Branching', desc: 'Model life decisions — job change, relocation, kids, sabbatical.' },
+              { icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M3 3v1.5M3 21v-6m0 0l2.77-.693a9 9 0 016.208.682l.108.054a9 9 0 006.086.71l3.114-.732a48.524 48.524 0 01-.005-10.499l-3.11.732a9 9 0 01-6.085-.711l-.108-.054a9 9 0 00-6.208-.682L3 4.5M3 15V4.5" /></svg>, title: 'Goal Tracker', desc: 'Set financial goals with progress tracking and target dates.' },
+              { icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z" /></svg>, title: 'Anti-Portfolio', desc: 'Track missed opportunities and learn from investment regrets.' },
+            ].map((mod, i) => (
+              <div key={i} className="group p-5 rounded-2xl border border-slate-100 hover:border-primary/20 bg-white hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
+                <div className="w-10 h-10 rounded-xl bg-primary/[0.08] flex items-center justify-center text-primary mb-3 group-hover:bg-primary group-hover:text-white transition-colors">
+                  {mod.icon}
+                </div>
+                <h3 className="font-bold text-secondary text-sm mb-1">{mod.title}</h3>
+                <p className="text-xs text-slate-500 leading-relaxed">{mod.desc}</p>
               </div>
-              <div className="text-left">
-                <div className="font-bold text-green-900">30-Day Money-Back Guarantee</div>
-                <div className="text-sm text-green-700">Not happy? Get a full refund. No questions asked.</div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Country-Specific Section ──────────────────────── */}
+      <section id="countries" className="py-20 lg:py-28 px-6 bg-slate-50/80">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-14">
+            <p className="text-sm font-semibold text-primary tracking-wide uppercase mb-3">Country-aware</p>
+            <h2 className="text-3xl lg:text-4xl font-bold text-secondary tracking-tight font-display">
+              Your country. Your rules. Your numbers.
+            </h2>
+            <p className="text-slate-500 mt-3 max-w-xl">Tax brackets, social security, inflation rates — all calibrated to where you live.</p>
+          </div>
+
+          {/* Country selector */}
+          <div className="flex flex-wrap gap-2 mb-8">
+            {COUNTRY_PROFILES.map((c, i) => (
+              <button key={i} onClick={() => setActiveCountry(i)}
+                className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${
+                  activeCountry === i
+                    ? 'bg-secondary text-white shadow-lg shadow-secondary/20'
+                    : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-300'
+                }`}>
+                <span className="text-base">{c.flag}</span>
+                {c.country}
+              </button>
+            ))}
+          </div>
+
+          {/* Country detail card */}
+          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-card overflow-hidden">
+            <div className="grid lg:grid-cols-2">
+              <div className="p-8 lg:p-10">
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-4xl">{profile.flag}</span>
+                  <div>
+                    <h3 className="text-2xl font-bold text-secondary font-display">{profile.country}</h3>
+                    <p className="text-sm text-slate-500">Target: {profile.goal} financial independence</p>
+                  </div>
+                </div>
+                <p className="text-slate-600 mb-6 leading-relaxed">{profile.tagline}</p>
+                <div className="space-y-3">
+                  {profile.features.map((f, i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <svg className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                      </svg>
+                      <span className="text-sm text-slate-700">{f}</span>
+                    </div>
+                  ))}
+                </div>
+                <Link to="/signup" className="inline-block mt-8 px-6 py-3 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary/90 transition-colors shadow-lg shadow-primary/10">
+                  Start with {profile.country} Profile →
+                </Link>
+              </div>
+
+              <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-secondary p-8 lg:p-10 text-white flex flex-col justify-center">
+                <div className="text-sm text-white/50 uppercase tracking-wider mb-2 font-semibold">Financial Independence Target</div>
+                <div className="text-5xl lg:text-6xl font-bold mb-4 tracking-tight font-display">{profile.goal}</div>
+                <div className="text-white/60 text-sm leading-relaxed mb-6">
+                  Calculated using {profile.country}-specific tax rules, social security contributions, inflation rates, and cost of living data.
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { label: 'Tax Calculator', status: 'Live' },
+                    { label: 'Live Prices', status: 'Live' },
+                    { label: 'Exchange Rates', status: 'Live' },
+                    { label: 'Language', status: profile.country === 'Germany' ? 'DE/EN' : 'EN' },
+                  ].map((item, i) => (
+                    <div key={i} className="bg-white/10 rounded-lg px-3 py-2 text-xs">
+                      <div className="text-white/40">{item.label}</div>
+                      <div className="font-semibold flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />
+                        {item.status}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <FAQSection />
-
-      {/* Email Capture CTA */}
-      <section className="py-24 px-6 bg-gradient-to-br from-primary via-teal-600 to-cyan-600 text-white relative overflow-hidden">
-        {/* Animated Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)',
-            backgroundSize: '30px 30px'
-          }}></div>
-        </div>
-
-        <div className="max-w-4xl mx-auto text-center relative">
-          <div className="inline-block px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full font-semibold text-sm mb-6">
-            🎁 Limited Time Offer
+      {/* ─── How It Works ──────────────────────────────────── */}
+      <section className="py-20 lg:py-28 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-14">
+            <p className="text-sm font-semibold text-primary tracking-wide uppercase mb-3">3 steps</p>
+            <h2 className="text-3xl lg:text-4xl font-bold text-secondary tracking-tight font-display">
+              From signup to clarity in under 5 minutes.
+            </h2>
           </div>
-          <h2 className="text-5xl lg:text-6xl font-bold mb-6">
-            Get the Complete
-            <br />
-            Truth Score Guide
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { step: '01', title: 'Set your country', desc: 'Select your country and currency. Tax rules, language, and defaults adapt automatically.', accent: 'bg-primary' },
+              { step: '02', title: 'Add your portfolio', desc: 'Enter investments, goals, and lifestyle items. Live prices update automatically via market data.', accent: 'bg-blue-600' },
+              { step: '03', title: 'See your real numbers', desc: 'Tax-aware projections, FIRE calculations, and scenario modeling — all calibrated to your reality.', accent: 'bg-emerald-600' },
+            ].map((s, i) => (
+              <div key={i} className="relative">
+                <div className={`w-8 h-8 ${s.accent} rounded-lg flex items-center justify-center text-white text-xs font-bold mb-4`}>{s.step}</div>
+                <h3 className="text-lg font-bold text-secondary mb-2">{s.title}</h3>
+                <p className="text-sm text-slate-500 leading-relaxed">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Pricing ───────────────────────────────────────── */}
+      <section id="pricing" className="py-20 lg:py-28 px-6 bg-slate-50/80">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-14">
+            <p className="text-sm font-semibold text-primary tracking-wide uppercase mb-3">Pricing</p>
+            <h2 className="text-3xl lg:text-4xl font-bold text-secondary tracking-tight font-display">
+              Start free. Upgrade when it makes sense.
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Free */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-8 hover:shadow-lg transition-all">
+              <div className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">Free</div>
+              <div className="text-4xl font-bold text-secondary mb-1 font-display">€0</div>
+              <div className="text-sm text-slate-500 mb-6">Forever. No card required.</div>
+              <ul className="space-y-3 mb-8">
+                {['Up to 10 investments', 'Dashboard + Goal Tracker', 'FIRE & Retirement calculators', '1 tax calculator (your country)', 'Live exchange rates'].map((f, i) => (
+                  <li key={i} className="flex items-center gap-2 text-sm text-slate-600">
+                    <svg className="w-4 h-4 text-primary flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/></svg>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <Link to="/signup" className="block w-full py-3 text-center border border-slate-200 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 transition-colors">
+                Get Started
+              </Link>
+            </div>
+
+            {/* Premium */}
+            <div className="bg-secondary rounded-2xl p-8 text-white relative overflow-hidden hover:shadow-xl transition-all">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-2xl -translate-y-8 translate-x-8" />
+              <div className="relative">
+                <div className="text-sm font-semibold text-white/50 uppercase tracking-wider mb-2">Premium</div>
+                <div className="flex items-baseline gap-1 mb-1">
+                  <span className="text-4xl font-bold font-display">€2.99</span>
+                  <span className="text-white/60">/month</span>
+                </div>
+                <div className="text-sm text-white/50 mb-6">or €29/year — save 19%</div>
+                <ul className="space-y-3 mb-8">
+                  {['Everything in Free', 'Unlimited investments', 'All 4 tax calculators', 'Lifestyle Basket + Truth Score', 'Scenario Branching', 'Anti-Portfolio tracking', '50-year wealth projections', 'Live market prices', 'Priority support'].map((f, i) => (
+                    <li key={i} className="flex items-center gap-2 text-sm text-white/80">
+                      <svg className="w-4 h-4 text-primary flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/></svg>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link to="/signup" className="block w-full py-3 text-center bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/30">
+                  Start 30-Day Free Trial
+                </Link>
+                <p className="text-xs text-white/40 text-center mt-3">Cancel anytime. 30-day money-back guarantee.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Final CTA ─────────────────────────────────────── */}
+      <section className="py-20 lg:py-28 px-6">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-3xl lg:text-4xl font-bold text-secondary tracking-tight mb-4 font-display">
+            Your financial clarity starts here.
           </h2>
-          <p className="text-2xl mb-8 opacity-90">
-            Free 20-page guide reveals how luxury inflation is stealing your retirement
+          <p className="text-slate-500 text-lg mb-8">
+            Join people in Germany, the US, Canada, India, and across Europe who are building wealth with real numbers.
           </p>
-
-          {showEmailSuccess ? (
-            <div className="max-w-md mx-auto bg-white/20 backdrop-blur-sm rounded-2xl p-8 border border-white/30">
-              <div className="text-6xl mb-4">✅</div>
-              <div className="text-2xl font-bold mb-2">Check your email!</div>
-              <div className="opacity-90">We've sent you the complete guide.</div>
-            </div>
-          ) : (
-            <form onSubmit={handleEmailSubmit} className="max-w-md mx-auto">
-              <div className="flex gap-3">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  required
-                  className="flex-1 px-6 py-4 rounded-xl text-secondary-900 text-lg focus:ring-4 focus:ring-white/50 outline-none"
-                />
-                <button
-                  type="submit"
-                  className="px-8 py-4 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all font-bold text-lg whitespace-nowrap"
-                >
-                  Get Guide →
-                </button>
-              </div>
-              <p className="text-sm mt-4 opacity-75">
-                Join 2,147+ subscribers. Unsubscribe anytime.
-              </p>
-            </form>
-          )}
-        </div>
-      </section>
-
-      {/* Final CTA */}
-      <section className="py-24 px-6 bg-gradient-to-br from-slate-900 to-slate-800 text-white">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-5xl lg:text-7xl font-bold mb-8">
-            Stop Underestimating.
-            <br />
-            <span className="bg-gradient-to-r from-primary to-cyan-400 bg-clip-text text-transparent">
-              Start Planning with Truth.
-            </span>
-          </h2>
-          <p className="text-2xl text-slate-300 mb-10 leading-relaxed">
-            The difference between retiring at 45 vs 52 is knowing your real numbers.
-            <br />
-            Don't waste 7 years of your life on bad assumptions.
-          </p>
-          <Link
-            to="/login"
-            className="inline-block group relative px-12 py-6 bg-gradient-to-r from-primary to-teal-600 text-white rounded-2xl hover:shadow-2xl transition-all font-bold text-2xl overflow-hidden"
-          >
-            <span className="relative z-10 flex items-center gap-3">
-              Get Your Truth Score Free
-              <svg className="w-8 h-8 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </span>
-            <div className="absolute inset-0 bg-gradient-to-r from-teal-600 to-cyan-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <Link to="/signup"
+            className="inline-block px-8 py-4 bg-secondary text-white rounded-xl font-semibold text-lg hover:bg-secondary/90 transition-all shadow-lg shadow-secondary/10">
+            Create Your Free Account →
           </Link>
-          <p className="text-sm text-secondary-300 mt-6">
-            No credit card required • 2,147 users started today
-          </p>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-16 px-6 bg-slate-900 text-secondary-300 border-t border-slate-800">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-12 mb-12">
+      {/* ─── Footer ────────────────────────────────────────── */}
+      <footer className="py-12 px-6 border-t border-slate-100 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-8 mb-10">
             <div>
-              <div className="flex items-center gap-2 mb-4">
-                <img src="/logo-transparent.png" alt="myfynzo" className="w-10 h-10 object-contain" />
-                <span className="text-xl font-bold text-white">
-                  myfynzo
-                </span>
+              <div className="flex items-center gap-2 mb-3">
+                <img src="/logo-transparent.png" alt="myfynzo" className="w-8 h-8 object-contain" />
+                <span className="text-lg font-bold text-secondary font-display">myfynzo</span>
               </div>
-              <p className="text-sm leading-relaxed">
-                Stop lying to yourself about inflation. Track YOUR real costs. Plan YOUR real future.
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Wealth management for people who take their money seriously. Built in Germany, available worldwide.
               </p>
             </div>
-
-            <div>
-              <h4 className="font-bold text-white mb-4">Product</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#features" className="hover:text-primary transition-colors">Features</a></li>
-                <li><a href="#pricing" className="hover:text-primary transition-colors">Pricing</a></li>
-                <li><a href="#calculator" className="hover:text-primary transition-colors">Calculator</a></li>
-                <li><Link to="/login" className="hover:text-primary transition-colors">Sign Up</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-bold text-white mb-4">Resources</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-primary transition-colors">Blog</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">API Docs</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Changelog</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-bold text-white mb-4">Legal</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-primary transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Cookie Policy</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">GDPR</a></li>
-              </ul>
-            </div>
+            {[
+              { title: 'Product', links: [{ label: 'Features', href: '#features' }, { label: 'Pricing', href: '#pricing' }, { label: 'Countries', href: '#countries' }] },
+              { title: 'Legal', links: [{ label: 'Privacy Policy', href: '#' }, { label: 'Terms of Service', href: '#' }, { label: 'GDPR', href: '#' }] },
+              { title: 'Connect', links: [{ label: 'support@myfynzo.com', href: 'mailto:support@myfynzo.com' }, { label: 'Twitter', href: '#' }, { label: 'LinkedIn', href: '#' }] },
+            ].map((col, i) => (
+              <div key={i}>
+                <h4 className="text-sm font-semibold text-secondary mb-3">{col.title}</h4>
+                <ul className="space-y-2">
+                  {col.links.map((link, j) => (
+                    <li key={j}><a href={link.href} className="text-xs text-slate-400 hover:text-primary transition-colors">{link.label}</a></li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
-
-          <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm">
-              © 2026 myfynzo. Built with honesty. Stop lying to yourself about inflation.
-            </p>
-            <div className="flex gap-6">
-              <a href="#" className="text-secondary-300 hover:text-primary transition-colors">
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
-                </svg>
-              </a>
-              <a href="#" className="text-secondary-300 hover:text-primary transition-colors">
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
-                </svg>
-              </a>
+          <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-3">
+            <p className="text-xs text-slate-400">© 2026 myfynzo. Built in Frankfurt, Germany.</p>
+            <div className="flex gap-3 text-xs text-slate-400">
+              {COUNTRY_PROFILES.map((c, i) => <span key={i}>{c.flag}</span>)}
             </div>
           </div>
         </div>
@@ -627,1065 +382,3 @@ export default function LandingPageExtended() {
     </div>
   );
 }
-
-// Interactive Components for Extended Landing Page
-// This file contains all the sub-components referenced in LandingPageExtended-Part1.tsx
-
-import { useState, useEffect } from 'react';
-
-// Floating Stat Card
-export function FloatingStatCard({ 
-  icon, 
-  value, 
-  label, 
-  position, 
-  delay = 0 
-}: { 
-  icon: string;
-  value: string;
-  label: string;
-  position: string;
-  delay?: number;
-}) {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    setTimeout(() => setIsVisible(true), delay * 1000);
-  }, [delay]);
-
-  return (
-    <div 
-      className={`hidden lg:block absolute ${position} transition-all duration-1000 ${
-        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-      }`}
-    >
-      <div className="bg-white rounded-2xl p-4 shadow-2xl border-2 border-primary/20 backdrop-blur-sm animate-float">
-        <div className="text-3xl mb-2">{icon}</div>
-        <div className="text-2xl font-bold text-primary">{value}</div>
-        <div className="text-xs text-slate-600">{label}</div>
-      </div>
-    </div>
-  );
-}
-
-// Animated Counter
-export function AnimatedStat({ 
-  end, 
-  label, 
-  prefix = '', 
-  suffix = '', 
-  duration = 2000,
-  decimals = 0
-}: {
-  end: number;
-  label: string;
-  prefix?: string;
-  suffix?: string;
-  duration?: number;
-  decimals?: number;
-}) {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    const startTime = Date.now();
-    const endTime = startTime + duration;
-
-    const updateCount = () => {
-      const now = Date.now();
-      const progress = Math.min((now - startTime) / duration, 1);
-      const easeOutQuad = 1 - (1 - progress) * (1 - progress);
-      setCount(end * easeOutQuad);
-
-      if (now < endTime) {
-        requestAnimationFrame(updateCount);
-      }
-    };
-
-    requestAnimationFrame(updateCount);
-  }, [end, duration]);
-
-  return (
-    <div className="text-center">
-      <div className="text-5xl font-bold mb-2">
-        {prefix}{count.toLocaleString(undefined, { 
-          minimumFractionDigits: decimals,
-          maximumFractionDigits: decimals 
-        })}{suffix}
-      </div>
-      <div className="text-slate-300 text-lg">{label}</div>
-    </div>
-  );
-}
-
-// Enhanced Truth Score Demo
-export function EnhancedTruthScoreDemo() {
-  const [animated, setAnimated] = useState(false);
-  const [step, setStep] = useState(0);
-
-  useEffect(() => {
-    setTimeout(() => setAnimated(true), 500);
-    const interval = setInterval(() => {
-      setStep(s => (s + 1) % 3);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div>
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-primary text-sm font-bold mb-4">
-          <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
-          Live Demo
-        </div>
-        <h3 className="text-3xl font-bold text-secondary mb-3">Your Truth Score</h3>
-        <p className="text-slate-600">Based on typical luxury lifestyle</p>
-      </div>
-
-      <div className="grid grid-cols-2 gap-6 mb-8">
-        <div className="group p-6 bg-gradient-to-br from-slate-50 to-white rounded-2xl border border-secondary-200 hover:border-secondary-200 transition-all">
-          <div className="text-sm text-slate-600 mb-2 font-semibold">What You Think</div>
-          <div className="text-4xl font-bold text-secondary-700 mb-1">€2.0M</div>
-          <div className="text-xs text-secondary-400">With 2% CPI inflation</div>
-        </div>
-        <div className="group p-6 bg-gradient-to-br from-primary/10 to-teal-500/10 rounded-2xl border-2 border-primary hover:border-teal-600 transition-all">
-          <div className="text-sm text-primary mb-2 font-semibold">What You Need</div>
-          <div className="text-4xl font-bold text-primary mb-1">€2.7M</div>
-          <div className="text-xs text-teal-700">With YOUR lifestyle inflation</div>
-        </div>
-      </div>
-
-      <div className="mb-8">
-        <div className="flex justify-between text-sm mb-3">
-          <span className="text-slate-600 font-semibold">Reality Gap</span>
-          <span className="font-bold text-red-600 text-lg">+35%</span>
-        </div>
-        <div className="h-4 bg-secondary-100 rounded-full overflow-hidden">
-          <div 
-            className="h-full bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 transition-all duration-1000 ease-out relative overflow-hidden"
-            style={{ width: animated ? '35%' : '0%' }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0 animate-shimmer"></div>
-          </div>
-        </div>
-      </div>
-
-      <div className="p-6 bg-gradient-to-br from-red-50 to-orange-50 border-2 border-red-200 rounded-2xl">
-        <div className="flex items-start gap-3">
-          <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 text-white text-xl">
-            🚨
-          </div>
-          <div className="flex-1">
-            <div className="font-bold text-red-900 text-lg mb-1">Gap: €700,000</div>
-            <div className="text-sm text-red-700 leading-relaxed">
-              That's <strong>3 extra years of work</strong> you didn't plan for.
-              Your retirement at 45? Try 48.
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-6 grid grid-cols-3 gap-3 text-center">
-        <div className={`p-3 rounded-lg transition-all ${step === 0 ? 'bg-primary/20' : 'bg-secondary-50'}`}>
-          <div className="text-xs text-slate-600 mb-1">Step 1</div>
-          <div className="text-sm font-bold">Add Items</div>
-        </div>
-        <div className={`p-3 rounded-lg transition-all ${step === 1 ? 'bg-primary/20' : 'bg-secondary-50'}`}>
-          <div className="text-xs text-slate-600 mb-1">Step 2</div>
-          <div className="text-sm font-bold">See Inflation</div>
-        </div>
-        <div className={`p-3 rounded-lg transition-all ${step === 2 ? 'bg-primary/20' : 'bg-secondary-50'}`}>
-          <div className="text-xs text-slate-600 mb-1">Step 3</div>
-          <div className="text-sm font-bold">Adjust Plan</div>
-        </div>
-      </div>
-
-      <div className="mt-6 text-center">
-        <div className="text-xs text-secondary-400">
-          *Example: Porsche 911 + 2 kids in private school + London flat
-        </div>
-      </div>
-
-      <style>{`
-        @keyframes shimmer {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
-        }
-        .animate-shimmer {
-          animation: shimmer 2s infinite;
-        }
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
-        }
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
-        }
-      `}</style>
-    </div>
-  );
-}
-
-// Live Inflation Calculator
-export function LiveInflationCalculator() {
-  const [items, setItems] = useState([
-    { name: 'Porsche 911', cost: 180000, inflation: 6.0, selected: true },
-    { name: 'Private School (2 kids)', cost: 50000, inflation: 4.5, selected: true },
-    { name: 'London Apartment', cost: 1200000, inflation: 5.5, selected: false },
-  ]);
-  const [years, setYears] = useState(10);
-
-  const selectedItems = items.filter(i => i.selected);
-  const totalCost = selectedItems.reduce((sum, i) => sum + i.cost, 0);
-  const avgInflation = selectedItems.reduce((sum, i) => sum + (i.inflation * i.cost), 0) / totalCost;
-  const futureCostReal = totalCost * Math.pow(1 + avgInflation / 100, years);
-  const futureCostCPI = totalCost * Math.pow(1.02, years);
-  const gap = futureCostReal - futureCostCPI;
-  const gapPercent = (gap / totalCost) * 100;
-
-  return (
-    <div className="bg-white rounded-3xl p-10 shadow-2xl border border-secondary-200">
-      <div className="grid lg:grid-cols-2 gap-10">
-        {/* Left - Controls */}
-        <div>
-          <h3 className="text-2xl font-bold text-secondary mb-6">Select Your Items</h3>
-          
-          <div className="space-y-4 mb-8">
-            {items.map((item, i) => (
-              <label key={i} className="flex items-center gap-4 p-4 border border-secondary-200 rounded-xl cursor-pointer hover:border-primary transition-all">
-                <input
-                  type="checkbox"
-                  checked={item.selected}
-                  onChange={() => {
-                    const newItems = [...items];
-                    newItems[i].selected = !newItems[i].selected;
-                    setItems(newItems);
-                  }}
-                  className="w-5 h-5 text-primary rounded focus:ring-2 focus:ring-primary"
-                />
-                <div className="flex-1">
-                  <div className="font-semibold text-secondary">{item.name}</div>
-                  <div className="text-sm text-slate-600">€{item.cost.toLocaleString()} • {item.inflation}%/yr</div>
-                </div>
-              </label>
-            ))}
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-secondary-700 mb-3">
-              Time Horizon: {years} years
-            </label>
-            <input
-              type="range"
-              min="1"
-              max="30"
-              value={years}
-              onChange={(e) => setYears(Number(e.target.value))}
-              className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary"
-            />
-            <div className="flex justify-between text-xs text-secondary-400 mt-1">
-              <span>1 year</span>
-              <span>30 years</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Right - Results */}
-        <div className="bg-gradient-to-br from-slate-50 to-white rounded-2xl p-8 border border-secondary-200">
-          <h3 className="text-2xl font-bold text-secondary mb-6">Your Results</h3>
-
-          <div className="space-y-6">
-            <div>
-              <div className="text-sm text-slate-600 mb-2">Total Cost Today</div>
-              <div className="text-4xl font-bold text-secondary">
-                €{(totalCost / 1000).toFixed(0)}K
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 bg-white rounded-xl border border-secondary-200">
-                <div className="text-xs text-slate-600 mb-1">With CPI (2%)</div>
-                <div className="text-2xl font-bold text-slate-600">
-                  €{(futureCostCPI / 1000).toFixed(0)}K
-                </div>
-              </div>
-              <div className="p-4 bg-primary/10 rounded-xl border-2 border-primary">
-                <div className="text-xs text-primary mb-1">With Reality ({avgInflation.toFixed(1)}%)</div>
-                <div className="text-2xl font-bold text-primary">
-                  €{(futureCostReal / 1000).toFixed(0)}K
-                </div>
-              </div>
-            </div>
-
-            <div className="p-6 bg-gradient-to-br from-red-50 to-orange-50 border-2 border-red-200 rounded-xl">
-              <div className="text-sm text-red-900 font-semibold mb-2">Reality Gap</div>
-              <div className="text-5xl font-bold text-red-600 mb-2">
-                +{gapPercent.toFixed(0)}%
-              </div>
-              <div className="text-lg font-bold text-red-700 mb-2">
-                €{(gap / 1000).toFixed(0)}K difference
-              </div>
-              <div className="text-sm text-red-600">
-                That's {((gap / 60000) / 12).toFixed(1)} extra years of work at €60K salary
-              </div>
-            </div>
-
-            <button className="w-full px-8 py-4 bg-gradient-to-r from-primary to-teal-600 text-white rounded-xl hover:shadow-xl transition-all font-bold text-lg">
-              Get My Full Truth Score →
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Comparison Table
-export function ComparisonTable() {
-  return (
-    <div className="grid md:grid-cols-2 gap-8 mb-12">
-      {/* Generic CPI */}
-      <div className="group bg-white rounded-2xl p-8 border border-secondary-200 hover:shadow-xl transition-all">
-        <div className="flex items-center gap-4 mb-6">
-          <div className="w-16 h-16 bg-secondary-100 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
-            📊
-          </div>
-          <div>
-            <h3 className="text-2xl font-bold text-secondary">Generic CPI</h3>
-            <p className="text-sm text-slate-600">What most use</p>
-          </div>
-        </div>
-
-        <div className="space-y-3 mb-6">
-          {[
-            'Milk and bread',
-            'Gas and utilities',
-            'Average rent',
-            'Public transport',
-            'Generic groceries'
-          ].map((item, i) => (
-            <div key={i} className="flex items-center gap-3 text-slate-600">
-              <svg className="w-5 h-5 text-secondary-300" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              {item}
-            </div>
-          ))}
-        </div>
-
-        <div className="p-6 bg-secondary-50 rounded-xl text-center">
-          <div className="text-5xl font-bold text-slate-600 mb-2">2.0%</div>
-          <div className="text-sm text-secondary-400">Annual inflation</div>
-        </div>
-      </div>
-
-      {/* Your Reality */}
-      <div className="group bg-gradient-to-br from-red-600 via-red-700 to-orange-600 rounded-2xl p-8 text-white shadow-2xl hover:shadow-3xl transition-all relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12"></div>
-        
-        <div className="relative z-10">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-16 h-16 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
-              🚨
-            </div>
-            <div>
-              <h3 className="text-2xl font-bold">Your Reality</h3>
-              <p className="text-sm opacity-90">What you actually buy</p>
-            </div>
-          </div>
-
-          <div className="space-y-3 mb-6">
-            {[
-              { name: 'Porsche 911', rate: '+6.0%' },
-              { name: 'Private School', rate: '+4.5%' },
-              { name: 'Prime Real Estate', rate: '+5.5%' },
-              { name: 'Luxury Watches', rate: '+8.0%' },
-              { name: 'Fine Dining', rate: '+5.2%' }
-            ].map((item, i) => (
-              <div key={i} className="flex items-center justify-between p-3 bg-white/10 rounded-lg backdrop-blur">
-                <span className="font-medium">{item.name}</span>
-                <span className="font-bold text-lg">{item.rate}</span>
-              </div>
-            ))}
-          </div>
-
-          <div className="p-6 bg-white/20 backdrop-blur rounded-xl text-center">
-            <div className="text-5xl font-bold mb-2">5.8%</div>
-            <div className="text-sm opacity-90 mb-1">Average inflation</div>
-            <div className="text-xs opacity-75 font-semibold">2.9x higher than CPI!</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Inflation Impact Chart
-export function InflationImpactChart() {
-  const years = [0, 5, 10, 15, 20];
-  const cpiValues = years.map(y => 100 * Math.pow(1.02, y));
-  const realValues = years.map(y => 100 * Math.pow(1.058, y));
-
-  return (
-    <div>
-      <div className="grid md:grid-cols-5 gap-4 mb-8">
-        {years.map((year, i) => (
-          <div key={i} className="text-center">
-            <div className="text-sm text-slate-600 mb-4 font-semibold">Year {year}</div>
-            <div className="space-y-3">
-              <div className="p-4 bg-secondary-100 rounded-xl">
-                <div className="text-xs text-slate-600 mb-1">CPI 2%</div>
-                <div className="text-2xl font-bold text-secondary-700">
-                  €{cpiValues[i].toFixed(0)}K
-                </div>
-              </div>
-              <div className="p-4 bg-red-50 border-2 border-red-200 rounded-xl">
-                <div className="text-xs text-red-600 mb-1">Reality 5.8%</div>
-                <div className="text-2xl font-bold text-red-600">
-                  €{realValues[i].toFixed(0)}K
-                </div>
-              </div>
-              {i > 0 && (
-                <div className="text-xs text-red-600 font-semibold">
-                  +€{(realValues[i] - cpiValues[i]).toFixed(0)}K gap
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="p-6 bg-gradient-to-r from-red-50 to-orange-50 rounded-xl border border-red-200">
-        <div className="text-center">
-          <div className="text-sm text-red-900 font-semibold mb-2">
-            After 20 years, the gap is <span className="text-2xl">€135K</span>
-          </div>
-          <div className="text-xs text-red-700">
-            That's 2.25 years of salary (€60K) you didn't account for
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Feature Tab Content Components
-export function LifestyleBasketFeature() {
-  return (
-    <div className="grid lg:grid-cols-2 gap-10 items-center">
-      <div>
-        <div className="inline-block px-4 py-2 bg-primary/10 rounded-full text-primary font-bold text-sm mb-4">
-          NEW
-        </div>
-        <h3 className="text-4xl font-bold text-secondary mb-4">Lifestyle Basket</h3>
-        <p className="text-xl text-slate-600 mb-6 leading-relaxed">
-          Track 40+ luxury items with real inflation rates. See the truth about what you'll actually need.
-        </p>
-
-        <div className="space-y-4 mb-8">
-          {[
-            { icon: '🏎️', title: 'Supercars', desc: 'Track Porsche, Ferrari, Tesla at real 6% inflation' },
-            { icon: '🏫', title: 'Private Education', desc: '4.5% inflation on UK/international schools' },
-            { icon: '🏡', title: 'Prime Real Estate', desc: 'London, Swiss, Miami property at 5.5%' },
-            { icon: '⌚', title: 'Luxury Goods', desc: 'Watches, jewelry, art at 8-14% growth' }
-          ].map((item, i) => (
-            <div key={i} className="flex items-start gap-4 p-4 bg-secondary-50 rounded-xl hover:bg-secondary-100 transition-colors">
-              <div className="text-3xl">{item.icon}</div>
-              <div>
-                <div className="font-bold text-secondary mb-1">{item.title}</div>
-                <div className="text-sm text-slate-600">{item.desc}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <button className="px-8 py-4 bg-primary text-white rounded-xl hover:bg-teal-700 transition-all font-bold">
-          Try Lifestyle Basket →
-        </button>
-      </div>
-
-      <div className="bg-gradient-to-br from-primary/10 to-teal-500/10 rounded-2xl p-8 border-2 border-primary/20">
-        <div className="bg-white rounded-xl p-6 shadow-lg mb-4">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <span className="text-3xl">🏎️</span>
-              <div>
-                <div className="font-bold text-secondary">Porsche 911 Turbo</div>
-                <div className="text-xs text-slate-600">Supercar</div>
-              </div>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <div className="text-xs text-slate-600 mb-1">Today</div>
-              <div className="text-2xl font-bold text-secondary">€180K</div>
-            </div>
-            <div>
-              <div className="text-xs text-primary mb-1">In 2034</div>
-              <div className="text-2xl font-bold text-primary">€287K</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="text-center p-4 bg-white rounded-xl">
-          <div className="text-sm text-amber-900 font-semibold mb-1">Inflation: 6.0%/year</div>
-          <div className="text-xs text-amber-700">3x higher than CPI</div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export function FIRECalculatorFeature() {
-  return (
-    <div className="grid lg:grid-cols-2 gap-10 items-center">
-      <div>
-        <h3 className="text-4xl font-bold text-secondary mb-4">FIRE Calculator</h3>
-        <p className="text-xl text-slate-600 mb-6 leading-relaxed">
-          Calculate 4 types of FIRE simultaneously. See all paths to financial independence.
-        </p>
-
-        <div className="grid grid-cols-2 gap-4 mb-8">
-          {[
-            { type: 'Lean FIRE', amount: '€600K', desc: 'Minimal lifestyle' },
-            { type: 'Regular FIRE', amount: '€1.2M', desc: 'Comfortable living' },
-            { type: 'Fat FIRE', amount: '€3M+', desc: 'Luxury lifestyle' },
-            { type: 'Barista FIRE', amount: '€800K', desc: 'Part-time work' }
-          ].map((item, i) => (
-            <div key={i} className="p-4 bg-gradient-to-br from-slate-50 to-white border border-secondary-200 rounded-xl">
-              <div className="text-xs text-slate-600 mb-1">{item.type}</div>
-              <div className="text-2xl font-bold text-primary mb-1">{item.amount}</div>
-              <div className="text-xs text-secondary-400">{item.desc}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-8 border-2 border-orange-200">
-        <div className="text-center mb-6">
-          <div className="text-6xl mb-4">🔥</div>
-          <div className="text-3xl font-bold text-secondary mb-2">Your FIRE Number</div>
-          <div className="text-5xl font-bold text-primary mb-2">€1.2M</div>
-          <div className="text-sm text-slate-600">Based on €40K/year spending</div>
-        </div>
-
-        <div className="space-y-3">
-          <div className="flex items-center justify-between p-3 bg-white rounded-lg">
-            <span className="text-sm text-slate-600">4% rule target</span>
-            <span className="font-bold">€1.0M</span>
-          </div>
-          <div className="flex items-center justify-between p-3 bg-white rounded-lg">
-            <span className="text-sm text-slate-600">Inflation buffer</span>
-            <span className="font-bold text-amber-600">+€200K</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export function TaxOptimizerFeature() {
-  return (
-    <div className="grid lg:grid-cols-2 gap-10 items-center">
-      <div>
-        <div className="flex items-center gap-2 mb-4">
-          <span className="text-3xl">🇩🇪</span>
-          <h3 className="text-4xl font-bold text-secondary">German Tax Calculator</h3>
-        </div>
-        <p className="text-xl text-slate-600 mb-6 leading-relaxed">
-          2026 rates. Kindergeld €259. All 16 Bundesländer. Couple mode. Church tax. Everything.
-        </p>
-
-        <div className="space-y-4 mb-8">
-          {[
-            'All 6 tax classes (I-VI)',
-            'Kirchensteuer 8-9% by Bundesland',
-            'Kindergeld €259/child (2026 rates)',
-            'Solidaritätszuschlag',
-            'Couple vs single optimization',
-            'Net income calculation'
-          ].map((item, i) => (
-            <div key={i} className="flex items-center gap-3">
-              <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              <span className="text-secondary-700">{item}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="bg-gradient-to-br from-red-50 to-white rounded-2xl p-8 border-2 border-red-200">
-        <div className="mb-6">
-          <div className="text-sm text-slate-600 mb-2">Gross Salary</div>
-          <div className="text-4xl font-bold text-secondary mb-4">€80,000</div>
-          
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between p-3 bg-white rounded-lg">
-              <span className="text-slate-600">Income Tax</span>
-              <span className="font-bold text-red-600">-€14,352</span>
-            </div>
-            <div className="flex justify-between p-3 bg-white rounded-lg">
-              <span className="text-slate-600">Solidarity</span>
-              <span className="font-bold text-red-600">-€789</span>
-            </div>
-            <div className="flex justify-between p-3 bg-white rounded-lg">
-              <span className="text-slate-600">Church Tax (9%)</span>
-              <span className="font-bold text-red-600">-€1,292</span>
-            </div>
-            <div className="flex justify-between p-3 bg-green-50 rounded-lg border border-green-200">
-              <span className="text-green-900 font-semibold">Net Salary</span>
-              <span className="font-bold text-green-600 text-lg">€63,567</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="p-4 bg-blue-50 rounded-lg border border-blue-200 text-sm text-blue-900">
-          💡 <strong>Tip:</strong> Married couples save €2,847/year with tax class III/V
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export function ScenariosFeature() {
-  return (
-    <div className="text-center py-12">
-      <div className="text-6xl mb-6">🚀</div>
-      <h3 className="text-4xl font-bold text-secondary mb-4">Scenario Branching</h3>
-      <p className="text-xl text-slate-600 mb-8 max-w-2xl mx-auto">
-        Model life decisions before you make them. See multiple futures simultaneously.
-      </p>
-      <div className="inline-block px-6 py-3 bg-amber-100 border-2 border-amber-300 rounded-xl text-amber-900 font-bold">
-        🎯 Coming Q2 2026
-      </div>
-      <p className="text-sm text-secondary-400 mt-4">
-        Join waitlist to get early access
-      </p>
-    </div>
-  );
-}
-
-// Continue with more components in next file...// Remaining Components for Extended Landing Page - Part 3
-
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-
-// Timeline Steps
-export function TimelineSteps() {
-  const steps = [
-    {
-      number: "01",
-      title: "Add Your Lifestyle Items",
-      description: "Choose from 40+ luxury items or create custom ones. Takes 2 minutes.",
-      details: [
-        "Porsche, Ferrari, Tesla",
-        "Private school tuition",
-        "Prime real estate",
-        "Or create custom items"
-      ],
-      icon: "🎯",
-      color: "from-blue-500 to-cyan-500"
-    },
-    {
-      number: "02",
-      title: "See Real Inflation Rates",
-      description: "We track category-specific inflation, not generic 2% CPI.",
-      details: [
-        "Supercars: 6.0%/year",
-        "Private school: 4.5%/year",
-        "Real estate: 5.5%/year",
-        "Luxury goods: 8.0%/year"
-      ],
-      icon: "📈",
-      color: "from-purple-500 to-pink-500"
-    },
-    {
-      number: "03",
-      title: "Get Your Truth Score",
-      description: "See the gap between expectations and reality. Adjust your plan.",
-      details: [
-        "What you think you need",
-        "What you actually need",
-        "The reality gap (%)",
-        "Extra years of work required"
-      ],
-      icon: "💡",
-      color: "from-orange-500 to-red-500"
-    }
-  ];
-
-  return (
-    <div className="relative">
-      {/* Connection Lines */}
-      <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-primary via-purple-500 to-orange-500 opacity-20"></div>
-
-      <div className="grid lg:grid-cols-3 gap-8">
-        {steps.map((step, i) => (
-          <div key={i} className="relative">
-            {/* Step Card */}
-            <div className="relative bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-8 hover:bg-white/15 transition-all group">
-              {/* Step Number */}
-              <div className={`absolute -top-6 left-8 w-16 h-16 bg-gradient-to-br ${step.color} rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-2xl group-hover:scale-110 transition-transform`}>
-                {step.number}
-              </div>
-
-              {/* Icon */}
-              <div className="text-6xl mb-6 mt-4 group-hover:scale-110 transition-transform">
-                {step.icon}
-              </div>
-
-              {/* Content */}
-              <h3 className="text-2xl font-bold mb-3">{step.title}</h3>
-              <p className="text-slate-300 mb-6 leading-relaxed">{step.description}</p>
-
-              {/* Details List */}
-              <ul className="space-y-2">
-                {step.details.map((detail, j) => (
-                  <li key={j} className="flex items-center gap-2 text-sm text-slate-300">
-                    <svg className="w-4 h-4 text-primary flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    {detail}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Arrow (desktop only) */}
-            {i < steps.length - 1 && (
-              <div className="hidden lg:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-10">
-                <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// Testimonial Grid
-export function TestimonialGrid() {
-  const testimonials = [
-    {
-      name: "James Chen",
-      role: "Tech CEO",
-      company: "London",
-      avatar: "👨‍💼",
-      quote: "Discovered I needed €800K more than I thought. The Truth Score was brutal but necessary. Glad I found out at 35, not 45.",
-      rating: 5,
-      metric: "Gap found: €800K",
-      color: "from-blue-500 to-cyan-500"
-    },
-    {
-      name: "Sarah Mueller",
-      role: "Finance Director",
-      company: "Frankfurt",
-      avatar: "👩‍💼",
-      quote: "Most honest financial tool I've used. The lifestyle basket showed me I was underestimating inflation by 38%. Changed my entire plan.",
-      rating: 5,
-      metric: "Saved 4 years",
-      color: "from-purple-500 to-pink-500"
-    },
-    {
-      name: "Michael Rodriguez",
-      role: "Entrepreneur",
-      company: "Barcelona",
-      avatar: "🧑‍💻",
-      quote: "I was planning with 2% inflation. My actual lifestyle inflates at 6.2%. This tool saved me from a massive retirement mistake.",
-      rating: 5,
-      metric: "€640K adjusted",
-      color: "from-orange-500 to-red-500"
-    },
-    {
-      name: "Emma Thompson",
-      role: "Investment Banker",
-      company: "Zurich",
-      avatar: "👩‍💼",
-      quote: "The German tax calculator alone is worth the price. Finally accurate Kirchensteuer calculations for all Bundesländer.",
-      rating: 5,
-      metric: "€3.2K saved",
-      color: "from-green-500 to-teal-500"
-    },
-    {
-      name: "David Kim",
-      role: "Software Engineer",
-      company: "Berlin",
-      avatar: "👨‍💻",
-      quote: "FIRE calculator showed me 4 different paths. I'm now on the 'Barista FIRE' track. So much clearer than other tools.",
-      rating: 5,
-      metric: "Plan optimized",
-      color: "from-cyan-500 to-blue-500"
-    },
-    {
-      name: "Lisa Wang",
-      role: "Consultant",
-      company: "Munich",
-      avatar: "👩‍💼",
-      quote: "The private school inflation tracker is eye-opening. €50K/year today becomes €82K in 10 years. Now I'm prepared.",
-      rating: 5,
-      metric: "€320K planned",
-      color: "from-pink-500 to-purple-500"
-    }
-  ];
-
-  return (
-    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {testimonials.map((t, i) => (
-        <div key={i} className="group bg-white rounded-2xl p-6 border border-secondary-200 hover:shadow-2xl hover:border-primary/50 transition-all">
-          {/* Header */}
-          <div className="flex items-center gap-4 mb-4">
-            <div className={`w-14 h-14 bg-gradient-to-br ${t.color} rounded-full flex items-center justify-center text-2xl group-hover:scale-110 transition-transform`}>
-              {t.avatar}
-            </div>
-            <div className="flex-1">
-              <div className="font-bold text-secondary">{t.name}</div>
-              <div className="text-sm text-slate-600">{t.role}</div>
-              <div className="text-xs text-secondary-400">{t.company}</div>
-            </div>
-          </div>
-
-          {/* Rating */}
-          <div className="flex gap-1 mb-4">
-            {Array(t.rating).fill(0).map((_, i) => (
-              <svg key={i} className="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-            ))}
-          </div>
-
-          {/* Quote */}
-          <p className="text-secondary-700 leading-relaxed mb-4 italic">
-            "{t.quote}"
-          </p>
-
-          {/* Metric */}
-          <div className={`inline-block px-3 py-1 bg-gradient-to-r ${t.color} bg-opacity-10 rounded-full text-sm font-semibold`}>
-            ✓ {t.metric}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// Enhanced Pricing Cards
-export function EnhancedPricingCards() {
-  return (
-    <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-      {/* Free Tier */}
-      <div className="group bg-white rounded-3xl p-10 border border-secondary-200 shadow-xl hover:shadow-2xl transition-all">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-3xl font-bold text-secondary">Free</h3>
-          <div className="px-4 py-1 bg-secondary-100 rounded-full text-slate-600 text-sm font-semibold">
-            Forever
-          </div>
-        </div>
-
-        <div className="mb-8">
-          <div className="flex items-baseline gap-2 mb-2">
-            <span className="text-6xl font-bold text-secondary">€0</span>
-            <span className="text-slate-600">/forever</span>
-          </div>
-          <p className="text-slate-600">Perfect to get started</p>
-        </div>
-
-        <ul className="space-y-4 mb-10">
-          {[
-            'Basic wealth tracking',
-            'Up to 20 assets',
-            '5-year projections',
-            'All 4 FIRE calculators',
-            'German tax calculator',
-            'CSV export (weekly)',
-            'Email support',
-            'All 5 currencies'
-          ].map((feature, i) => (
-            <li key={i} className="flex items-center gap-3">
-              <svg className="w-6 h-6 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              <span className="text-secondary-700">{feature}</span>
-            </li>
-          ))}
-        </ul>
-
-        <Link
-          to="/login"
-          className="block w-full px-8 py-4 bg-secondary-100 text-secondary-700 rounded-xl hover:bg-slate-200 transition-all font-bold text-center text-lg"
-        >
-          Get Started Free
-        </Link>
-      </div>
-
-      {/* Premium Tier */}
-      <div className="relative group bg-gradient-to-br from-primary to-teal-600 rounded-3xl p-10 shadow-2xl text-white overflow-hidden">
-        {/* Popular Badge */}
-        <div className="absolute -top-4 right-10 z-10">
-          <div className="bg-amber-400 text-secondary-900 px-6 py-2 rounded-full text-sm font-bold shadow-xl flex items-center gap-2">
-            <span className="text-lg">⭐</span>
-            MOST POPULAR
-          </div>
-        </div>
-
-        {/* Animated Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)',
-            backgroundSize: '30px 30px'
-          }}></div>
-        </div>
-
-        <div className="relative z-10">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-3xl font-bold">Premium</h3>
-            <span className="text-3xl">💎</span>
-          </div>
-
-          <div className="mb-8">
-            <div className="flex items-baseline gap-2 mb-2">
-              <span className="text-6xl font-bold">€9.99</span>
-              <span className="opacity-90">/month</span>
-            </div>
-            <p className="opacity-90">or €99/year (save 17%)</p>
-          </div>
-
-          <ul className="space-y-4 mb-10">
-            {[
-              'Everything in Free',
-              'Lifestyle Basket (40+ items)',
-              'Truth Score analysis',
-              'Unlimited assets',
-              '50-year projections',
-              'Advanced scenarios (coming)',
-              'Family sharing (coming)',
-              'PDF reports',
-              'Priority support',
-              'Early access to features'
-            ].map((feature, i) => (
-              <li key={i} className="flex items-center gap-3">
-                <svg className="w-6 h-6 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                <span className="font-medium">{feature}</span>
-              </li>
-            ))}
-          </ul>
-
-          <Link
-            to="/login"
-            className="block w-full px-8 py-4 bg-white text-primary rounded-xl hover:bg-secondary-50 transition-all font-bold text-center text-lg shadow-xl group-hover:shadow-2xl"
-          >
-            Start 30-Day Trial
-          </Link>
-
-          <p className="text-center text-sm opacity-80 mt-4">
-            No credit card required • Cancel anytime
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// FAQ Section
-export function FAQSection() {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
-
-  const faqs = [
-    {
-      question: "How is this different from other FIRE calculators?",
-      answer: "Most FIRE calculators use generic 2% CPI inflation. We track YOUR specific lifestyle items (Porsche, private school, real estate) with real category-specific inflation rates (6-8%). This reveals the TRUE cost of your lifestyle, often 30-40% higher than generic calculators show."
-    },
-    {
-      question: "Why do I need the Lifestyle Basket?",
-      answer: "Because generic inflation doesn't match reality for high-earners. A Porsche inflates at 6%/year, private school at 4.5%/year, prime real estate at 5.5%/year. If you're planning retirement based on 2% inflation but your lifestyle inflates at 6%, you could be underestimating by €500K-€1M. That's 3-7 years of extra work you didn't plan for."
-    },
-    {
-      question: "Is my financial data secure?",
-      answer: "Yes. We use bank-level 256-bit encryption. Your data is stored in Firebase (Google Cloud) with enterprise-grade security. We never sell your data. Optional: Enable 'Shadow Vault' for zero-knowledge end-to-end encryption where even we can't see your data."
-    },
-    {
-      question: "Can I cancel anytime?",
-      answer: "Absolutely. No contracts, no commitments. Cancel with one click from your settings. If you cancel within 30 days, you get a full refund, no questions asked."
-    },
-    {
-      question: "Do you support currencies other than Euro?",
-      answer: "Yes! We support 5 currencies: EUR (€), USD ($), GBP (£), INR (₹), and CAD ($). All calculations, inflation rates, and pricing adjust to your selected currency. Exchange rates update daily."
-    },
-    {
-      question: "How accurate is the German tax calculator?",
-      answer: "Extremely accurate. We use 2026 official rates including: all 6 tax classes, Kirchensteuer (8-9% by Bundesland), Solidaritätszuschlag, Kindergeld (€259/child), and all 16 Bundesländer. Updated annually with new government rates."
-    },
-    {
-      question: "What's coming next?",
-      answer: "Q2 2026: Scenario branching (model life decisions), Auto bank sync (Germany first via FinAPI), Family sharing (5 members). Q3 2026: Monte Carlo simulations, Anti-Portfolio (track missed opportunities), Advanced 'what-if' scenarios."
-    },
-    {
-      question: "Is there a free trial?",
-      answer: "Yes! Free tier is available forever (no credit card required). Premium features have a 30-day free trial. If you're not satisfied, cancel within 30 days for a full refund."
-    }
-  ];
-
-  return (
-    <section className="py-24 px-6 bg-gradient-to-br from-white to-slate-50">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-16">
-          <div className="inline-block px-4 py-2 bg-primary/10 rounded-full text-primary font-semibold text-sm mb-4">
-            FAQ
-          </div>
-          <h2 className="text-5xl font-bold text-secondary mb-4">
-            Questions? Answered.
-          </h2>
-          <p className="text-xl text-slate-600">
-            Everything you need to know about myfynzo
-          </p>
-        </div>
-
-        <div className="space-y-4">
-          {faqs.map((faq, i) => (
-            <div key={i} className="bg-white rounded-2xl border border-secondary-200 overflow-hidden hover:border-primary/50 transition-all">
-              <button
-                onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                className="w-full px-8 py-6 flex items-center justify-between text-left hover:bg-secondary-50 transition-colors"
-              >
-                <span className="text-lg font-bold text-secondary pr-8">{faq.question}</span>
-                <svg 
-                  className={`w-6 h-6 text-primary flex-shrink-0 transition-transform ${openIndex === i ? 'rotate-180' : ''}`}
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              
-              {openIndex === i && (
-                <div className="px-8 pb-6">
-                  <div className="pt-4 border-t border-secondary-200">
-                    <p className="text-secondary-700 leading-relaxed">{faq.answer}</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-12 text-center p-8 bg-gradient-to-br from-primary/10 to-teal-500/10 rounded-2xl border-2 border-primary/20">
-          <h3 className="text-2xl font-bold text-secondary mb-3">Still have questions?</h3>
-          <p className="text-slate-600 mb-6">We're here to help! Email us anytime.</p>
-          <a 
-            href="mailto:support@myfynzo.com"
-            className="inline-block px-8 py-3 bg-primary text-white rounded-xl hover:bg-teal-700 transition-all font-semibold"
-          >
-            Contact Support
-          </a>
-        </div>
-      </div>
-    </section>
-  );
-}
-

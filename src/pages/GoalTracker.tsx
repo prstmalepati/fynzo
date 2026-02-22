@@ -318,156 +318,119 @@ export default function GoalTracker() {
 
         {/* Add/Edit Goal Modal */}
         {showAddModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-surface-900">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            onClick={() => { setShowAddModal(false); resetForm(); }}>
+            <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] shadow-elevated animate-slideUp flex flex-col"
+              onClick={e => e.stopPropagation()}>
+
+              {/* Fixed header */}
+              <div className="flex justify-between items-center p-6 lg:p-8 pb-4 border-b border-slate-100 shrink-0">
+                <h2 className="text-2xl font-bold text-secondary font-display">
                   {editingGoal ? 'Edit Goal' : 'Create New Goal'}
                 </h2>
-                <button
+                <button type="button"
                   onClick={() => { setShowAddModal(false); resetForm(); }}
-                  className="text-surface-900-300 hover:text-surface-900-500 text-2xl"
-                >
-                  ✕
+                  className="p-2 rounded-lg hover:bg-slate-100 text-slate-400 transition-colors">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
 
-              <div className="space-y-4">
+              {/* Scrollable body */}
+              <div className="overflow-y-auto flex-1 p-6 lg:p-8 pt-5 space-y-4">
                 {/* Goal Name */}
                 <div>
-                  <label className="block text-sm font-semibold text-surface-900-700 mb-2">
-                    Goal Name *
-                  </label>
-                  <input
-                    type="text"
-                    value={goalName}
-                    onChange={(e) => setGoalName(e.target.value)}
+                  <label className="block text-sm font-medium text-slate-700 mb-1.5">Goal Name *</label>
+                  <input type="text" value={goalName} onChange={e => setGoalName(e.target.value)}
                     placeholder="e.g., Emergency Fund, Down Payment, Vacation"
-                    className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
-                  />
+                    className="w-full px-4 py-3 border border-slate-200 rounded-xl text-secondary focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
                 </div>
 
-                {/* Category */}
+                {/* Category — compact horizontal scroll on mobile, wrapping grid on desktop */}
                 <div>
-                  <label className="block text-sm font-semibold text-surface-900-700 mb-2">
-                    Category
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-1.5">Category</label>
+                  <div className="flex flex-wrap gap-2">
                     {categories.map(cat => (
-                      <button
-                        key={cat.id}
-                        onClick={() => setCategory(cat.id)}
-                        className={`p-3 rounded-xl border-2 transition-all flex items-center gap-3 ${
+                      <button key={cat.id} type="button" onClick={() => setCategory(cat.id)}
+                        className={`px-3 py-2 rounded-lg border-2 transition-all flex items-center gap-2 text-sm ${
                           category === cat.id
-                            ? 'border-primary bg-primary/10'
-                            : 'border-secondary-200 hover:border-secondary-200'
-                        }`}
-                      >
-                        <span className="text-2xl">{cat.icon}</span>
-                        <span className="font-semibold text-sm">{cat.label}</span>
+                            ? 'border-primary bg-primary/10 font-semibold text-primary'
+                            : 'border-slate-200 hover:border-slate-300 text-slate-600'
+                        }`}>
+                        <span>{cat.icon}</span>
+                        <span>{cat.label}</span>
                       </button>
                     ))}
                   </div>
                 </div>
 
-                {/* Target Amount */}
-                <div>
-                  <label className="block text-sm font-semibold text-surface-900-700 mb-2">
-                    Target Amount (€) *
-                  </label>
-                  <input
-                    type="number"
-                    value={targetAmount}
-                    onChange={(e) => setTargetAmount(e.target.value)}
-                    placeholder="25000"
-                    min="0"
-                    step="100"
-                    className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
-                  />
-                </div>
-
-                {/* Current Amount */}
-                <div>
-                  <label className="block text-sm font-semibold text-surface-900-700 mb-2">
-                    Current Amount (€)
-                  </label>
-                  <input
-                    type="number"
-                    value={currentAmount}
-                    onChange={(e) => setCurrentAmount(e.target.value)}
-                    placeholder="5000"
-                    min="0"
-                    step="100"
-                    className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
-                  />
+                {/* Amount fields side by side */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Target Amount *</label>
+                    <input type="number" value={targetAmount} onChange={e => setTargetAmount(e.target.value)}
+                      placeholder="25000" min="0" step="100"
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl text-secondary focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Current Amount</label>
+                    <input type="number" value={currentAmount} onChange={e => setCurrentAmount(e.target.value)}
+                      placeholder="5000" min="0" step="100"
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl text-secondary focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
+                  </div>
                 </div>
 
                 {/* Target Date */}
                 <div>
-                  <label className="block text-sm font-semibold text-surface-900-700 mb-2">
-                    Target Date *
-                  </label>
-                  <input
-                    type="date"
-                    value={targetDate}
-                    onChange={(e) => setTargetDate(e.target.value)}
-                    className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none"
-                  />
+                  <label className="block text-sm font-medium text-slate-700 mb-1.5">Target Date *</label>
+                  <input type="date" value={targetDate} onChange={e => setTargetDate(e.target.value)}
+                    className="w-full px-4 py-3 border border-slate-200 rounded-xl text-secondary focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
                 </div>
 
                 {/* Notes */}
                 <div>
-                  <label className="block text-sm font-semibold text-surface-900-700 mb-2">
-                    Notes (Optional)
-                  </label>
-                  <textarea
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Add any additional notes..."
-                    rows={3}
-                    className="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none resize-none"
-                  />
+                  <label className="block text-sm font-medium text-slate-700 mb-1.5">Notes (Optional)</label>
+                  <textarea value={notes} onChange={e => setNotes(e.target.value)}
+                    placeholder="Add any additional notes..." rows={2}
+                    className="w-full px-4 py-3 border border-slate-200 rounded-xl text-secondary resize-none focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
                 </div>
 
                 {/* Preview */}
                 {targetAmount && currentAmount && (
-                  <div className="bg-blue-50 rounded-xl p-4 border-2 border-blue-200">
+                  <div className="bg-primary/5 rounded-xl p-4 border border-primary/10">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="font-semibold text-blue-900">Progress Preview:</span>
-                      <span className="text-2xl font-bold text-blue-700">
+                      <span className="font-semibold text-primary text-sm">Progress Preview:</span>
+                      <span className="text-xl font-bold text-primary">
                         {calculateProgress(Number(currentAmount) || 0, Number(targetAmount)).toFixed(1)}%
                       </span>
                     </div>
-                    <div className="h-2 bg-blue-200 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-blue-600 rounded-full"
-                        style={{ width: `${calculateProgress(Number(currentAmount) || 0, Number(targetAmount))}%` }}
-                      />
+                    <div className="h-2 bg-primary/10 rounded-full overflow-hidden">
+                      <div className="h-full bg-primary rounded-full transition-all"
+                        style={{ width: `${calculateProgress(Number(currentAmount) || 0, Number(targetAmount))}%` }} />
                     </div>
                   </div>
                 )}
-
-                {/* Buttons */}
-                <div className="flex gap-3 pt-4">
-                  <button
-                    onClick={handleAddGoal}
-                    disabled={!goalName || !targetAmount || !targetDate}
-                    className={`flex-1 px-6 py-3 rounded-xl font-semibold transition-colors ${
-                      !goalName || !targetAmount || !targetDate
-                        ? 'bg-secondary-300 text-surface-900-400 cursor-not-allowed'
-                        : 'bg-primary text-white hover:bg-primary/90'
-                    }`}
-                  >
-                    {editingGoal ? 'Update Goal' : 'Create Goal'}
-                  </button>
-                  <button
-                    onClick={() => { setShowAddModal(false); resetForm(); }}
-                    className="px-6 py-3 border border-secondary-200 text-surface-900-700 rounded-xl font-semibold hover:bg-secondary-50 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                </div>
               </div>
+
+              {/* Fixed footer — always visible */}
+              <div className="flex gap-3 p-6 lg:p-8 pt-4 border-t border-slate-100 bg-white rounded-b-2xl shrink-0">
+                <button type="button" onClick={handleAddGoal}
+                  disabled={!goalName.trim() || !targetAmount || !targetDate}
+                  className={`flex-1 py-3 rounded-xl font-semibold transition-all ${
+                    !goalName.trim() || !targetAmount || !targetDate
+                      ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                      : 'bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20 active:scale-[0.98]'
+                  }`}>
+                  {editingGoal ? 'Update Goal' : 'Create Goal'}
+                </button>
+                <button type="button"
+                  onClick={() => { setShowAddModal(false); resetForm(); }}
+                  className="px-6 py-3 border border-slate-200 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 transition-colors">
+                  Cancel
+                </button>
+              </div>
+
             </div>
           </div>
         )}

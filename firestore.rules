@@ -1,0 +1,38 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users can only read/write their own data
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // User sub-collections (investments, goals, etc.)
+    match /users/{userId}/{subcollection}/{docId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Market prices — readable by any authenticated user, writable only by Cloud Functions
+    match /market_prices/{symbol} {
+      allow read: if request.auth != null;
+      allow write: if false; // Only Cloud Functions (admin SDK) can write
+    }
+
+    // Tax rules — readable by any authenticated user, writable only by admin
+    match /tax_rules/{countryCode}/{year} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // System config (exchange rates, API keys) — read by auth users
+    match /system/{document} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // Default: deny everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
