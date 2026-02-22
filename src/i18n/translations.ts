@@ -11,6 +11,7 @@ export interface Translations {
 const en: Translations = {
   // Nav / Sidebar
   'nav.dashboard': 'Dashboard',
+  'nav.wealthProjection': 'Wealth Projection',
   'nav.investments': 'Investments',
   'nav.lifestyleBasket': 'Lifestyle Basket',
   'nav.antiPortfolio': 'Anti-Portfolio',
@@ -175,6 +176,7 @@ const en: Translations = {
 const de: Translations = {
   // Nav / Sidebar
   'nav.dashboard': 'Übersicht',
+  'nav.wealthProjection': 'Vermögensprojektion',
   'nav.investments': 'Anlagen',
   'nav.lifestyleBasket': 'Lifestyle-Warenkorb',
   'nav.antiPortfolio': 'Anti-Portfolio',
