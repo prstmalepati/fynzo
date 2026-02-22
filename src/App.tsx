@@ -17,6 +17,9 @@ import ScenarioBranching from './pages/ScenarioBranching';
 import GoalTracker from './pages/GoalTracker';
 import Calculators from './pages/Calculators';
 import Settings from './pages/Settings';
+import Admin from './pages/Admin';
+import SecurityPrivacy from './pages/SecurityPrivacy';
+import Account from './pages/Account';
 
 export default function App() {
   return (
@@ -40,6 +43,9 @@ export default function App() {
                 <Route path="/goal-tracker" element={<ProtectedRoute><GoalTracker /></ProtectedRoute>} />
                 <Route path="/calculators" element={<ProtectedRoute><Calculators /></ProtectedRoute>} />
                 <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+                <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
+                <Route path="/security" element={<ProtectedRoute><SecurityPrivacy /></ProtectedRoute>} />
+                <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
 
                 {/* Catch all */}
                 <Route path="*" element={<Navigate to="/" replace />} />

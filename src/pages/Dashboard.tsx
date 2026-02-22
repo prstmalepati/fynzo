@@ -205,6 +205,29 @@ export default function Dashboard() {
             Track investments, set goals, and plan your financial future — all in one place.
           </p>
         </div>
+
+        {/* Trust strip */}
+        <div className="mt-6 animate-fadeIn" style={{ animationDelay: '500ms' }}>
+          <Link to="/security" className="flex items-center justify-center gap-4 py-3 px-4 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50 hover:border-slate-200 transition-all group">
+            <div className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+              <span className="text-[11px] text-slate-400 font-medium">AES-256 encrypted</span>
+            </div>
+            <span className="text-slate-200">|</span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[11px]">🇪🇺</span>
+              <span className="text-[11px] text-slate-400 font-medium">EU data residency</span>
+            </div>
+            <span className="text-slate-200">|</span>
+            <div className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+              <span className="text-[11px] text-slate-400 font-medium">GDPR compliant</span>
+            </div>
+            <svg className="w-3 h-3 text-slate-300 group-hover:text-primary transition-colors ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
+          </Link>
+        </div>
       </div>
     </SidebarLayout>
   );

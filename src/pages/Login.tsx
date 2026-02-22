@@ -151,6 +151,25 @@ export default function Login() {
               ← Back to home
             </Link>
           </div>
+
+          {/* Trust signals */}
+          <div className="mt-8 pt-6 border-t border-slate-100">
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                { icon: '🔐', text: 'AES-256 encryption' },
+                { icon: '🇪🇺', text: 'EU data residency' },
+                { icon: '🛡️', text: 'GDPR compliant' },
+              ].map((t, i) => (
+                <div key={i} className="text-center">
+                  <div className="text-base mb-0.5">{t.icon}</div>
+                  <div className="text-[10px] text-slate-400 font-medium leading-tight">{t.text}</div>
+                </div>
+              ))}
+            </div>
+            <p className="text-[10px] text-slate-300 text-center mt-3">
+              Your data is stored in Frankfurt, Germany. We never sell or share your financial data.
+            </p>
+          </div>
         </div>
       </div>
     </div>

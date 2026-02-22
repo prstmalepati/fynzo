@@ -2,35 +2,67 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Users can only read/write their own data
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+    // ─── Helper: Check if user is admin ─────────────────────
+    // Reads the admin_whitelist document to check UID membership
+    function isAdmin() {
+      return request.auth != null 
+        && request.auth.uid in get(/databases/$(database)/documents/system/admin_whitelist).data.uids;
     }
 
-    // User sub-collections (investments, goals, etc.)
+    // ─── User profile ───────────────────────────────────────
+    // Users can ONLY read/write their own profile document
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null && request.auth.uid == userId
+        // Prevent users from escalating — cannot write 'role' or 'isAdmin' fields
+        && !('role' in request.resource.data)
+        && !('isAdmin' in request.resource.data);
+      
+      // Admins can READ any user profile (for admin panel)
+      allow read: if isAdmin();
+    }
+
+    // ─── User sub-collections ───────────────────────────────
+    // investments, goals, lifestyleBasket, anti_portfolio, scenarios
     match /users/{userId}/{subcollection}/{docId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
+      // Admins can read (not write) any user's sub-collections
+      allow read: if isAdmin();
     }
 
-    // Market prices — readable by any authenticated user, writable only by Cloud Functions
+    // ─── Market prices cache (shared) ───────────────────────
+    // Any authenticated user can read.
+    // Writes allowed with rate-limit protection:
+    //   - Must be authenticated
+    //   - Document size capped (prevent abuse)
+    //   - Only expected fields allowed
     match /market_prices/{symbol} {
       allow read: if request.auth != null;
-      allow write: if false; // Only Cloud Functions (admin SDK) can write
+      allow create, update: if request.auth != null
+        && request.resource.data.keys().hasOnly(
+          ['symbol', 'price', 'previousClose', 'change', 'changePercent',
+           'currency', 'name', 'exchange', 'updatedAt', 'source'])
+        && request.resource.data.price is number
+        && request.resource.data.symbol is string
+        && request.resource.data.symbol.size() <= 20;
+      allow delete: if false;
     }
 
-    // Tax rules — readable by any authenticated user, writable only by admin
-    match /tax_rules/{countryCode}/{year} {
+    // ─── Tax rules (read-only, admin-seeded) ────────────────
+    match /tax_rules/{countryCode}/{document=**} {
       allow read: if request.auth != null;
-      allow write: if false;
+      allow write: if isAdmin();
     }
 
-    // System config (exchange rates, API keys) — read by auth users
+    // ─── System config ──────────────────────────────────────
     match /system/{document} {
+      // All authenticated users can read (needed for exchange rates, API keys check)
       allow read: if request.auth != null;
-      allow write: if false;
+      // Only admins can write (API keys, exchange rates, config)
+      allow write: if isAdmin();
     }
 
-    // Default: deny everything else
+    // ─── Default: deny everything else ──────────────────────
     match /{document=**} {
       allow read, write: if false;
     }

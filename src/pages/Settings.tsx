@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
 import { useLocale } from '../context/LocaleContext';
@@ -6,7 +7,7 @@ import { db } from '../firebase/config';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import SidebarLayout from '../components/SidebarLayout';
 import { useToast } from '../context/ToastContext';
-import { SUPPORTED_COUNTRIES, SUPPORTED_CURRENCIES, getDefaultCurrency, SupportedCurrency } from '../constants/countries';
+import { SUPPORTED_CURRENCIES, SupportedCurrency } from '../constants/countries';
 
 interface UserProfile {
   fullName: string;
@@ -56,19 +57,6 @@ export default function Settings() {
       }
     } catch (err) { console.error('Error loading profile:', err); }
     finally { setLoading(false); }
-  };
-
-  const handleCountryChange = (countryName: string) => {
-    updateProfile('country', countryName);
-    // Auto-set currency based on country
-    const defaultCurr = getDefaultCurrency(countryName);
-    updateProfile('preferredCurrency', defaultCurr);
-    setCurrency(defaultCurr);
-
-    // If Germany, suggest German locale
-    if (countryName === 'Germany' || countryName === 'Austria') {
-      // Don't force, just set default
-    }
   };
 
   const handleSave = async () => {
@@ -125,86 +113,26 @@ export default function Settings() {
           <p className="text-slate-500 mt-1">{t('settings.subtitle')}</p>
         </div>
 
-        {/* Personal Information */}
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-card p-6 lg:p-8 mb-6 animate-fadeIn">
-          <h2 className="text-xl font-bold text-secondary mb-6 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-primary/8 flex items-center justify-center">
-              <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+        {/* Account link card */}
+        <Link to="/account" className="block bg-white rounded-2xl border border-slate-200/80 shadow-card p-5 mb-6 hover:border-primary/20 hover:shadow-card-hover transition-all group animate-fadeIn">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-lg font-bold text-primary">
+                {(profile.fullName || user?.email || '?').charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <div className="text-sm font-bold text-secondary">{profile.fullName || 'Set your name'}</div>
+                <div className="text-xs text-slate-500">{user?.email}</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-slate-400 hidden sm:block">Profile, address & subscription</span>
+              <svg className="w-5 h-5 text-slate-300 group-hover:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
               </svg>
             </div>
-            {t('settings.personalInfo')}
-          </h2>
-          <div className="grid md:grid-cols-2 gap-5">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">{t('settings.fullName')}</label>
-              <input type="text" value={profile.fullName} onChange={e => updateProfile('fullName', e.target.value)}
-                className="w-full px-4 py-3 border border-slate-200 rounded-xl text-secondary" placeholder="John Doe" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">{t('settings.email')}</label>
-              <input type="email" value={profile.email} disabled
-                className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-slate-50 text-slate-400 cursor-not-allowed" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">{t('settings.phone')}</label>
-              <input type="tel" value={profile.phone} onChange={e => updateProfile('phone', e.target.value)}
-                className="w-full px-4 py-3 border border-slate-200 rounded-xl text-secondary" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">{t('settings.dob')}</label>
-              <input type="date" value={profile.dateOfBirth} onChange={e => updateProfile('dateOfBirth', e.target.value)}
-                className="w-full px-4 py-3 border border-slate-200 rounded-xl text-secondary" />
-            </div>
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">{t('settings.occupation')}</label>
-              <input type="text" value={profile.occupation} onChange={e => updateProfile('occupation', e.target.value)}
-                className="w-full px-4 py-3 border border-slate-200 rounded-xl text-secondary" />
-            </div>
           </div>
-        </div>
-
-        {/* Address */}
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-card p-6 lg:p-8 mb-6">
-          <h2 className="text-xl font-bold text-secondary mb-6 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-500/8 flex items-center justify-center">
-              <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-              </svg>
-            </div>
-            {t('settings.address')}
-          </h2>
-          <div className="grid md:grid-cols-2 gap-5">
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">{t('settings.country')}</label>
-              <select value={profile.country} onChange={e => handleCountryChange(e.target.value)}
-                className="w-full px-4 py-3 border border-slate-200 rounded-xl text-secondary bg-white">
-                <option value="">{t('settings.selectCountry')}</option>
-                {SUPPORTED_COUNTRIES.map(c => (
-                  <option key={c.code} value={c.name}>
-                    {c.flag} {isGerman ? c.nameDE : c.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">{t('settings.streetAddress')}</label>
-              <input type="text" value={profile.address} onChange={e => updateProfile('address', e.target.value)}
-                className="w-full px-4 py-3 border border-slate-200 rounded-xl text-secondary" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">{t('settings.city')}</label>
-              <input type="text" value={profile.city} onChange={e => updateProfile('city', e.target.value)}
-                className="w-full px-4 py-3 border border-slate-200 rounded-xl text-secondary" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">{t('settings.postalCode')}</label>
-              <input type="text" value={profile.postalCode} onChange={e => updateProfile('postalCode', e.target.value)}
-                className="w-full px-4 py-3 border border-slate-200 rounded-xl text-secondary" />
-            </div>
-          </div>
-        </div>
+        </Link>
 
         {/* Preferences: Currency + Language */}
         <div className="bg-white rounded-2xl border border-slate-200/80 shadow-card p-6 lg:p-8 mb-6">
@@ -328,6 +256,32 @@ export default function Settings() {
             ))}
           </div>
         </div>
+
+        {/* Security & Privacy link */}
+        <Link to="/security" className="block bg-white rounded-2xl border border-slate-200/80 shadow-card p-6 mb-6 hover:border-primary/20 hover:shadow-card-hover transition-all group">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center">
+                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-secondary">Security & Privacy</h2>
+                <p className="text-xs text-slate-500">Data protection, GDPR rights, export & delete your data</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 px-2 py-1 bg-emerald-50 border border-emerald-200 rounded-full">
+                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                <span className="text-[10px] font-semibold text-emerald-700">Secure</span>
+              </div>
+              <svg className="w-5 h-5 text-slate-300 group-hover:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+              </svg>
+            </div>
+          </div>
+        </Link>
 
         {/* Save */}
         <div className="flex justify-end gap-3 animate-fadeIn">

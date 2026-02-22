@@ -1,12 +1,15 @@
 // =============================================================
 // services/marketDataService.ts — Live stock/ETF/crypto prices
 // =============================================================
-// Uses Twelve Data (free: 800 req/day, 8/min) as primary
-// Falls back to Alpha Vantage, then CoinGecko for crypto
+// STRATEGY:
+// 1. Try Cloud Function (fetchPrice) — secure, server-side API key
+// 2. Fall back to direct client fetch if CF unavailable (dev mode)
+// 3. CoinGecko for crypto (free, no key needed)
 // Caches in Firestore under market_prices/{symbol}
 
 import { db } from '../firebase/config';
 import { doc, getDoc, setDoc, collection, getDocs } from 'firebase/firestore';
+import { cloudFetchPrice, cloudFetchPrices } from './cloudFunctions';
 
 export interface MarketPrice {
   symbol: string;
@@ -137,21 +140,38 @@ export async function fetchLivePrice(symbol: string): Promise<MarketPrice | null
   if (!symbol?.trim()) return null;
   const sym = symbol.trim().toUpperCase();
 
-  // 1. Check cache
+  // 1. Check Firestore cache
   const cached = await getCachedPrice(sym);
   if (cached) return cached;
 
-  // 2. Try crypto first if it's a known crypto symbol
+  // 2. Try crypto first if it's a known crypto symbol (free, no key)
   if (CRYPTO_MAP[sym]) {
     const crypto = await fetchFromCoinGecko(sym);
     if (crypto) { await setCachedPrice(crypto); return crypto; }
   }
 
-  // 3. Try Twelve Data for stocks/ETFs
+  // 3. Try Cloud Function (secure, server-side API key)
+  try {
+    const cloudResult = await cloudFetchPrice(sym);
+    if (cloudResult && cloudResult.price) {
+      const mp: MarketPrice = {
+        symbol: cloudResult.symbol, price: cloudResult.price,
+        previousClose: cloudResult.previousClose, change: cloudResult.change,
+        changePercent: cloudResult.changePercent, currency: cloudResult.currency,
+        name: cloudResult.name, exchange: cloudResult.exchange,
+        updatedAt: new Date(cloudResult.updatedAt), source: cloudResult.source,
+      };
+      return mp;
+    }
+  } catch {
+    // Cloud Function not deployed — fall back to direct client fetch
+  }
+
+  // 4. Fallback: Direct Twelve Data fetch from client (dev mode)
   const stock = await fetchFromTwelveData(sym);
   if (stock) { await setCachedPrice(stock); return stock; }
 
-  // 4. Try crypto as fallback (maybe user typed 'bitcoin' style)
+  // 5. Try crypto as last resort
   const cryptoFallback = await fetchFromCoinGecko(sym);
   if (cryptoFallback) { await setCachedPrice(cryptoFallback); return cryptoFallback; }
 
@@ -161,19 +181,39 @@ export async function fetchLivePrice(symbol: string): Promise<MarketPrice | null
 // Batch fetch for multiple symbols (used by dashboard)
 export async function fetchMultiplePrices(symbols: string[]): Promise<Map<string, MarketPrice>> {
   const results = new Map<string, MarketPrice>();
-  // Deduplicate
   const unique = [...new Set(symbols.map(s => s.trim().toUpperCase()).filter(Boolean))];
-  // Fetch in parallel with concurrency limit
+
+  // Try Cloud Function batch first
+  try {
+    const cloudResults = await cloudFetchPrices(unique.slice(0, 10));
+    for (const [sym, data] of Object.entries(cloudResults)) {
+      if (data && data.price) {
+        results.set(sym, {
+          symbol: data.symbol, price: data.price,
+          previousClose: data.previousClose, change: data.change,
+          changePercent: data.changePercent, currency: data.currency,
+          name: data.name, exchange: data.exchange,
+          updatedAt: new Date(data.updatedAt), source: data.source,
+        });
+      }
+    }
+    // If cloud handled everything, return
+    if (unique.every(s => results.has(s))) return results;
+  } catch {
+    // Cloud Functions not available, fall back to individual fetches
+  }
+
+  // Fallback: fetch remaining individually
+  const remaining = unique.filter(s => !results.has(s));
   const batchSize = 4;
-  for (let i = 0; i < unique.length; i += batchSize) {
-    const batch = unique.slice(i, i + batchSize);
+  for (let i = 0; i < remaining.length; i += batchSize) {
+    const batch = remaining.slice(i, i + batchSize);
     const promises = batch.map(async sym => {
       const price = await fetchLivePrice(sym);
       if (price) results.set(sym, price);
     });
     await Promise.all(promises);
-    // Small delay between batches to respect rate limits
-    if (i + batchSize < unique.length) {
+    if (i + batchSize < remaining.length) {
       await new Promise(r => setTimeout(r, 500));
     }
   }
