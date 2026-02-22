@@ -80,50 +80,189 @@ export default function LandingPageExtended() {
       </nav>
 
       {/* ─── Hero ──────────────────────────────────────────── */}
-      <section className="relative pt-28 pb-20 lg:pt-36 lg:pb-28 px-6 overflow-hidden">
-        {/* Subtle gradient background */}
+      <section className="relative pt-28 pb-16 lg:pt-36 lg:pb-24 px-6 overflow-hidden">
+        {/* Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-teal-50/30 pointer-events-none" />
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/[0.03] rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+        <div className="absolute bottom-0 left-1/2 w-[400px] h-[400px] bg-blue-500/[0.02] rounded-full blur-3xl translate-y-1/2 pointer-events-none" />
 
         <div className="max-w-6xl mx-auto relative">
-          <div className="max-w-3xl">
-            {/* Country pill — dynamic */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-full text-sm text-slate-600 mb-6 shadow-sm">
-              <span className="text-base">{profile.flag}</span>
-              <span className="font-medium">Built for {profile.country}</span>
-              <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+            {/* Left — Text */}
+            <div>
+              {/* Country pill — dynamic */}
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-full text-sm text-slate-600 mb-6 shadow-sm">
+                <span className="text-base">{profile.flag}</span>
+                <span className="font-medium">Built for {profile.country}</span>
+                <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+              </div>
+
+              <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-bold text-secondary leading-[1.1] tracking-tight mb-6 font-display">
+                Know your real numbers.
+                <br />
+                <span className="text-primary">Plan with clarity.</span>
+              </h1>
+
+              <p className="text-lg lg:text-xl text-slate-500 leading-relaxed mb-8 max-w-xl">
+                myfynzo is a wealth management platform for people who take their money seriously.
+                Track investments, calculate taxes, model scenarios, and build your path to financial independence — tailored to your country.
+              </p>
+
+              <div className="flex flex-wrap gap-3 mb-8">
+                <Link to="/signup"
+                  className="px-7 py-3.5 bg-secondary text-white rounded-xl font-semibold hover:bg-secondary/90 transition-all shadow-lg shadow-secondary/10">
+                  Start Free — No Card Required
+                </Link>
+                <a href="#features"
+                  className="px-7 py-3.5 border border-slate-200 text-slate-700 rounded-xl font-semibold hover:border-slate-300 hover:bg-slate-50 transition-all">
+                  See Features
+                </a>
+              </div>
+
+              {/* Trust — honest, minimal */}
+              <div className="flex flex-wrap items-center gap-5 text-sm text-slate-400">
+                {['Free forever tier', 'Bank-level encryption', 'GDPR compliant', 'EU-hosted data'].map((t, i) => (
+                  <span key={i} className="flex items-center gap-1.5">
+                    <svg className="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/></svg>
+                    {t}
+                  </span>
+                ))}
+              </div>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-bold text-secondary leading-[1.1] tracking-tight mb-6 font-display">
-              Know your real numbers.
-              <br />
-              <span className="text-primary">Plan with clarity.</span>
-            </h1>
+            {/* Right — Device mockups */}
+            <div className="relative hidden lg:block">
+              {/* iPad mockup */}
+              <div className="relative mx-auto" style={{ width: '460px' }}>
+                {/* iPad frame */}
+                <div className="bg-slate-900 rounded-[2rem] p-3 shadow-2xl shadow-slate-900/30 rotate-1 hover:rotate-0 transition-transform duration-500">
+                  <div className="bg-white rounded-[1.4rem] overflow-hidden">
+                    {/* Status bar */}
+                    <div className="bg-slate-800 px-5 py-1.5 flex items-center justify-between">
+                      <span className="text-[9px] text-white/50 font-medium">9:41</span>
+                      <div className="flex items-center gap-1">
+                        <div className="w-3 h-1.5 border border-white/40 rounded-sm"><div className="w-2 h-full bg-emerald-400 rounded-sm" /></div>
+                      </div>
+                    </div>
+                    {/* App content — dashboard mockup */}
+                    <div className="p-4 bg-slate-50" style={{ minHeight: '280px' }}>
+                      {/* Mini sidebar hint */}
+                      <div className="flex gap-3">
+                        <div className="w-10 flex-shrink-0">
+                          <div className="w-7 h-7 rounded-lg bg-primary/20 flex items-center justify-center mb-3">
+                            <span className="text-[8px] font-bold text-primary">mf</span>
+                          </div>
+                          {[1,2,3,4,5].map(i => <div key={i} className="w-5 h-1 bg-slate-200 rounded-full mb-2.5 mx-auto" />)}
+                        </div>
+                        {/* Main content area */}
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-3">
+                            <div>
+                              <div className="w-24 h-2 bg-slate-300 rounded-full mb-1" />
+                              <div className="w-16 h-1.5 bg-slate-200 rounded-full" />
+                            </div>
+                            <div className="w-6 h-6 bg-primary/10 rounded-lg" />
+                          </div>
+                          {/* Portfolio cards */}
+                          <div className="grid grid-cols-3 gap-2 mb-3">
+                            <div className="bg-gradient-to-br from-slate-800 to-slate-700 rounded-xl p-2.5 text-white">
+                              <div className="w-8 h-1 bg-white/30 rounded-full mb-2" />
+                              <div className="text-sm font-bold">€47,230</div>
+                              <div className="w-10 h-1 bg-white/20 rounded-full mt-1" />
+                            </div>
+                            <div className="bg-white rounded-xl p-2.5 border border-slate-100">
+                              <div className="w-8 h-1 bg-slate-200 rounded-full mb-2" />
+                              <div className="text-sm font-bold text-slate-800">€25,000</div>
+                              <div className="w-10 h-1 bg-slate-100 rounded-full mt-1" />
+                            </div>
+                            <div className="bg-white rounded-xl p-2.5 border border-slate-100">
+                              <div className="w-8 h-1 bg-slate-200 rounded-full mb-2" />
+                              <div className="text-sm font-bold text-slate-800">€8,500</div>
+                              <div className="w-10 h-1 bg-slate-100 rounded-full mt-1" />
+                            </div>
+                          </div>
+                          {/* Chart area */}
+                          <div className="bg-white rounded-xl p-3 border border-slate-100">
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="w-16 h-1.5 bg-slate-200 rounded-full" />
+                              <div className="flex gap-1">
+                                <div className="px-1.5 py-0.5 bg-primary/10 rounded text-[7px] text-primary font-bold">1Y</div>
+                                <div className="px-1.5 py-0.5 bg-slate-100 rounded text-[7px] text-slate-400">5Y</div>
+                              </div>
+                            </div>
+                            {/* SVG chart line */}
+                            <svg viewBox="0 0 200 60" className="w-full h-12">
+                              <defs>
+                                <linearGradient id="heroChartGrad" x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="0%" stopColor="rgb(15,118,110)" stopOpacity="0.15" />
+                                  <stop offset="100%" stopColor="rgb(15,118,110)" stopOpacity="0" />
+                                </linearGradient>
+                              </defs>
+                              <path d="M0,45 C20,42 30,38 50,35 C70,32 80,40 100,30 C120,20 130,25 150,18 C170,12 185,15 200,8" fill="none" stroke="rgb(15,118,110)" strokeWidth="2" />
+                              <path d="M0,45 C20,42 30,38 50,35 C70,32 80,40 100,30 C120,20 130,25 150,18 C170,12 185,15 200,8 L200,60 L0,60 Z" fill="url(#heroChartGrad)" />
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-            <p className="text-lg lg:text-xl text-slate-500 leading-relaxed mb-8 max-w-2xl">
-              myfynzo is a wealth management platform for people who take their money seriously.
-              Track investments, calculate taxes, model scenarios, and build your path to financial independence — tailored to your country.
-            </p>
+                {/* iPhone mockup — overlapping bottom-right */}
+                <div className="absolute -bottom-8 -right-6 z-10" style={{ width: '140px' }}>
+                  <div className="bg-slate-900 rounded-[1.5rem] p-1.5 shadow-2xl shadow-slate-900/40 -rotate-2 hover:rotate-0 transition-transform duration-500">
+                    <div className="bg-white rounded-[1.2rem] overflow-hidden">
+                      {/* Notch */}
+                      <div className="bg-slate-800 pt-2 pb-1 flex justify-center">
+                        <div className="w-12 h-1.5 bg-slate-700 rounded-full" />
+                      </div>
+                      {/* Phone content */}
+                      <div className="p-2.5 bg-slate-50" style={{ minHeight: '180px' }}>
+                        <div className="w-14 h-1.5 bg-slate-300 rounded-full mb-2" />
+                        {/* Mini investment list */}
+                        {[
+                          { name: 'MSCI World', val: '+12.4%', up: true },
+                          { name: 'Bitcoin', val: '+8.2%', up: true },
+                          { name: 'Gold ETF', val: '-1.8%', up: false },
+                        ].map((item, i) => (
+                          <div key={i} className="flex items-center justify-between py-1.5 border-b border-slate-100 last:border-0">
+                            <div>
+                              <div className="text-[7px] font-bold text-slate-800">{item.name}</div>
+                              <div className="w-10 h-0.5 bg-slate-200 rounded-full mt-0.5" />
+                            </div>
+                            <span className={`text-[8px] font-bold ${item.up ? 'text-emerald-600' : 'text-red-500'}`}>{item.val}</span>
+                          </div>
+                        ))}
+                        {/* Quick action buttons */}
+                        <div className="grid grid-cols-2 gap-1.5 mt-2">
+                          <div className="bg-primary/10 rounded-lg py-1.5 flex items-center justify-center">
+                            <span className="text-[7px] font-bold text-primary">+ Add</span>
+                          </div>
+                          <div className="bg-slate-100 rounded-lg py-1.5 flex items-center justify-center">
+                            <span className="text-[7px] font-bold text-slate-500">Import</span>
+                          </div>
+                        </div>
+                      </div>
+                      {/* Home bar */}
+                      <div className="flex justify-center py-1">
+                        <div className="w-8 h-1 bg-slate-300 rounded-full" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-            <div className="flex flex-wrap gap-3 mb-10">
-              <Link to="/signup"
-                className="px-7 py-3.5 bg-secondary text-white rounded-xl font-semibold hover:bg-secondary/90 transition-all shadow-lg shadow-secondary/10">
-                Start Free — No Card Required
-              </Link>
-              <a href="#features"
-                className="px-7 py-3.5 border border-slate-200 text-slate-700 rounded-xl font-semibold hover:border-slate-300 hover:bg-slate-50 transition-all">
-                See Features
-              </a>
-            </div>
-
-            {/* Trust — honest, minimal */}
-            <div className="flex flex-wrap items-center gap-6 text-sm text-slate-400">
-              {['Free forever tier', 'Bank-level encryption', 'GDPR compliant', 'EU-hosted data'].map((t, i) => (
-                <span key={i} className="flex items-center gap-1.5">
-                  <svg className="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/></svg>
-                  {t}
-                </span>
-              ))}
+                {/* Floating stat badges */}
+                <div className="absolute -left-4 top-12 bg-white rounded-xl shadow-lg shadow-slate-200/60 border border-slate-100 px-3 py-2 -rotate-2 animate-float z-10">
+                  <div className="text-[9px] text-slate-400 mb-0.5">Portfolio</div>
+                  <div className="text-sm font-bold text-secondary">+23.4%</div>
+                  <div className="text-[8px] text-emerald-600 font-semibold">↑ This year</div>
+                </div>
+                <div className="absolute -left-2 bottom-16 bg-white rounded-xl shadow-lg shadow-slate-200/60 border border-slate-100 px-3 py-2 rotate-1 z-10" style={{ animationDelay: '1s', animation: 'float 6s ease-in-out infinite 1s' }}>
+                  <div className="text-[9px] text-slate-400 mb-0.5">Tax Saved</div>
+                  <div className="text-sm font-bold text-primary">€3,847</div>
+                  <div className="text-[8px] text-slate-500 font-medium">DE optimizer</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
