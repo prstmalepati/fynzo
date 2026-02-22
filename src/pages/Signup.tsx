@@ -36,7 +36,16 @@ export default function Signup() {
       });
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.message || 'Failed to create account');
+      const code = err?.code || '';
+      const friendlyErrors: Record<string, string> = {
+        'auth/email-already-in-use': 'An account with this email already exists. Try signing in instead.',
+        'auth/invalid-email': 'Please enter a valid email address.',
+        'auth/weak-password': 'Password is too weak. Use at least 6 characters with a mix of letters and numbers.',
+        'auth/operation-not-allowed': 'Account creation is currently disabled. Please try again later.',
+        'auth/too-many-requests': 'Too many attempts. Please wait a moment and try again.',
+        'auth/network-request-failed': 'Connection error. Please check your internet and try again.',
+      };
+      setError(friendlyErrors[code] || 'Something went wrong. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -60,7 +69,13 @@ export default function Signup() {
       navigate('/dashboard');
     } catch (err: any) {
       if (err.code !== 'auth/popup-closed-by-user') {
-        setError(err.message || 'Failed to sign up with Google');
+        const friendlyErrors: Record<string, string> = {
+          'auth/account-exists-with-different-credential': 'An account with this email exists using a different sign-in method.',
+          'auth/popup-blocked': 'Pop-up was blocked by your browser. Please allow pop-ups for this site.',
+          'auth/network-request-failed': 'Connection error. Please check your internet and try again.',
+          'auth/too-many-requests': 'Too many attempts. Please wait a moment and try again.',
+        };
+        setError(friendlyErrors[err.code] || 'Something went wrong with Google sign-up. Please try again.');
       }
     } finally {
       setLoading(false);

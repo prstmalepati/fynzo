@@ -133,7 +133,7 @@ export default function LandingPageExtended() {
             {/* Right — Device mockups */}
             <div className="relative hidden lg:block">
               {/* iPad mockup */}
-              <div className="relative mx-auto" style={{ width: '460px' }}>
+              <div className="relative mx-auto" style={{ width: '540px' }}>
                 {/* iPad frame */}
                 <div className="bg-slate-900 rounded-[2rem] p-3 shadow-2xl shadow-slate-900/30 rotate-1 hover:rotate-0 transition-transform duration-500">
                   <div className="bg-white rounded-[1.4rem] overflow-hidden">
@@ -145,7 +145,7 @@ export default function LandingPageExtended() {
                       </div>
                     </div>
                     {/* App content — dashboard mockup */}
-                    <div className="p-4 bg-slate-50" style={{ minHeight: '280px' }}>
+                    <div className="p-4 bg-slate-50" style={{ minHeight: '320px' }}>
                       {/* Mini sidebar hint */}
                       <div className="flex gap-3">
                         <div className="w-10 flex-shrink-0">
@@ -191,7 +191,7 @@ export default function LandingPageExtended() {
                               </div>
                             </div>
                             {/* SVG chart line */}
-                            <svg viewBox="0 0 200 60" className="w-full h-12">
+                            <svg viewBox="0 0 200 60" className="w-full h-16">
                               <defs>
                                 <linearGradient id="heroChartGrad" x1="0" y1="0" x2="0" y2="1">
                                   <stop offset="0%" stopColor="rgb(15,118,110)" stopOpacity="0.15" />
@@ -209,15 +209,15 @@ export default function LandingPageExtended() {
                 </div>
 
                 {/* iPhone mockup — overlapping bottom-right */}
-                <div className="absolute -bottom-8 -right-6 z-10" style={{ width: '140px' }}>
-                  <div className="bg-slate-900 rounded-[1.5rem] p-1.5 shadow-2xl shadow-slate-900/40 -rotate-2 hover:rotate-0 transition-transform duration-500">
-                    <div className="bg-white rounded-[1.2rem] overflow-hidden">
+                <div className="absolute -bottom-10 -right-8 z-10" style={{ width: '175px' }}>
+                  <div className="bg-slate-900 rounded-[1.8rem] p-2 shadow-2xl shadow-slate-900/40 -rotate-2 hover:rotate-0 transition-transform duration-500">
+                    <div className="bg-white rounded-[1.4rem] overflow-hidden">
                       {/* Notch */}
                       <div className="bg-slate-800 pt-2 pb-1 flex justify-center">
                         <div className="w-12 h-1.5 bg-slate-700 rounded-full" />
                       </div>
                       {/* Phone content */}
-                      <div className="p-2.5 bg-slate-50" style={{ minHeight: '180px' }}>
+                      <div className="p-3 bg-slate-50" style={{ minHeight: '220px' }}>
                         <div className="w-14 h-1.5 bg-slate-300 rounded-full mb-2" />
                         {/* Mini investment list */}
                         {[

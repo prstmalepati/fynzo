@@ -19,7 +19,17 @@ export default function Login() {
       await signInWithEmailAndPassword(auth, email, password);
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.message || 'Failed to log in');
+      const code = err?.code || '';
+      const friendlyErrors: Record<string, string> = {
+        'auth/invalid-credential': 'Incorrect email or password. Please try again.',
+        'auth/user-not-found': 'No account found with this email. Would you like to create one?',
+        'auth/wrong-password': 'Incorrect password. Please try again.',
+        'auth/invalid-email': 'Please enter a valid email address.',
+        'auth/user-disabled': 'This account has been disabled. Please contact support.',
+        'auth/too-many-requests': 'Too many failed attempts. Please wait a moment and try again.',
+        'auth/network-request-failed': 'Connection error. Please check your internet and try again.',
+      };
+      setError(friendlyErrors[code] || 'Something went wrong. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -43,9 +53,15 @@ export default function Login() {
       navigate('/dashboard');
     } catch (err: any) {
       if (err.code === 'auth/popup-closed-by-user') {
-        setError('Google sign-in was cancelled');
+        setError('Google sign-in was cancelled.');
       } else {
-        setError(err.message || 'Failed to sign in with Google');
+        const friendlyErrors: Record<string, string> = {
+          'auth/account-exists-with-different-credential': 'An account with this email exists using a different sign-in method.',
+          'auth/popup-blocked': 'Pop-up was blocked by your browser. Please allow pop-ups for this site.',
+          'auth/network-request-failed': 'Connection error. Please check your internet and try again.',
+          'auth/too-many-requests': 'Too many attempts. Please wait a moment and try again.',
+        };
+        setError(friendlyErrors[err.code] || 'Something went wrong with Google sign-in. Please try again.');
       }
     } finally {
       setLoading(false);
