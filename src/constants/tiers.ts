@@ -1,21 +1,25 @@
 /**
- * Tier Limits and Features
- * Defines what Free and Premium users can access
+ * 3-Tier Subscription Model
+ * Free → Premium Single → Premium Couples (Partner Card)
  */
 
-export type TierType = 'free' | 'premium';
+export type TierType = 'free' | 'premium' | 'couples';
 
 export interface TierLimits {
   maxAssets: number;
   projectionYears: number;
   bankConnections: number;
   maxScenarios: number;
-  familyMembers: number;
+  users: number;
   exportFrequency: 'daily' | 'weekly' | 'unlimited';
   advancedProjections: boolean;
+  couplesProjection: boolean;
   monteCarlo: boolean;
   pdfReports: boolean;
   prioritySupport: boolean;
+  liveMarketPrices: boolean;
+  csvImport: boolean;
+  allTaxCalcs: boolean;
 }
 
 export const TIER_LIMITS: Record<TierType, TierLimits> = {
@@ -24,99 +28,119 @@ export const TIER_LIMITS: Record<TierType, TierLimits> = {
     projectionYears: 5,
     bankConnections: 0,
     maxScenarios: 0,
-    familyMembers: 1,
+    users: 1,
     exportFrequency: 'weekly',
     advancedProjections: false,
+    couplesProjection: false,
     monteCarlo: false,
     pdfReports: false,
-    prioritySupport: false
+    prioritySupport: false,
+    liveMarketPrices: false,
+    csvImport: false,
+    allTaxCalcs: false,
   },
   premium: {
     maxAssets: 999,
     projectionYears: 50,
     bankConnections: 10,
     maxScenarios: 10,
-    familyMembers: 5,
+    users: 1,
     exportFrequency: 'unlimited',
     advancedProjections: true,
+    couplesProjection: false,
     monteCarlo: true,
     pdfReports: true,
-    prioritySupport: true
-  }
-};
-
-export const TIER_FEATURES = {
-  free: [
-    'Manual asset entry',
-    'Basic net worth tracking',
-    'Dashboard with charts',
-    '5-year wealth projection',
-    'FIRE Calculator (all 4 types)',
-    'German Tax Calculator',
-    'Basic calculators',
-    'Up to 20 assets',
-    'CSV export (weekly)'
-  ],
-  premium: [
-    'Everything in Free',
-    'Auto bank sync (Germany)',
-    'Unlimited assets',
-    'Unlimited projections (50+ years)',
-    'Advanced "what-if" scenarios',
-    'Monte Carlo simulations',
-    'Family sharing (5 members)',
-    'PDF reports & analytics',
-    'Priority email support',
-    'Early access to new features'
-  ]
-};
-
-export const TIER_PRICES = {
-  monthly: {
-    EUR: 2.99,
-    USD: 2.99,
-    GBP: 2.99,
-    INR: 199,
-    CAD: 3.99
+    prioritySupport: true,
+    liveMarketPrices: true,
+    csvImport: true,
+    allTaxCalcs: true,
   },
-  annual: {
-    EUR: 29,
-    USD: 29,
-    GBP: 29,
-    INR: 1999,
-    CAD: 39
-  }
+  couples: {
+    maxAssets: 999,
+    projectionYears: 50,
+    bankConnections: 10,
+    maxScenarios: 10,
+    users: 2,
+    exportFrequency: 'unlimited',
+    advancedProjections: true,
+    couplesProjection: true,
+    monteCarlo: true,
+    pdfReports: true,
+    prioritySupport: true,
+    liveMarketPrices: true,
+    csvImport: true,
+    allTaxCalcs: true,
+  },
 };
 
-/**
- * Get tier price in user's currency
- */
-export function getTierPrice(currency: string, period: 'monthly' | 'annual'): number {
-  return TIER_PRICES[period][currency as keyof typeof TIER_PRICES.monthly] || TIER_PRICES[period].EUR;
-}
-
-/**
- * Calculate savings percentage for annual plan
- */
-export function getAnnualSavings(currency: string): number {
-  const monthly = TIER_PRICES.monthly[currency as keyof typeof TIER_PRICES.monthly] || TIER_PRICES.monthly.EUR;
-  const annual = TIER_PRICES.annual[currency as keyof typeof TIER_PRICES.annual] || TIER_PRICES.annual.EUR;
-  
-  const monthlyAnnual = monthly * 12;
-  const savings = ((monthlyAnnual - annual) / monthlyAnnual) * 100;
-  
-  return Math.round(savings);
-}
-
-/**
- * Feature gate messages for premium features
- */
-export const PREMIUM_FEATURE_MESSAGES = {
-  bankSync: 'Auto bank sync is a Premium feature. Connect your bank accounts to automatically update your net worth.',
-  advancedProjections: 'Advanced projections are available in Premium. Create unlimited "what-if" scenarios and see 50+ year projections.',
-  familySharing: 'Family sharing is a Premium feature. Track wealth across your household with up to 5 family members.',
-  monteCarlo: 'Monte Carlo simulations are available in Premium. See probability-based projections for more accurate planning.',
-  pdfReports: 'PDF report generation is a Premium feature. Export professional reports of your financial situation.',
-  unlimitedAssets: 'Free tier is limited to 20 assets. Upgrade to Premium for unlimited assets.',
-  scenarios: 'Scenario planning is a Premium feature. Model different life events and compare outcomes.'
+export const TIER_INFO = {
+  free: {
+    name: 'Free',
+    tagline: 'Get started — no card required',
+    features: [
+      'Up to 10 investments',
+      'Basic dashboard & charts',
+      '5-year wealth projection',
+      '1 tax calculator (your country)',
+      'Goal tracker (3 goals)',
+      'Weekly data export',
+    ],
+  },
+  premium: {
+    name: 'Premium',
+    tagline: 'For serious wealth builders',
+    features: [
+      'Everything in Free',
+      'Unlimited investments',
+      '50-year projections',
+      'All 4 tax calculators (DE, US, CA, IN)',
+      'Scenario branching',
+      'Live market prices',
+      'CSV broker import',
+      'PDF reports & analytics',
+      'Priority support',
+    ],
+  },
+  couples: {
+    name: 'Couples',
+    tagline: 'One subscription, two partners',
+    features: [
+      'Everything in Premium',
+      'Partner card — invite your partner',
+      'Joint wealth projection',
+      'Combined net worth dashboard',
+      'Shared goals & scenarios',
+      'Individual + merged tax views',
+      'Household FIRE calculator',
+      'Partner activity feed',
+    ],
+  },
 };
+
+// ─── Purchasing Power Parity Pricing ──────────────────────────
+// Prices calibrated to local purchasing power
+export const TIER_PRICES: Record<string, { premium: { monthly: number; annual: number }; couples: { monthly: number; annual: number } }> = {
+  EUR: { premium: { monthly: 2.99, annual: 29 },    couples: { monthly: 3.99, annual: 39 } },
+  USD: { premium: { monthly: 2.99, annual: 29 },    couples: { monthly: 4.49, annual: 44 } },
+  GBP: { premium: { monthly: 2.49, annual: 24 },    couples: { monthly: 3.49, annual: 34 } },
+  CAD: { premium: { monthly: 3.99, annual: 39 },    couples: { monthly: 5.49, annual: 54 } },
+  INR: { premium: { monthly: 149,  annual: 1499 },  couples: { monthly: 199,  annual: 1999 } },
+  CHF: { premium: { monthly: 2.99, annual: 29 },    couples: { monthly: 4.49, annual: 44 } },
+};
+
+export function getTierPrice(currency: string, tier: 'premium' | 'couples', period: 'monthly' | 'annual'): number {
+  const prices = TIER_PRICES[currency] || TIER_PRICES.EUR;
+  return prices[tier][period];
+}
+
+export function getAnnualSavings(currency: string, tier: 'premium' | 'couples'): number {
+  const prices = TIER_PRICES[currency] || TIER_PRICES.EUR;
+  const monthly = prices[tier].monthly * 12;
+  const annual = prices[tier].annual;
+  return Math.round(((monthly - annual) / monthly) * 100);
+}
+
+export function getCurrencySymbol(currency: string): string {
+  const symbols: Record<string, string> = { EUR: '€', USD: '$', GBP: '£', CAD: 'C$', INR: '₹', CHF: 'CHF' };
+  return symbols[currency] || '€';
+}
