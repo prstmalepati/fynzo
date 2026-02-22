@@ -18,6 +18,7 @@ const en: Translations = {
   'nav.goalTracker': 'Goal Tracker',
   'nav.calculators': 'Calculators',
   'nav.settings': 'Settings',
+  'nav.security': 'Security & Privacy',
   'nav.signOut': 'Sign Out',
   'nav.account': 'Account',
 
@@ -181,6 +182,7 @@ const de: Translations = {
   'nav.goalTracker': 'Ziel-Tracker',
   'nav.calculators': 'Rechner',
   'nav.settings': 'Einstellungen',
+  'nav.security': 'Sicherheit & Datenschutz',
   'nav.signOut': 'Abmelden',
   'nav.account': 'Konto',
 
