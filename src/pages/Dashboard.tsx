@@ -21,6 +21,9 @@ export default function Dashboard() {
   const [goalProgress, setGoalProgress] = useState(0);
   const [invByType, setInvByType] = useState<InvData[]>([]);
   const [projYears, setProjYears] = useState(10);
+  const [cashSavings, setCashSavings] = useState(0);
+  const [totalDebt, setTotalDebt] = useState(0);
+  const [monthlyInvestment, setMonthlyInvestment] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => { if (user) loadDashboardData(); }, [user]);
@@ -65,11 +68,19 @@ export default function Dashboard() {
       const lifeSnap = await getDocs(collection(db, 'users', user.uid, 'lifestyleBasket'));
       setTotalLifestyleItems(lifeSnap.docs.reduce((s, d) => s + (d.data().cost || 0), 0));
 
-      // Projection years preference
+      // Projection years preference + wealth projection inputs
       const userSnap = await getDoc(doc(db, 'users', user.uid));
       if (userSnap.exists()) {
         const ud = userSnap.data();
         if (ud.projectionYears) setProjYears(ud.projectionYears);
+      }
+      // Load saved wealth projection data for net worth calc
+      const projSnap = await getDoc(doc(db, 'users', user.uid, 'projections', 'wealth'));
+      if (projSnap.exists()) {
+        const pd = projSnap.data();
+        setCashSavings(pd.currentNetWorth || 0);
+        setTotalDebt(pd.totalDebt || 0);
+        setMonthlyInvestment(pd.monthlyInvestment || 0);
       }
     } catch (error) {
       console.error('Error loading dashboard:', error);
@@ -80,11 +91,20 @@ export default function Dashboard() {
   const totalGain = totalInvestments - totalCost;
   const totalGainPct = totalCost > 0 ? (totalGain / totalCost) * 100 : 0;
 
-  // Simple compound projection: current investments * (1 + 7% annual return) ^ years
+  // Net Worth = Cash/Savings + Investments - Debt
+  const todayNetWorth = cashSavings + totalInvestments - totalDebt;
+
+  // Projected net worth: compound growth on investments + monthly contributions
   const projectedValue = useMemo(() => {
     const annualReturn = 0.07;
-    return totalInvestments * Math.pow(1 + annualReturn, projYears);
-  }, [totalInvestments, projYears]);
+    const annualContribution = monthlyInvestment * 12;
+    let projected = totalInvestments;
+    for (let y = 0; y < projYears; y++) {
+      projected = projected * (1 + annualReturn) + annualContribution;
+    }
+    // Add cash, subtract remaining debt (simplified: debt reduces linearly)
+    return cashSavings + projected - Math.max(0, totalDebt - (projYears * annualContribution * 0.1));
+  }, [totalInvestments, projYears, cashSavings, totalDebt, monthlyInvestment]);
 
   const colors = ['#0f766e', '#2563eb', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4', '#ec4899', '#84cc16', '#f97316', '#6b7280'];
 
@@ -142,7 +162,7 @@ export default function Dashboard() {
               <div className="flex items-end justify-between">
                 <div>
                   <div className="text-[10px] text-white/40 mb-0.5">Today Net Worth</div>
-                  <div className="text-xl font-bold tracking-tight">{formatAmount(totalInvestments)}</div>
+                  <div className="text-xl font-bold tracking-tight">{formatAmount(todayNetWorth)}</div>
                   <div className="text-[10px] text-white/40 mt-2">Net Worth in {projYears} years</div>
                   <div className="text-xl font-bold text-accent tracking-tight">{formatAmount(projectedValue)}</div>
                 </div>
