@@ -8,6 +8,9 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 import SidebarLayout from '../components/SidebarLayout';
 import { useToast } from '../context/ToastContext';
 import { SUPPORTED_COUNTRIES } from '../constants/countries';
+import { useAdmin } from '../hooks/useAdmin';
+import { useTier } from '../hooks/useTier';
+import { TierType, TIER_INFO, getTierPrice, getAnnualSavings, getCurrencySymbol } from '../constants/tiers';
 
 type Tab = 'profile' | 'subscription' | 'billing';
 
@@ -223,87 +226,7 @@ export default function Account() {
 
         {/* ═══ SUBSCRIPTION TAB ══════════════════════════════ */}
         {tab === 'subscription' && (
-          <div className="space-y-6">
-            {/* Current plan */}
-            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-card p-6 lg:p-8">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-bold text-secondary">Current Plan</h2>
-                <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-bold uppercase tracking-wider">Free</span>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-5">
-                {/* Free plan */}
-                <div className="relative p-5 rounded-2xl border-2 border-primary bg-primary/[0.03]">
-                  <div className="absolute -top-2.5 left-4 px-2 py-0.5 bg-primary text-white text-[10px] font-bold rounded-full uppercase">Current</div>
-                  <div className="text-xl font-bold text-secondary mb-1 mt-1">Free</div>
-                  <div className="text-3xl font-bold text-secondary">
-                    {currency === 'EUR' ? '€' : currency === 'USD' ? '$' : currency === 'INR' ? '₹' : currency === 'CAD' ? 'C$' : '€'}0
-                    <span className="text-sm font-normal text-slate-400">/month</span>
-                  </div>
-                  <div className="text-xs text-slate-500 mt-1 mb-4">Free forever — no credit card needed</div>
-                  <ul className="space-y-2">
-                    {['Up to 25 investments', 'Basic dashboard', '3 financial goals', 'German tax calculator', 'Community support'].map((f, i) => (
-                      <li key={i} className="flex items-center gap-2 text-sm text-slate-600">
-                        <svg className="w-4 h-4 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                        </svg>
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Premium plan */}
-                <div className="relative p-5 rounded-2xl border border-slate-200 hover:border-primary/30 hover:shadow-lg transition-all group">
-                  <div className="absolute -top-2.5 right-4 px-2 py-0.5 bg-amber-500 text-white text-[10px] font-bold rounded-full uppercase">Recommended</div>
-                  <div className="text-xl font-bold text-secondary mb-1 mt-1">Premium</div>
-                  <div className="text-3xl font-bold text-secondary">
-                    {currency === 'EUR' ? '€' : currency === 'USD' ? '$' : currency === 'INR' ? '₹' : currency === 'CAD' ? 'C$' : '€'}2.99
-                    <span className="text-sm font-normal text-slate-400">/month</span>
-                  </div>
-                  <div className="text-xs text-slate-500 mt-1 mb-4">
-                    or {currency === 'EUR' ? '€' : '$'}29/year (save 19%)
-                  </div>
-                  <ul className="space-y-2 mb-5">
-                    {['Unlimited investments', 'All 4 country tax calculators', 'FIRE calculator & projections', 'Scenario branching', 'Live market prices', 'CSV broker import', 'Priority support', 'Multi-currency tracking', 'Data export'].map((f, i) => (
-                      <li key={i} className="flex items-center gap-2 text-sm text-slate-600">
-                        <svg className="w-4 h-4 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                        </svg>
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <button className="w-full py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
-                    Upgrade to Premium
-                  </button>
-                  <p className="text-[10px] text-slate-400 text-center mt-2">30-day free trial. Cancel anytime.</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Usage */}
-            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-card p-6">
-              <h2 className="text-lg font-bold text-secondary mb-4">Plan Usage</h2>
-              <div className="space-y-3">
-                {[
-                  { label: 'Investments tracked', used: '—', limit: '25', pct: 0 },
-                  { label: 'Financial goals', used: '—', limit: '3', pct: 0 },
-                  { label: 'Tax calculators', used: 'DE only', limit: 'All (DE, US, CA, IN)', pct: 25 },
-                ].map((item, i) => (
-                  <div key={i} className="p-3 bg-slate-50 rounded-xl">
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-sm font-semibold text-secondary">{item.label}</span>
-                      <span className="text-xs text-slate-500">{item.used} / {item.limit}</span>
-                    </div>
-                    <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                      <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${item.pct}%` }} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          <SubscriptionTab user={user!} currency={currency} showToast={showToast} />
         )}
 
         {/* ═══ BILLING TAB ═══════════════════════════════════ */}
@@ -390,5 +313,159 @@ export default function Account() {
         )}
       </div>
     </SidebarLayout>
+  );
+}
+
+// ─── Subscription Tab Component ──────────────────────────────
+function SubscriptionTab({ user, currency, showToast }: { user: any; currency: string; showToast: (msg: string, type: 'success' | 'error') => void }) {
+  const { isAdmin } = useAdmin();
+  const { tier } = useTier();
+  const [selectedTier, setSelectedTier] = useState<TierType>(tier);
+  const [savingTier, setSavingTier] = useState(false);
+
+  useEffect(() => { setSelectedTier(tier); }, [tier]);
+
+  const sym = getCurrencySymbol(currency);
+
+  const handleSaveTier = async () => {
+    setSavingTier(true);
+    try {
+      await setDoc(doc(db, 'users', user.uid), { tier: selectedTier, updatedAt: new Date() }, { merge: true });
+      showToast(`Plan updated to ${selectedTier}`, 'success');
+    } catch (err) {
+      showToast('Failed to update plan', 'error');
+    } finally { setSavingTier(false); }
+  };
+
+  const plans: { id: TierType; border: string; bg: string; badge?: { text: string; color: string }; accent: string; btnClass: string }[] = [
+    { id: 'free', border: 'border-slate-200', bg: 'bg-white', accent: 'text-primary', btnClass: 'border border-slate-200 text-slate-700 hover:bg-slate-50' },
+    { id: 'premium', border: 'border-primary/40', bg: 'bg-primary/[0.02]', badge: { text: 'Popular', color: 'bg-primary text-white' }, accent: 'text-primary', btnClass: 'bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20' },
+    { id: 'couples', border: 'border-rose-300/50', bg: 'bg-gradient-to-br from-rose-50/50 to-amber-50/50', badge: { text: 'Partner Card', color: 'bg-rose-500 text-white' }, accent: 'text-rose-500', btnClass: 'bg-gradient-to-r from-rose-500 to-amber-500 text-white hover:opacity-90 shadow-lg shadow-rose-500/20' },
+  ];
+
+  return (
+    <div className="space-y-6">
+      {/* Admin override banner */}
+      {isAdmin && (
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-lg">🔧</span>
+            <div>
+              <div className="text-sm font-bold text-amber-800">Admin Mode</div>
+              <div className="text-xs text-amber-600">You can select and save any plan for testing.</div>
+            </div>
+          </div>
+          {selectedTier !== tier && (
+            <button onClick={handleSaveTier} disabled={savingTier}
+              className={`px-5 py-2 rounded-xl font-semibold text-sm transition-all ${savingTier ? 'bg-slate-200 text-slate-400' : 'bg-amber-500 text-white hover:bg-amber-600'}`}>
+              {savingTier ? 'Saving...' : `Save as "${selectedTier}"`}
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Plan cards */}
+      <div className="grid md:grid-cols-3 gap-4">
+        {plans.map(plan => {
+          const info = TIER_INFO[plan.id];
+          const isCurrent = tier === plan.id;
+          const isSelected = selectedTier === plan.id;
+          const price = plan.id === 'free' ? 0 : getTierPrice(currency, plan.id as 'premium' | 'couples', 'monthly');
+          const annual = plan.id === 'free' ? 0 : getTierPrice(currency, plan.id as 'premium' | 'couples', 'annual');
+          const savings = plan.id === 'free' ? 0 : getAnnualSavings(currency, plan.id as 'premium' | 'couples');
+
+          return (
+            <div key={plan.id}
+              onClick={() => isAdmin ? setSelectedTier(plan.id) : undefined}
+              className={`relative rounded-2xl p-5 border-2 transition-all ${
+                isSelected && isAdmin ? 'ring-2 ring-offset-2 ring-primary' : ''
+              } ${isCurrent ? `border-primary ${plan.bg}` : `${plan.border} ${plan.bg}`} ${isAdmin ? 'cursor-pointer hover:shadow-lg' : ''}`}>
+              
+              {/* Badges */}
+              {isCurrent && (
+                <div className="absolute -top-2.5 left-4 px-2.5 py-0.5 bg-primary text-white text-[10px] font-bold rounded-full uppercase">Current</div>
+              )}
+              {plan.badge && !isCurrent && (
+                <div className={`absolute -top-2.5 right-4 px-2.5 py-0.5 ${plan.badge.color} text-[10px] font-bold rounded-full`}>{plan.badge.text}</div>
+              )}
+
+              <div className="mt-1">
+                <div className="text-lg font-bold text-secondary mb-0.5">{info.name}</div>
+                <div className="text-xs text-slate-500 mb-3">{info.tagline}</div>
+                
+                <div className="flex items-baseline gap-0.5 mb-0.5">
+                  <span className="text-2xl font-bold text-secondary">{sym}{price === 0 ? '0' : price.toFixed(2)}</span>
+                  <span className="text-sm text-slate-400">/month</span>
+                </div>
+                {plan.id !== 'free' && (
+                  <div className="text-xs text-slate-500 mb-4">or {sym}{annual}/year — save {savings}%</div>
+                )}
+                {plan.id === 'free' && <div className="text-xs text-slate-500 mb-4">Free forever</div>}
+
+                {/* Partner card visual for couples */}
+                {plan.id === 'couples' && (
+                  <div className="bg-gradient-to-r from-slate-800 to-slate-700 rounded-xl p-2.5 mb-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="w-4 h-4 rounded-full bg-primary/40 flex items-center justify-center text-[7px] text-white font-bold">1</div>
+                      <div className="w-4 h-4 rounded-full bg-rose-400/40 flex items-center justify-center text-[7px] text-white font-bold">2</div>
+                      <span className="text-[8px] text-white/50">2 users, 1 subscription</span>
+                    </div>
+                    <div className="text-white text-[9px] font-semibold">Partner Card</div>
+                  </div>
+                )}
+
+                <ul className="space-y-2 mb-5">
+                  {info.features.map((f, i) => (
+                    <li key={i} className="flex items-center gap-2 text-xs text-slate-600">
+                      <svg className={`w-3.5 h-3.5 flex-shrink-0 ${plan.accent}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                      </svg>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+
+                {!isAdmin && !isCurrent && (
+                  <button className={`w-full py-2.5 rounded-xl font-semibold text-sm transition-all ${plan.btnClass}`}>
+                    {plan.id === 'free' ? 'Downgrade' : `Upgrade to ${info.name}`}
+                  </button>
+                )}
+                {!isAdmin && isCurrent && (
+                  <div className="w-full py-2.5 text-center bg-slate-100 text-slate-400 rounded-xl text-sm font-semibold">Current Plan</div>
+                )}
+                {isAdmin && (
+                  <div className={`w-full py-2.5 text-center rounded-xl text-sm font-semibold ${isSelected ? 'bg-primary text-white' : 'bg-slate-100 text-slate-500'}`}>
+                    {isSelected ? (isCurrent ? '✓ Current' : '● Selected') : 'Click to select'}
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Usage */}
+      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-card p-6">
+        <h2 className="text-lg font-bold text-secondary mb-4">Plan Usage</h2>
+        <div className="space-y-3">
+          {[
+            { label: 'Investments', used: '—', limit: tier === 'free' ? '10' : '∞', pct: 0 },
+            { label: 'Projection years', used: '—', limit: tier === 'free' ? '5' : '50', pct: 0 },
+            { label: 'Tax calculators', used: tier === 'free' ? '1' : '4', limit: '4', pct: tier === 'free' ? 25 : 100 },
+            { label: 'Users', used: '1', limit: tier === 'couples' ? '2' : '1', pct: tier === 'couples' ? 50 : 100 },
+          ].map((item, i) => (
+            <div key={i} className="p-3 bg-slate-50 rounded-xl">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-sm font-semibold text-secondary">{item.label}</span>
+                <span className="text-xs text-slate-500">{item.used} / {item.limit}</span>
+              </div>
+              <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${item.pct}%` }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }

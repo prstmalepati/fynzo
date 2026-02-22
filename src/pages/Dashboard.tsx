@@ -123,32 +123,81 @@ export default function Dashboard() {
           <p className="text-sm text-slate-500">Here's your financial overview</p>
         </div>
 
-        {/* Summary Cards */}
-        <div className="grid md:grid-cols-3 gap-4 mb-6 stagger">
-          {/* Investments */}
-          <Link to="/investments" className="group animate-slideUp">
+        {/* Row 1: Wealth Projection + Portfolio Value */}
+        <div className="grid md:grid-cols-2 gap-4 mb-4 stagger">
+          {/* Wealth Projection */}
+          <Link to="/wealth-projection" className="group animate-slideUp">
             <div className="relative overflow-hidden rounded-2xl p-5 bg-gradient-to-br from-secondary to-surface-700 text-white shadow-elevated transition-transform duration-200 group-hover:scale-[1.02]">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
-                  <svg className="w-4 h-4 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22" />
-                  </svg>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6" />
+                    </svg>
+                  </div>
+                  <span className="text-xs text-white/50 font-medium">Wealth Projection</span>
                 </div>
-                <span className="text-xs text-white/50 font-medium">Portfolio Value</span>
+                <span className="text-[10px] text-white/30 bg-white/10 px-2 py-0.5 rounded-full group-hover:bg-white/15">View full →</span>
               </div>
-              <div className="text-2xl font-bold tracking-tight mb-0.5">{formatAmount(totalInvestments)}</div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-white/40">{investmentCount} assets</span>
-                {totalGain !== 0 && (
-                  <span className={`text-xs font-semibold px-1.5 py-0.5 rounded ${totalGain >= 0 ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-300'}`}>
-                    {totalGain >= 0 ? '+' : ''}{totalGainPct.toFixed(1)}%
-                  </span>
-                )}
+              <div className="flex items-end justify-between">
+                <div>
+                  <div className="text-[10px] text-white/40 mb-0.5">Today</div>
+                  <div className="text-xl font-bold tracking-tight">{formatAmount(totalInvestments)}</div>
+                  <div className="text-[10px] text-white/40 mt-2">In {projYears} years</div>
+                  <div className="text-xl font-bold text-accent tracking-tight">{formatAmount(projectedValue)}</div>
+                </div>
+                <svg viewBox="0 0 100 50" className="w-28 h-14 opacity-60">
+                  <defs>
+                    <linearGradient id="dashSpk" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="rgb(15,118,110)" stopOpacity="0.3" />
+                      <stop offset="100%" stopColor="rgb(15,118,110)" stopOpacity="0" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M0,42 C12,40 20,36 30,33 C42,30 50,38 60,28 C72,18 80,22 90,15 C95,12 100,8 100,6" fill="none" stroke="rgb(15,118,110)" strokeWidth="2" />
+                  <path d="M0,42 C12,40 20,36 30,33 C42,30 50,38 60,28 C72,18 80,22 90,15 C95,12 100,8 100,6 L100,50 L0,50 Z" fill="url(#dashSpk)" />
+                </svg>
               </div>
               <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl" />
             </div>
           </Link>
 
+          {/* Portfolio Value */}
+          <Link to="/investments" className="group animate-slideUp">
+            <div className="relative overflow-hidden rounded-2xl p-5 bg-white border border-slate-200/80 shadow-card transition-all group-hover:shadow-card-hover group-hover:border-primary/20 h-full">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-8 h-8 rounded-lg bg-primary/8 flex items-center justify-center">
+                  <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
+                  </svg>
+                </div>
+                <span className="text-xs text-slate-500 font-medium">Portfolio Value</span>
+              </div>
+              <div className="text-2xl font-bold text-secondary tracking-tight mb-1">{formatAmount(totalInvestments)}</div>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-xs text-slate-400">{investmentCount} assets</span>
+                {totalGain !== 0 && (
+                  <span className={`text-xs font-semibold px-1.5 py-0.5 rounded ${totalGain >= 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-500'}`}>
+                    {totalGain >= 0 ? '+' : ''}{totalGainPct.toFixed(1)}%
+                  </span>
+                )}
+              </div>
+              {investmentCount > 0 && allocationData.length > 0 && (
+                <div className="space-y-1">
+                  {allocationData.slice(0, 3).map((item, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-sm flex-shrink-0" style={{ backgroundColor: item.color }} />
+                      <span className="text-[10px] text-slate-500 flex-1 truncate">{item.type}</span>
+                      <span className="text-[10px] font-bold text-slate-600">{item.pct.toFixed(0)}%</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </Link>
+        </div>
+
+        {/* Row 2: Financial Goals + Lifestyle Basket */}
+        <div className="grid md:grid-cols-2 gap-4 mb-6">
           {/* Goals */}
           <Link to="/goal-tracker" className="group animate-slideUp">
             <div className="rounded-2xl p-5 bg-white border border-slate-200/80 shadow-card transition-all group-hover:shadow-card-hover group-hover:border-primary/20">
@@ -167,6 +216,7 @@ export default function Dashboard() {
                 </div>
                 <span className="text-[10px] text-slate-400 font-semibold">{goalProgress.toFixed(0)}%</span>
               </div>
+              <div className="text-xs text-slate-400 mt-1">{goalCount} goal{goalCount !== 1 ? 's' : ''} active</div>
             </div>
           </Link>
 
@@ -185,66 +235,6 @@ export default function Dashboard() {
               <div className="text-xs text-slate-400">Planned purchases</div>
             </div>
           </Link>
-        </div>
-
-        {/* Wealth Projection + Allocation */}
-        <div className="grid lg:grid-cols-2 gap-4 mb-6 animate-fadeIn" style={{ animationDelay: '200ms' }}>
-          {/* Wealth Projection Mini */}
-          <Link to="/wealth-projection" className="group bg-white rounded-2xl border border-slate-200/80 shadow-card p-5 hover:shadow-card-hover hover:border-primary/20 transition-all">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-bold text-secondary">Wealth Projection</h3>
-              <span className="text-[10px] text-primary font-semibold bg-primary/5 px-2 py-0.5 rounded-full group-hover:bg-primary/10">View full →</span>
-            </div>
-            <div className="flex items-end gap-4">
-              <div className="flex-shrink-0">
-                <div className="text-[10px] text-slate-400 mb-0.5">Today</div>
-                <div className="text-lg font-bold text-secondary">{formatAmount(totalInvestments)}</div>
-                <div className="text-[10px] text-slate-400 mt-1">In {projYears} years</div>
-                <div className="text-lg font-bold text-primary">{formatAmount(projectedValue)}</div>
-              </div>
-              <svg viewBox="0 0 120 40" className="flex-1 h-12">
-                <defs>
-                  <linearGradient id="dashGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="rgb(15,118,110)" stopOpacity="0.15" />
-                    <stop offset="100%" stopColor="rgb(15,118,110)" stopOpacity="0" />
-                  </linearGradient>
-                </defs>
-                <path d="M0,35 C10,33 20,30 30,28 C40,26 50,32 60,24 C70,16 80,20 90,14 C100,10 110,12 120,6" fill="none" stroke="rgb(15,118,110)" strokeWidth="2" />
-                <path d="M0,35 C10,33 20,30 30,28 C40,26 50,32 60,24 C70,16 80,20 90,14 C100,10 110,12 120,6 L120,40 L0,40 Z" fill="url(#dashGrad)" />
-              </svg>
-            </div>
-          </Link>
-
-          {/* Allocation */}
-          {investmentCount > 0 ? (
-            <Link to="/investments" className="group bg-white rounded-2xl border border-slate-200/80 shadow-card p-5 hover:shadow-card-hover hover:border-primary/20 transition-all">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-bold text-secondary">Portfolio ({investmentCount} assets)</h3>
-                <span className="text-[10px] text-primary font-semibold bg-primary/5 px-2 py-0.5 rounded-full group-hover:bg-primary/10">Details →</span>
-              </div>
-              <div className="space-y-1.5">
-                {allocationData.slice(0, 4).map((item, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-sm flex-shrink-0" style={{ backgroundColor: item.color }} />
-                    <span className="text-[10px] text-slate-500 w-14 truncate">{item.type}</span>
-                    <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                      <div className="h-full rounded-full" style={{ width: `${item.pct}%`, backgroundColor: item.color }} />
-                    </div>
-                    <span className="text-[10px] font-bold text-slate-600 w-8 text-right">{item.pct.toFixed(0)}%</span>
-                  </div>
-                ))}
-                {allocationData.length > 4 && <div className="text-[10px] text-slate-400 pl-4">+{allocationData.length - 4} more</div>}
-              </div>
-            </Link>
-          ) : (
-            <Link to="/investments" className="group bg-gradient-to-br from-primary/5 to-emerald-50 rounded-2xl border border-primary/10 p-5 hover:border-primary/20 transition-all flex flex-col justify-center items-center text-center">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-2">
-                <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-              </div>
-              <span className="text-sm font-semibold text-secondary">Add your first investment</span>
-              <span className="text-xs text-slate-400 mt-0.5">Start tracking your portfolio</span>
-            </Link>
-          )}
         </div>
 
         {/* Quick Actions */}

@@ -10,9 +10,9 @@ interface ProjectionInputs {
   currentNetWorth: number;
   totalInvestments: number;
   totalDebt: number;
-  annualIncome: number;
-  annualExpenses: number;
-  monthlySavings: number;
+  monthlyExpenses: number;
+  monthlyInvestment: number;
+  monthlyDebtPayment: number;
   expectedReturn: number;
   inflationRate: number;
   projectionYears: number;
@@ -42,9 +42,9 @@ export default function WealthProjection() {
     currentNetWorth: 0,
     totalInvestments: 0,
     totalDebt: 0,
-    annualIncome: 60000,
-    annualExpenses: 36000,
-    monthlySavings: 2000,
+    monthlyExpenses: 2500,
+    monthlyInvestment: 500,
+    monthlyDebtPayment: 0,
     expectedReturn: 7,
     inflationRate: 2.5,
     projectionYears: 30,
@@ -102,7 +102,8 @@ export default function WealthProjection() {
     const data: YearData[] = [];
     const r = inputs.expectedReturn / 100;
     const inf = inputs.inflationRate / 100;
-    const annualSavings = inputs.monthlySavings * 12;
+    const annualInvestment = inputs.monthlyInvestment * 12;
+    const annualDebtPayment = inputs.monthlyDebtPayment * 12;
 
     let netWorth = inputs.currentNetWorth + inputs.totalInvestments - inputs.totalDebt;
     let investments = inputs.totalInvestments;
@@ -117,16 +118,16 @@ export default function WealthProjection() {
     });
 
     for (let y = 1; y <= inputs.projectionYears; y++) {
-      // Investments grow + new contributions
+      // Investments grow + new monthly contributions
       const growth = investments * r;
-      investments = investments + growth + annualSavings;
+      investments = investments + growth + annualInvestment;
       totalGrowth += growth;
-      totalContributed += annualSavings;
+      totalContributed += annualInvestment;
 
-      // Debt decreases (assume min payments eat into it)
-      if (debt > 0) {
-        const debtPayment = Math.min(debt, annualSavings * 0.1); // 10% of savings to debt
-        debt = Math.max(0, debt - debtPayment);
+      // Debt decreases via monthly debt payments
+      if (debt > 0 && annualDebtPayment > 0) {
+        const payment = Math.min(debt, annualDebtPayment);
+        debt = Math.max(0, debt - payment);
       }
 
       netWorth = inputs.currentNetWorth + investments - debt;
@@ -259,27 +260,38 @@ export default function WealthProjection() {
               </div>
             </div>
 
-            {/* Income & Savings */}
+            {/* Monthly Budget */}
             <div className="bg-white rounded-2xl border border-slate-200/80 shadow-card p-5">
               <h3 className="text-sm font-bold text-secondary mb-4 flex items-center gap-2">
-                <span className="w-6 h-6 rounded-lg bg-blue-500/10 flex items-center justify-center text-[10px]">📈</span>
-                Income & Savings
+                <span className="w-6 h-6 rounded-lg bg-blue-500/10 flex items-center justify-center text-[10px]">📊</span>
+                Monthly Budget
               </h3>
               <div className="space-y-3">
                 <div>
-                  <label className="text-xs font-semibold text-slate-500 mb-1 block">Annual Income ({currency})</label>
-                  <input type="number" value={inputs.annualIncome || ''} onChange={e => update('annualIncome', Number(e.target.value))}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm text-secondary focus:border-primary/40 focus:ring-2 focus:ring-primary/10" />
+                  <label className="text-xs font-semibold text-slate-500 mb-1 block">Monthly Expenses ({currency})</label>
+                  <input type="number" value={inputs.monthlyExpenses || ''} onChange={e => update('monthlyExpenses', Number(e.target.value))}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm text-secondary focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
+                    placeholder="Rent, food, utilities..." />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-slate-500 mb-1 block">Monthly Savings ({currency})</label>
-                  <input type="number" value={inputs.monthlySavings || ''} onChange={e => update('monthlySavings', Number(e.target.value))}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm text-secondary focus:border-primary/40 focus:ring-2 focus:ring-primary/10" />
+                  <label className="text-xs font-semibold text-slate-500 mb-1 block">Monthly Investment ({currency})</label>
+                  <input type="number" value={inputs.monthlyInvestment || ''} onChange={e => update('monthlyInvestment', Number(e.target.value))}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm text-secondary focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
+                    placeholder="Amount you invest each month" />
                 </div>
-                <div className="text-xs text-slate-400 bg-slate-50 rounded-lg px-3 py-2">
-                  Savings rate: <span className="font-bold text-secondary">
-                    {inputs.annualIncome > 0 ? ((inputs.monthlySavings * 12 / inputs.annualIncome) * 100).toFixed(0) : 0}%
-                  </span>
+                <div>
+                  <label className="text-xs font-semibold text-slate-500 mb-1 block">Monthly Debt Payment ({currency})</label>
+                  <input type="number" value={inputs.monthlyDebtPayment || ''} onChange={e => update('monthlyDebtPayment', Number(e.target.value))}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm text-secondary focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
+                    placeholder="0" />
+                </div>
+                <div className="text-xs text-slate-400 bg-slate-50 rounded-lg px-3 py-2 space-y-0.5">
+                  <div>Annual investment: <span className="font-bold text-secondary">{formatAmount(inputs.monthlyInvestment * 12)}</span></div>
+                  {inputs.monthlyDebtPayment > 0 && inputs.totalDebt > 0 && (
+                    <div>Debt-free in: <span className="font-bold text-secondary">
+                      {Math.ceil(inputs.totalDebt / (inputs.monthlyDebtPayment * 12))} years
+                    </span></div>
+                  )}
                 </div>
               </div>
             </div>
