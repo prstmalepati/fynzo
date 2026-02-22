@@ -21,6 +21,7 @@ interface UserProfile {
   occupation: string;
   preferredCurrency: string;
   locale: string;
+  projectionYears: number;
   notifications: { email: boolean; push: boolean; weekly: boolean };
 }
 
@@ -34,7 +35,7 @@ export default function Settings() {
   const [profile, setProfile] = useState<UserProfile>({
     fullName: '', email: user?.email || '', phone: '', address: '', city: '',
     country: '', postalCode: '', dateOfBirth: '', occupation: '',
-    preferredCurrency: currency, locale: locale,
+    preferredCurrency: currency, locale: locale, projectionYears: 10,
     notifications: { email: true, push: false, weekly: true }
   });
 
@@ -51,7 +52,7 @@ export default function Settings() {
           address: d.address || '', city: d.city || '', country: d.country || '',
           postalCode: d.postalCode || '', dateOfBirth: d.dateOfBirth || '',
           occupation: d.occupation || '', preferredCurrency: d.preferredCurrency || currency,
-          locale: d.locale || locale,
+          locale: d.locale || locale, projectionYears: d.projectionYears || 10,
           notifications: d.notifications || { email: true, push: false, weekly: true }
         });
       }
@@ -171,6 +172,19 @@ export default function Settings() {
                   <span>🇩🇪</span> Deutsch
                 </button>
               </div>
+            </div>
+            <div className="md:col-span-2">
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-sm font-medium text-slate-700">Dashboard Projection Period</label>
+                <span className="text-sm font-bold text-primary">{profile.projectionYears} years</span>
+              </div>
+              <input type="range" min="5" max="50" step="5" value={profile.projectionYears}
+                onChange={e => updateProfile('projectionYears', Number(e.target.value))}
+                className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary" />
+              <div className="flex justify-between text-[10px] text-slate-400 mt-1">
+                <span>5yr</span><span>10yr</span><span>20yr</span><span>30yr</span><span>50yr</span>
+              </div>
+              <p className="text-xs text-slate-400 mt-1">Controls the projected value shown on your Dashboard card</p>
             </div>
           </div>
         </div>

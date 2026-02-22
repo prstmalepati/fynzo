@@ -145,62 +145,71 @@ export default function LandingPageExtended() {
                       </div>
                     </div>
                     {/* App content — dashboard mockup */}
-                    <div className="p-4 bg-slate-50" style={{ minHeight: '320px' }}>
-                      {/* Mini sidebar hint */}
-                      <div className="flex gap-3">
-                        <div className="w-10 flex-shrink-0">
-                          <div className="w-7 h-7 rounded-lg bg-primary/20 flex items-center justify-center mb-3">
-                            <span className="text-[8px] font-bold text-primary">mf</span>
+                    <div className="p-3 bg-slate-50" style={{ minHeight: '340px' }}>
+                      {/* App layout: sidebar + main */}
+                      <div className="flex gap-2.5">
+                        {/* Dark sidebar */}
+                        <div className="w-14 bg-slate-800 rounded-xl p-2 flex-shrink-0">
+                          <div className="w-7 h-7 rounded-lg bg-primary/30 flex items-center justify-center mb-3 mx-auto">
+                            <span className="text-[7px] font-bold text-white">mf</span>
                           </div>
-                          {[1,2,3,4,5].map(i => <div key={i} className="w-5 h-1 bg-slate-200 rounded-full mb-2.5 mx-auto" />)}
+                          {['Dashboard', 'Wealth', 'Invest', 'Goals', 'Tax'].map((_, i) => (
+                            <div key={i} className={`w-7 h-7 rounded-lg mx-auto mb-1.5 flex items-center justify-center ${i === 0 ? 'bg-primary/80' : 'bg-white/5'}`}>
+                              <div className={`w-3 h-0.5 rounded-full ${i === 0 ? 'bg-white' : 'bg-white/30'}`} />
+                            </div>
+                          ))}
                         </div>
-                        {/* Main content area */}
+                        {/* Main content */}
                         <div className="flex-1">
+                          {/* Header */}
                           <div className="flex items-center justify-between mb-3">
                             <div>
-                              <div className="w-24 h-2 bg-slate-300 rounded-full mb-1" />
-                              <div className="w-16 h-1.5 bg-slate-200 rounded-full" />
+                              <div className="text-[8px] text-slate-400">Welcome back</div>
+                              <div className="text-[11px] font-bold text-slate-800">My Dashboard</div>
                             </div>
-                            <div className="w-6 h-6 bg-primary/10 rounded-lg" />
-                          </div>
-                          {/* Portfolio cards */}
-                          <div className="grid grid-cols-3 gap-2 mb-3">
-                            <div className="bg-gradient-to-br from-slate-800 to-slate-700 rounded-xl p-2.5 text-white">
-                              <div className="w-8 h-1 bg-white/30 rounded-full mb-2" />
-                              <div className="text-sm font-bold">€47,230</div>
-                              <div className="w-10 h-1 bg-white/20 rounded-full mt-1" />
-                            </div>
-                            <div className="bg-white rounded-xl p-2.5 border border-slate-100">
-                              <div className="w-8 h-1 bg-slate-200 rounded-full mb-2" />
-                              <div className="text-sm font-bold text-slate-800">€25,000</div>
-                              <div className="w-10 h-1 bg-slate-100 rounded-full mt-1" />
-                            </div>
-                            <div className="bg-white rounded-xl p-2.5 border border-slate-100">
-                              <div className="w-8 h-1 bg-slate-200 rounded-full mb-2" />
-                              <div className="text-sm font-bold text-slate-800">€8,500</div>
-                              <div className="w-10 h-1 bg-slate-100 rounded-full mt-1" />
+                            <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center">
+                              <div className="w-3 h-3 rounded-full bg-primary/30" />
                             </div>
                           </div>
-                          {/* Chart area */}
-                          <div className="bg-white rounded-xl p-3 border border-slate-100">
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="w-16 h-1.5 bg-slate-200 rounded-full" />
-                              <div className="flex gap-1">
-                                <div className="px-1.5 py-0.5 bg-primary/10 rounded text-[7px] text-primary font-bold">1Y</div>
-                                <div className="px-1.5 py-0.5 bg-slate-100 rounded text-[7px] text-slate-400">5Y</div>
-                              </div>
+                          {/* Stats row */}
+                          <div className="grid grid-cols-3 gap-1.5 mb-3">
+                            <div className="bg-gradient-to-br from-slate-800 to-slate-700 rounded-lg p-2 text-white">
+                              <div className="text-[7px] text-white/40">Portfolio</div>
+                              <div className="text-[11px] font-bold">€47,230</div>
+                              <div className="text-[7px] text-emerald-400 font-semibold">+12.4%</div>
                             </div>
-                            {/* SVG chart line */}
-                            <svg viewBox="0 0 200 60" className="w-full h-16">
-                              <defs>
-                                <linearGradient id="heroChartGrad" x1="0" y1="0" x2="0" y2="1">
-                                  <stop offset="0%" stopColor="rgb(15,118,110)" stopOpacity="0.15" />
-                                  <stop offset="100%" stopColor="rgb(15,118,110)" stopOpacity="0" />
-                                </linearGradient>
-                              </defs>
-                              <path d="M0,45 C20,42 30,38 50,35 C70,32 80,40 100,30 C120,20 130,25 150,18 C170,12 185,15 200,8" fill="none" stroke="rgb(15,118,110)" strokeWidth="2" />
-                              <path d="M0,45 C20,42 30,38 50,35 C70,32 80,40 100,30 C120,20 130,25 150,18 C170,12 185,15 200,8 L200,60 L0,60 Z" fill="url(#heroChartGrad)" />
+                            <div className="bg-white rounded-lg p-2 border border-slate-100">
+                              <div className="text-[7px] text-slate-400">Goals</div>
+                              <div className="text-[11px] font-bold text-slate-800">€80,000</div>
+                              <div className="w-full h-1 bg-slate-100 rounded-full mt-0.5"><div className="w-3/5 h-full bg-blue-500 rounded-full" /></div>
+                            </div>
+                            <div className="bg-white rounded-lg p-2 border border-slate-100">
+                              <div className="text-[7px] text-slate-400">Projection</div>
+                              <div className="text-[11px] font-bold text-primary">€142K</div>
+                              <div className="text-[7px] text-slate-400">in 10yr</div>
+                            </div>
+                          </div>
+                          {/* Donut chart + allocation */}
+                          <div className="bg-white rounded-lg p-2.5 border border-slate-100 flex gap-3 items-center">
+                            <svg viewBox="0 0 80 80" className="w-20 h-20 flex-shrink-0">
+                              <circle cx="40" cy="40" r="30" fill="none" stroke="#0f766e" strokeWidth="10" strokeDasharray="65 189" strokeDashoffset="0" />
+                              <circle cx="40" cy="40" r="30" fill="none" stroke="#2563eb" strokeWidth="10" strokeDasharray="42 189" strokeDashoffset="-65" />
+                              <circle cx="40" cy="40" r="30" fill="none" stroke="#f59e0b" strokeWidth="10" strokeDasharray="32 189" strokeDashoffset="-107" />
+                              <circle cx="40" cy="40" r="30" fill="none" stroke="#8b5cf6" strokeWidth="10" strokeDasharray="25 189" strokeDashoffset="-139" />
+                              <circle cx="40" cy="40" r="30" fill="none" stroke="#ec4899" strokeWidth="10" strokeDasharray="25 189" strokeDashoffset="-164" />
+                              <circle cx="40" cy="40" r="22" fill="white" />
+                              <text x="40" y="38" textAnchor="middle" className="text-[7px] fill-slate-400">Total</text>
+                              <text x="40" y="46" textAnchor="middle" className="text-[8px] fill-slate-800 font-bold">€47.2K</text>
                             </svg>
+                            <div className="flex-1 space-y-1">
+                              {[{c:'#0f766e',n:'ETFs',p:'34%'},{c:'#2563eb',n:'Stocks',p:'22%'},{c:'#f59e0b',n:'Crypto',p:'17%'},{c:'#8b5cf6',n:'Gold',p:'14%'},{c:'#ec4899',n:'Bonds',p:'13%'}].map((a,i) => (
+                                <div key={i} className="flex items-center gap-1.5">
+                                  <span className="w-1.5 h-1.5 rounded-sm flex-shrink-0" style={{backgroundColor:a.c}} />
+                                  <span className="text-[7px] text-slate-500 flex-1">{a.n}</span>
+                                  <span className="text-[7px] font-bold text-slate-700">{a.p}</span>
+                                </div>
+                              ))}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -216,32 +225,37 @@ export default function LandingPageExtended() {
                       <div className="bg-slate-800 pt-2 pb-1 flex justify-center">
                         <div className="w-12 h-1.5 bg-slate-700 rounded-full" />
                       </div>
-                      {/* Phone content */}
+                      {/* Phone content — mobile portfolio */}
                       <div className="p-3 bg-slate-50" style={{ minHeight: '220px' }}>
-                        <div className="w-14 h-1.5 bg-slate-300 rounded-full mb-2" />
-                        {/* Mini investment list */}
+                        {/* Mini donut */}
+                        <div className="flex items-center gap-2 mb-2">
+                          <svg viewBox="0 0 40 40" className="w-10 h-10">
+                            <circle cx="20" cy="20" r="14" fill="none" stroke="#0f766e" strokeWidth="5" strokeDasharray="30 88" />
+                            <circle cx="20" cy="20" r="14" fill="none" stroke="#2563eb" strokeWidth="5" strokeDasharray="20 88" strokeDashoffset="-30" />
+                            <circle cx="20" cy="20" r="14" fill="none" stroke="#f59e0b" strokeWidth="5" strokeDasharray="18 88" strokeDashoffset="-50" />
+                            <circle cx="20" cy="20" r="14" fill="none" stroke="#8b5cf6" strokeWidth="5" strokeDasharray="20 88" strokeDashoffset="-68" />
+                            <circle cx="20" cy="20" r="9" fill="white" />
+                          </svg>
+                          <div>
+                            <div className="text-[10px] font-bold text-slate-800">€47,230</div>
+                            <div className="text-[7px] text-emerald-600 font-semibold">+€5,230 ↑ 12.4%</div>
+                          </div>
+                        </div>
+                        {/* Holdings */}
                         {[
-                          { name: 'MSCI World', val: '+12.4%', up: true },
-                          { name: 'Bitcoin', val: '+8.2%', up: true },
-                          { name: 'Gold ETF', val: '-1.8%', up: false },
+                          { name: 'MSCI World ETF', val: '+12.4%', up: true, amt: '€16,200' },
+                          { name: 'Apple Inc.', val: '+8.2%', up: true, amt: '€10,400' },
+                          { name: 'Bitcoin', val: '+24.1%', up: true, amt: '€8,030' },
+                          { name: 'Gold (XAU)', val: '+3.1%', up: true, amt: '€6,600' },
                         ].map((item, i) => (
                           <div key={i} className="flex items-center justify-between py-1.5 border-b border-slate-100 last:border-0">
                             <div>
-                              <div className="text-[7px] font-bold text-slate-800">{item.name}</div>
-                              <div className="w-10 h-0.5 bg-slate-200 rounded-full mt-0.5" />
+                              <div className="text-[8px] font-bold text-slate-800">{item.name}</div>
+                              <div className="text-[7px] text-slate-400">{item.amt}</div>
                             </div>
                             <span className={`text-[8px] font-bold ${item.up ? 'text-emerald-600' : 'text-red-500'}`}>{item.val}</span>
                           </div>
                         ))}
-                        {/* Quick action buttons */}
-                        <div className="grid grid-cols-2 gap-1.5 mt-2">
-                          <div className="bg-primary/10 rounded-lg py-1.5 flex items-center justify-center">
-                            <span className="text-[7px] font-bold text-primary">+ Add</span>
-                          </div>
-                          <div className="bg-slate-100 rounded-lg py-1.5 flex items-center justify-center">
-                            <span className="text-[7px] font-bold text-slate-500">Import</span>
-                          </div>
-                        </div>
                       </div>
                       {/* Home bar */}
                       <div className="flex justify-center py-1">
@@ -417,7 +431,7 @@ export default function LandingPageExtended() {
 
       {/* ─── Pricing ───────────────────────────────────────── */}
       <section id="pricing" className="py-20 lg:py-28 px-6 bg-slate-50/80">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
             <p className="text-sm font-semibold text-primary tracking-wide uppercase mb-3">Pricing</p>
             <h2 className="text-3xl lg:text-4xl font-bold tracking-tight font-display">
@@ -426,47 +440,89 @@ export default function LandingPageExtended() {
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-3 gap-5">
             {/* Free */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-8 hover:shadow-lg transition-all">
-              <div className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">Free</div>
-              <div className="text-4xl font-bold text-secondary mb-1 font-display">€0</div>
-              <div className="text-sm text-slate-500 mb-6">Forever. No card required.</div>
-              <ul className="space-y-3 mb-8">
-                {['Up to 10 investments', 'Dashboard + Goal Tracker', 'FIRE & Retirement calculators', '1 tax calculator (your country)', 'Live exchange rates'].map((f, i) => (
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 hover:shadow-lg transition-all">
+              <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Free</div>
+              <div className="text-3xl font-bold text-secondary mb-1 font-display">€0</div>
+              <div className="text-xs text-slate-500 mb-5">Forever. No card required.</div>
+              <ul className="space-y-2.5 mb-6">
+                {['Up to 10 investments', 'Dashboard & charts', '5-year projection', '1 tax calculator', 'Goal tracker (3 goals)', 'Weekly data export'].map((f, i) => (
                   <li key={i} className="flex items-center gap-2 text-sm text-slate-600">
-                    <svg className="w-4 h-4 text-primary flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/></svg>
+                    <svg className="w-3.5 h-3.5 text-primary flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/></svg>
                     {f}
                   </li>
                 ))}
               </ul>
-              <Link to="/signup" className="block w-full py-3 text-center border border-slate-200 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 transition-colors">
+              <Link to="/signup" className="block w-full py-2.5 text-center border border-slate-200 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 transition-colors text-sm">
                 Get Started
               </Link>
             </div>
 
-            {/* Premium */}
-            <div className="bg-secondary rounded-2xl p-8 text-white relative overflow-hidden hover:shadow-xl transition-all">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-2xl -translate-y-8 translate-x-8" />
+            {/* Premium Single */}
+            <div className="bg-secondary rounded-2xl p-6 text-white relative overflow-hidden hover:shadow-xl transition-all ring-2 ring-primary/30">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-primary/20 rounded-full blur-2xl -translate-y-6 translate-x-6" />
+              <div className="absolute top-3 right-3 bg-primary text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full">Popular</div>
               <div className="relative">
-                <div className="text-sm font-semibold text-white/50 uppercase tracking-wider mb-2">Premium</div>
+                <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Premium</div>
                 <div className="flex items-baseline gap-1 mb-1">
-                  <span className="text-4xl font-bold font-display">€2.99</span>
-                  <span className="text-white/60">/month</span>
+                  <span className="text-3xl font-bold font-display">€2.99</span>
+                  <span className="text-white/60 text-sm">/month</span>
                 </div>
-                <div className="text-sm text-white/50 mb-6">or €29/year — save 19%</div>
-                <ul className="space-y-3 mb-8">
-                  {['Everything in Free', 'Unlimited investments', 'All 4 tax calculators', 'Lifestyle Basket + Truth Score', 'Scenario Branching', 'Anti-Portfolio tracking', '50-year wealth projections', 'Live market prices', 'Priority support'].map((f, i) => (
+                <div className="text-xs text-white/50 mb-5">or €29/year — save 19%</div>
+                <ul className="space-y-2.5 mb-6">
+                  {['Everything in Free', 'Unlimited investments', 'All 4 tax calculators', 'Scenario branching', '50-year projections', 'Live market prices', 'CSV broker import', 'PDF reports', 'Priority support'].map((f, i) => (
                     <li key={i} className="flex items-center gap-2 text-sm text-white/80">
-                      <svg className="w-4 h-4 text-primary flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/></svg>
+                      <svg className="w-3.5 h-3.5 text-primary flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/></svg>
                       {f}
                     </li>
                   ))}
                 </ul>
-                <Link to="/signup" className="block w-full py-3 text-center bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/30">
+                <Link to="/signup" className="block w-full py-2.5 text-center bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/30 text-sm">
                   Start 30-Day Free Trial
                 </Link>
-                <p className="text-xs text-white/40 text-center mt-3">Cancel anytime. 30-day money-back guarantee.</p>
+                <p className="text-[10px] text-white/40 text-center mt-2">Cancel anytime. 30-day money-back guarantee.</p>
+              </div>
+            </div>
+
+            {/* Couples Partner Card */}
+            <div className="bg-gradient-to-br from-rose-50 to-amber-50 rounded-2xl border border-rose-200/60 p-6 hover:shadow-lg transition-all relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-28 h-28 bg-rose-200/30 rounded-full blur-2xl -translate-y-6 translate-x-8" />
+              <div className="relative">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xs font-semibold text-rose-600 uppercase tracking-wider">Couples</span>
+                  <span className="text-[10px] bg-rose-100 text-rose-700 px-2 py-0.5 rounded-full font-bold">Partner Card</span>
+                </div>
+                <div className="flex items-baseline gap-1 mb-1">
+                  <span className="text-3xl font-bold text-secondary font-display">€3.99</span>
+                  <span className="text-slate-500 text-sm">/month</span>
+                </div>
+                <div className="text-xs text-slate-500 mb-5">or €39/year — save 19%</div>
+
+                {/* Partner card visual */}
+                <div className="bg-gradient-to-r from-slate-800 to-slate-700 rounded-xl p-3 mb-4 relative overflow-hidden">
+                  <div className="absolute top-1 right-2 text-[8px] text-white/30 font-mono">myfynzo</div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-5 h-5 rounded-full bg-primary/40 flex items-center justify-center text-[8px] text-white font-bold">1</div>
+                    <div className="w-5 h-5 rounded-full bg-rose-400/40 flex items-center justify-center text-[8px] text-white font-bold">2</div>
+                    <span className="text-[9px] text-white/50">2 users, 1 subscription</span>
+                  </div>
+                  <div className="text-white text-[10px] font-semibold">Partner Card</div>
+                  <div className="text-white/40 text-[8px]">Invite your partner via email</div>
+                </div>
+
+                <ul className="space-y-2.5 mb-6">
+                  {['Everything in Premium', 'Invite your partner', 'Joint wealth projection', 'Combined dashboard', 'Shared goals', 'Household FIRE calc'].map((f, i) => (
+                    <li key={i} className="flex items-center gap-2 text-sm text-slate-600">
+                      <svg className="w-3.5 h-3.5 text-rose-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/></svg>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link to="/signup" className="block w-full py-2.5 text-center bg-gradient-to-r from-rose-500 to-amber-500 text-white rounded-xl font-semibold hover:opacity-90 transition-all shadow-lg shadow-rose-500/20 text-sm">
+                  Start Couples Trial
+                </Link>
+                <p className="text-[10px] text-slate-400 text-center mt-2">+€1/mo vs Premium. Both partners get full access.</p>
               </div>
             </div>
           </div>
