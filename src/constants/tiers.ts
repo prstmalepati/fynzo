@@ -20,7 +20,7 @@ export interface TierLimits {
 
 export const TIER_LIMITS: Record<TierType, TierLimits> = {
   free: {
-    maxAssets: 20,
+    maxAssets: 10,
     projectionYears: 5,
     bankConnections: 0,
     maxScenarios: 0,
