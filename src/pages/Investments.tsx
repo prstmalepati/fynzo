@@ -32,7 +32,7 @@ export default function Investments() {
   
   // Form
   const [assetName, setAssetName] = useState('');
-  const [assetType, setAssetType] = useState('Stocks / ETFs');
+  const [assetType, setAssetType] = useState('Stocks');
   const [quantity, setQuantity] = useState('');
   const [purchasePrice, setPurchasePrice] = useState('');
   const [currentPrice, setCurrentPrice] = useState('');
@@ -54,7 +54,7 @@ export default function Investments() {
   };
 
   const resetForm = () => {
-    setAssetName(''); setAssetType('Stocks / ETFs'); setQuantity('');
+    setAssetName(''); setAssetType('Stocks'); setQuantity('');
     setPurchasePrice(''); setCurrentPrice(''); setNotes('');
     setPurchaseDate(new Date().toISOString().split('T')[0]);
     setEditingId(null);
@@ -108,7 +108,7 @@ export default function Investments() {
   const totalGain = totalValue - totalCost;
   const totalGainPct = totalCost > 0 ? (totalGain / totalCost) * 100 : 0;
 
-  const assetTypes = ['Stocks / ETFs', 'Cryptocurrency', 'Bonds', 'Real Estate', 'Commodities', 'Mutual Funds', 'Other'];
+  const assetTypes = ['Stocks', 'ETFs', 'Cryptocurrency', 'Bonds', 'Gold', 'Silver', 'Real Estate', 'Commodities', 'Mutual Funds', 'Other'];
 
   return (
     <SidebarLayout>
@@ -155,6 +155,112 @@ export default function Investments() {
             </div>
           </div>
         </div>
+
+        {/* Asset Allocation */}
+        {investments.length > 0 && (
+          <div className="grid lg:grid-cols-2 gap-4 mb-8">
+            {/* Donut Chart */}
+            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-card p-5">
+              <h3 className="text-sm font-bold text-secondary mb-4">Asset Allocation</h3>
+              <div className="flex items-center gap-6">
+                <svg viewBox="0 0 120 120" className="w-32 h-32 flex-shrink-0">
+                  {(() => {
+                    const typeMap: Record<string, number> = {};
+                    investments.forEach(inv => {
+                      const v = calcValue(inv);
+                      const t = inv.type || 'Other';
+                      typeMap[t] = (typeMap[t] || 0) + v;
+                    });
+                    const colors = ['#0f766e','#2563eb','#f59e0b','#8b5cf6','#ef4444','#06b6d4','#ec4899','#84cc16','#f97316','#6b7280'];
+                    const entries = Object.entries(typeMap).sort((a,b) => b[1] - a[1]);
+                    let startAngle = 0;
+                    return entries.map(([type, value], i) => {
+                      const pct = totalValue > 0 ? value / totalValue : 0;
+                      const angle = pct * 360;
+                      const endAngle = startAngle + angle;
+                      const largeArc = angle > 180 ? 1 : 0;
+                      const r = 50;
+                      const cx = 60, cy = 60;
+                      const x1 = cx + r * Math.cos((startAngle - 90) * Math.PI / 180);
+                      const y1 = cy + r * Math.sin((startAngle - 90) * Math.PI / 180);
+                      const x2 = cx + r * Math.cos((endAngle - 90) * Math.PI / 180);
+                      const y2 = cy + r * Math.sin((endAngle - 90) * Math.PI / 180);
+                      const path = entries.length === 1
+                        ? `M${cx},${cy-r} A${r},${r} 0 1,1 ${cx-0.01},${cy-r} Z`
+                        : `M${cx},${cy} L${x1},${y1} A${r},${r} 0 ${largeArc},1 ${x2},${y2} Z`;
+                      startAngle = endAngle;
+                      return <path key={type} d={path} fill={colors[i % colors.length]} opacity={0.85} />;
+                    });
+                  })()}
+                  <circle cx="60" cy="60" r="28" fill="white" />
+                  <text x="60" y="57" textAnchor="middle" className="text-[10px] fill-slate-400">Total</text>
+                  <text x="60" y="69" textAnchor="middle" className="text-[11px] fill-slate-800 font-bold">{investments.length}</text>
+                </svg>
+                <div className="flex-1 space-y-1.5">
+                  {(() => {
+                    const typeMap: Record<string, number> = {};
+                    investments.forEach(inv => {
+                      const t = inv.type || 'Other';
+                      typeMap[t] = (typeMap[t] || 0) + calcValue(inv);
+                    });
+                    const colors = ['#0f766e','#2563eb','#f59e0b','#8b5cf6','#ef4444','#06b6d4','#ec4899','#84cc16','#f97316','#6b7280'];
+                    return Object.entries(typeMap).sort((a,b) => b[1] - a[1]).map(([type, value], i) => {
+                      const pct = totalValue > 0 ? (value / totalValue * 100) : 0;
+                      return (
+                        <div key={type} className="flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 rounded-sm flex-shrink-0" style={{ backgroundColor: colors[i % colors.length] }} />
+                          <span className="text-xs text-slate-600 flex-1 truncate">{type}</span>
+                          <span className="text-xs font-bold text-secondary">{pct.toFixed(1)}%</span>
+                        </div>
+                      );
+                    });
+                  })()}
+                </div>
+              </div>
+            </div>
+
+            {/* Performance by Type */}
+            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-card p-5">
+              <h3 className="text-sm font-bold text-secondary mb-4">Performance by Type</h3>
+              <div className="space-y-2.5">
+                {(() => {
+                  const typePerf: Record<string, { value: number; cost: number }> = {};
+                  investments.forEach(inv => {
+                    const t = inv.type || 'Other';
+                    if (!typePerf[t]) typePerf[t] = { value: 0, cost: 0 };
+                    typePerf[t].value += calcValue(inv);
+                    typePerf[t].cost += inv.quantity * inv.purchasePrice;
+                  });
+                  const maxPct = Math.max(...Object.values(typePerf).map(v => Math.abs(v.cost > 0 ? ((v.value - v.cost) / v.cost) * 100 : 0)), 1);
+                  return Object.entries(typePerf).sort((a,b) => {
+                    const pA = a[1].cost > 0 ? ((a[1].value - a[1].cost) / a[1].cost) * 100 : 0;
+                    const pB = b[1].cost > 0 ? ((b[1].value - b[1].cost) / b[1].cost) * 100 : 0;
+                    return pB - pA;
+                  }).map(([type, data]) => {
+                    const gain = data.value - data.cost;
+                    const pct = data.cost > 0 ? (gain / data.cost) * 100 : 0;
+                    const barW = Math.min(Math.abs(pct) / maxPct * 100, 100);
+                    return (
+                      <div key={type}>
+                        <div className="flex items-center justify-between mb-0.5">
+                          <span className="text-xs font-semibold text-slate-600">{type}</span>
+                          <span className={`text-xs font-bold ${pct >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                            {pct >= 0 ? '+' : ''}{pct.toFixed(1)}%
+                          </span>
+                        </div>
+                        <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                          <div className={`h-full rounded-full transition-all ${pct >= 0 ? 'bg-emerald-500' : 'bg-red-400'}`}
+                            style={{ width: `${barW}%` }} />
+                        </div>
+                        <div className="text-[10px] text-slate-400 mt-0.5">{formatAmount(data.value)} · {gain >= 0 ? '+' : ''}{formatAmount(gain)}</div>
+                      </div>
+                    );
+                  });
+                })()}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Table / Cards */}
         {pageLoading ? (

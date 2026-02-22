@@ -269,29 +269,33 @@ export default function LandingPageExtended() {
       </section>
 
       {/* ─── Modules Grid ──────────────────────────────────── */}
-      <section id="features" className="py-20 lg:py-28 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-14">
+      <section id="features" className="py-20 lg:py-28 px-6 relative overflow-hidden">
+        {/* Subtle gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-white via-teal-50/30 to-white pointer-events-none" />
+        <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-primary/[0.03] rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+        <div className="max-w-6xl mx-auto relative">
+          <div className="mb-14 text-center">
             <p className="text-sm font-semibold text-primary tracking-wide uppercase mb-3">What you get</p>
-            <h2 className="text-3xl lg:text-4xl font-bold text-secondary tracking-tight font-display">
-              Eight modules. One platform.
+            <h2 className="text-3xl lg:text-4xl font-bold tracking-tight font-display">
+              <span className="text-secondary">Eight modules.</span>{' '}
+              <span className="text-primary">One platform.</span>
             </h2>
-            <p className="text-slate-500 mt-3 max-w-xl">Every tool a serious wealth builder needs — from daily tracking to decade-long projections.</p>
+            <p className="text-slate-500 mt-3 max-w-xl mx-auto">Every tool a serious wealth builder needs — from daily tracking to decade-long projections.</p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5" /></svg>, title: 'Dashboard', desc: 'Portfolio overview with live market data and performance tracking.' },
-              { icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" /></svg>, title: 'Investments', desc: 'Track stocks, ETFs, crypto with live prices via Twelve Data.' },
-              { icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z" /></svg>, title: 'FIRE Calculator', desc: 'Financial independence projections with real inflation rates.' },
-              { icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" /></svg>, title: 'Tax Calculators', desc: 'Country-specific: DE, US, CA, IN — updated for 2025.' },
-              { icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>, title: 'Lifestyle Basket', desc: 'Track luxury inflation — Porsche, private school, real estate.' },
-              { icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>, title: 'Scenario Branching', desc: 'Model life decisions — job change, relocation, kids, sabbatical.' },
-              { icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M3 3v1.5M3 21v-6m0 0l2.77-.693a9 9 0 016.208.682l.108.054a9 9 0 006.086.71l3.114-.732a48.524 48.524 0 01-.005-10.499l-3.11.732a9 9 0 01-6.085-.711l-.108-.054a9 9 0 00-6.208-.682L3 4.5M3 15V4.5" /></svg>, title: 'Goal Tracker', desc: 'Set financial goals with progress tracking and target dates.' },
-              { icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z" /></svg>, title: 'Anti-Portfolio', desc: 'Track missed opportunities and learn from investment regrets.' },
+              { icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5" /></svg>, title: 'Dashboard', desc: 'Portfolio overview with live market data and performance tracking.', accent: 'from-teal-500 to-primary' },
+              { icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" /></svg>, title: 'Investments', desc: 'Track stocks, ETFs, crypto, gold & silver with live market prices.', accent: 'from-blue-500 to-blue-600' },
+              { icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z" /></svg>, title: 'FIRE Calculator', desc: 'Financial independence projections with real inflation rates.', accent: 'from-orange-500 to-red-500' },
+              { icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" /></svg>, title: 'Tax Calculators', desc: 'Country-specific: DE, US, CA, IN — updated for 2025.', accent: 'from-emerald-500 to-teal-600' },
+              { icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>, title: 'Lifestyle Basket', desc: 'Track luxury inflation — Porsche, private school, real estate.', accent: 'from-purple-500 to-purple-600' },
+              { icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>, title: 'Scenario Branching', desc: 'Model life decisions — job change, relocation, kids, sabbatical.', accent: 'from-cyan-500 to-blue-500' },
+              { icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M3 3v1.5M3 21v-6m0 0l2.77-.693a9 9 0 016.208.682l.108.054a9 9 0 006.086.71l3.114-.732a48.524 48.524 0 01-.005-10.499l-3.11.732a9 9 0 01-6.085-.711l-.108-.054a9 9 0 00-6.208-.682L3 4.5M3 15V4.5" /></svg>, title: 'Goal Tracker', desc: 'Set financial goals with progress tracking and target dates.', accent: 'from-amber-500 to-orange-500' },
+              { icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z" /></svg>, title: 'Anti-Portfolio', desc: 'Track missed opportunities and learn from investment regrets.', accent: 'from-rose-500 to-pink-600' },
             ].map((mod, i) => (
-              <div key={i} className="group p-5 rounded-2xl border border-slate-100 hover:border-primary/20 bg-white hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
-                <div className="w-10 h-10 rounded-xl bg-primary/[0.08] flex items-center justify-center text-primary mb-3 group-hover:bg-primary group-hover:text-white transition-colors">
+              <div key={i} className="group p-5 rounded-2xl border border-slate-100 hover:border-transparent bg-white hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 hover:-translate-y-1">
+                <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${mod.accent} flex items-center justify-center text-white mb-3 shadow-lg shadow-slate-200/50 group-hover:scale-110 transition-transform`}>
                   {mod.icon}
                 </div>
                 <h3 className="font-bold text-secondary text-sm mb-1">{mod.title}</h3>
@@ -307,8 +311,9 @@ export default function LandingPageExtended() {
         <div className="max-w-6xl mx-auto">
           <div className="mb-14">
             <p className="text-sm font-semibold text-primary tracking-wide uppercase mb-3">Country-aware</p>
-            <h2 className="text-3xl lg:text-4xl font-bold text-secondary tracking-tight font-display">
-              Your country. Your rules. Your numbers.
+            <h2 className="text-3xl lg:text-4xl font-bold tracking-tight font-display">
+              <span className="text-secondary">Your country. Your rules.</span>{' '}
+              <span className="text-primary">Your numbers.</span>
             </h2>
             <p className="text-slate-500 mt-3 max-w-xl">Tax brackets, social security, inflation rates — all calibrated to where you live.</p>
           </div>
@@ -388,8 +393,9 @@ export default function LandingPageExtended() {
         <div className="max-w-6xl mx-auto">
           <div className="mb-14">
             <p className="text-sm font-semibold text-primary tracking-wide uppercase mb-3">3 steps</p>
-            <h2 className="text-3xl lg:text-4xl font-bold text-secondary tracking-tight font-display">
-              From signup to clarity in under 5 minutes.
+            <h2 className="text-3xl lg:text-4xl font-bold tracking-tight font-display">
+              <span className="text-secondary">From signup to clarity</span>{' '}
+              <span className="text-primary">in under 5 minutes.</span>
             </h2>
           </div>
 
@@ -414,8 +420,9 @@ export default function LandingPageExtended() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-14">
             <p className="text-sm font-semibold text-primary tracking-wide uppercase mb-3">Pricing</p>
-            <h2 className="text-3xl lg:text-4xl font-bold text-secondary tracking-tight font-display">
-              Start free. Upgrade when it makes sense.
+            <h2 className="text-3xl lg:text-4xl font-bold tracking-tight font-display">
+              <span className="text-secondary">Start free.</span>{' '}
+              <span className="text-primary">Upgrade when it makes sense.</span>
             </h2>
           </div>
 
@@ -469,8 +476,9 @@ export default function LandingPageExtended() {
       {/* ─── Final CTA ─────────────────────────────────────── */}
       <section className="py-20 lg:py-28 px-6">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl lg:text-4xl font-bold text-secondary tracking-tight mb-4 font-display">
-            Your financial clarity starts here.
+          <h2 className="text-3xl lg:text-4xl font-bold tracking-tight mb-4 font-display">
+            <span className="text-secondary">Your financial clarity</span>{' '}
+            <span className="text-primary">starts here.</span>
           </h2>
           <p className="text-slate-500 text-lg mb-8">
             Join people in Germany, the US, Canada, India, and across Europe who are building wealth with real numbers.
