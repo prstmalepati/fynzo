@@ -20,6 +20,7 @@ import Settings from './pages/Settings';
 import Admin from './pages/Admin';
 import SecurityPrivacy from './pages/SecurityPrivacy';
 import Account from './pages/Account';
+import WealthProjection from './pages/WealthProjection';
 
 export default function App() {
   return (
@@ -36,6 +37,7 @@ export default function App() {
 
                 {/* Protected Routes */}
                 <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                <Route path="/wealth-projection" element={<ProtectedRoute><WealthProjection /></ProtectedRoute>} />
                 <Route path="/investments" element={<ProtectedRoute><Investments /></ProtectedRoute>} />
                 <Route path="/lifestyle-basket" element={<ProtectedRoute><LifestyleBasket /></ProtectedRoute>} />
                 <Route path="/anti-portfolio" element={<ProtectedRoute><AntiPortfolio /></ProtectedRoute>} />
