@@ -36,6 +36,8 @@ export default function WealthProjection() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [fetchedInvestments, setFetchedInvestments] = useState<number | null>(null);
+  const [fetchedDebt, setFetchedDebt] = useState<number | null>(null);
+  const [fetchedMonthlyDebtPayment, setFetchedMonthlyDebtPayment] = useState<number>(0);
   const [currentAge, setCurrentAge] = useState(30);
 
   const [inputs, setInputs] = useState<ProjectionInputs>({
@@ -74,6 +76,22 @@ export default function WealthProjection() {
         if (total > 0) {
           setInputs(prev => ({ ...prev, totalInvestments: total }));
         }
+
+        // Auto-fetch total debt from debts collection
+        const debtSnap = await getDocs(collection(db, 'users', user.uid, 'debts'));
+        let debtTotal = 0, debtMonthly = 0;
+        debtSnap.docs.forEach(d => {
+          const dd = d.data();
+          debtTotal += dd.remainingAmount || 0;
+          debtMonthly += dd.monthlyPayment || 0;
+        });
+        setFetchedDebt(debtTotal);
+        setFetchedMonthlyDebtPayment(debtMonthly);
+        setInputs(prev => ({
+          ...prev,
+          totalDebt: debtTotal,
+          monthlyDebtPayment: debtMonthly,
+        }));
       } catch (err) {
         console.error('Error loading:', err);
       } finally {
@@ -252,10 +270,17 @@ export default function WealthProjection() {
                     className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm text-secondary focus:border-primary/40 focus:ring-2 focus:ring-primary/10" />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-slate-500 mb-1 block">Total Debt ({currency})</label>
-                  <input type="number" value={inputs.totalDebt || ''} onChange={e => update('totalDebt', Number(e.target.value))}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm text-secondary focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
-                    placeholder="0" />
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs font-semibold text-slate-500">Total Debt ({currency})</label>
+                    {fetchedDebt !== null && (
+                      <span className="text-[10px] text-emerald-600 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded">From Debt Tracker</span>
+                    )}
+                  </div>
+                  <input type="number" value={inputs.totalDebt || ''} readOnly disabled
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm text-secondary bg-slate-50 cursor-not-allowed" />
+                  <a href="/debts" className="text-[10px] text-primary font-semibold hover:underline mt-1 inline-block">
+                    Manage debts →
+                  </a>
                 </div>
               </div>
             </div>
@@ -280,10 +305,14 @@ export default function WealthProjection() {
                     placeholder="Amount you invest each month" />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-slate-500 mb-1 block">Monthly Debt Payment ({currency})</label>
-                  <input type="number" value={inputs.monthlyDebtPayment || ''} onChange={e => update('monthlyDebtPayment', Number(e.target.value))}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm text-secondary focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
-                    placeholder="0" />
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs font-semibold text-slate-500">Monthly Debt Payment ({currency})</label>
+                    {fetchedDebt !== null && (
+                      <span className="text-[10px] text-emerald-600 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded">Auto</span>
+                    )}
+                  </div>
+                  <input type="number" value={inputs.monthlyDebtPayment || ''} readOnly disabled
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm text-secondary bg-slate-50 cursor-not-allowed" />
                 </div>
                 <div className="text-xs text-slate-400 bg-slate-50 rounded-lg px-3 py-2 space-y-0.5">
                   <div>Annual investment: <span className="font-bold text-secondary">{formatAmount(inputs.monthlyInvestment * 12)}</span></div>

@@ -79,9 +79,14 @@ export default function Dashboard() {
       if (projSnap.exists()) {
         const pd = projSnap.data();
         setCashSavings(pd.currentNetWorth || 0);
-        setTotalDebt(pd.totalDebt || 0);
         setMonthlyInvestment(pd.monthlyInvestment || 0);
       }
+
+      // Fetch total debt from debts collection (source of truth)
+      const debtSnap = await getDocs(collection(db, 'users', user.uid, 'debts'));
+      let debtSum = 0;
+      debtSnap.docs.forEach(d => { debtSum += d.data().remainingAmount || 0; });
+      setTotalDebt(debtSum);
     } catch (error) {
       console.error('Error loading dashboard:', error);
     } finally { setLoading(false); }
