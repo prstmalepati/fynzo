@@ -4,21 +4,22 @@ import { db } from '../firebase/config';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { TIER_LIMITS, TierType, TierLimits } from '../constants/tiers';
 
-// Premium users — add emails here to grant premium access
-// In production, this would come from a Stripe webhook writing to Firestore
-const PREMIUM_EMAILS: string[] = [
-  // Add premium user emails here
-  // 'premium@example.com',
-];
+// Hardcoded tier overrides for testing (bypasses Firestore)
+// In production, tier comes from Stripe webhook → Firestore
+const TIER_OVERRIDES: Record<string, TierType> = {
+  // 'admin@myfynzo.com': 'couples',
+  // 'bk.malepati@gmail.com': 'free',  // free tier test user
+};
 
 interface TierInfo {
   tier: TierType;
   isPremium: boolean;
+  isCouples: boolean;
   isFree: boolean;
   limits: TierLimits;
   loading: boolean;
   canUseFeature: (feature: keyof TierLimits) => boolean;
-  checkLimit: (feature: 'maxAssets' | 'projectionYears' | 'bankConnections' | 'maxScenarios' | 'familyMembers', currentCount: number) => boolean;
+  checkLimit: (feature: 'maxAssets' | 'projectionYears' | 'bankConnections' | 'maxScenarios' | 'users', currentCount: number) => boolean;
 }
 
 export function useTier(): TierInfo {
@@ -33,14 +34,14 @@ export function useTier(): TierInfo {
       return;
     }
 
-    // Check hardcoded premium list first
-    if (user.email && PREMIUM_EMAILS.includes(user.email)) {
-      setTier('premium');
+    // Check hardcoded overrides first
+    if (user.email && TIER_OVERRIDES[user.email]) {
+      setTier(TIER_OVERRIDES[user.email]);
       setLoading(false);
       return;
     }
 
-    // Listen for real-time tier from Firestore profile
+    // Listen for real-time tier from Firestore
     const unsubscribe = onSnapshot(
       doc(db, 'users', user.uid),
       (snap) => {
@@ -59,8 +60,9 @@ export function useTier(): TierInfo {
     return unsubscribe;
   }, [user]);
 
-  const limits = TIER_LIMITS[tier];
-  const isPremium = tier === 'premium';
+  const limits = TIER_LIMITS[tier] || TIER_LIMITS.free;
+  const isPremium = tier === 'premium' || tier === 'couples';
+  const isCouples = tier === 'couples';
   const isFree = tier === 'free';
 
   const canUseFeature = (feature: keyof TierLimits): boolean => {
@@ -71,13 +73,13 @@ export function useTier(): TierInfo {
   };
 
   const checkLimit = (
-    feature: 'maxAssets' | 'projectionYears' | 'bankConnections' | 'maxScenarios' | 'familyMembers',
+    feature: 'maxAssets' | 'projectionYears' | 'bankConnections' | 'maxScenarios' | 'users',
     currentCount: number
   ): boolean => {
     return currentCount < limits[feature];
   };
 
-  return { tier, isPremium, isFree, limits, loading, canUseFeature, checkLimit };
+  return { tier, isPremium, isCouples, isFree, limits, loading, canUseFeature, checkLimit };
 }
 
 export function usePremiumFeature(feature: keyof TierLimits) {
