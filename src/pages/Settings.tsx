@@ -178,11 +178,11 @@ export default function Settings() {
                 <label className="text-sm font-medium text-slate-700">Dashboard Projection Period</label>
                 <span className="text-sm font-bold text-primary">{profile.projectionYears} years</span>
               </div>
-              <input type="range" min="5" max="50" step="5" value={profile.projectionYears}
+              <input type="range" min="5" max="50" step="1" value={profile.projectionYears}
                 onChange={e => updateProfile('projectionYears', Number(e.target.value))}
                 className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary" />
               <div className="flex justify-between text-[10px] text-slate-400 mt-1">
-                <span>5yr</span><span>10yr</span><span>20yr</span><span>30yr</span><span>50yr</span>
+                <span>5yr</span><span>15yr</span><span>25yr</span><span>35yr</span><span>50yr</span>
               </div>
               <p className="text-xs text-slate-400 mt-1">Controls the projected value shown on your Dashboard card</p>
             </div>

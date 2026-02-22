@@ -329,11 +329,11 @@ export default function WealthProjection() {
                     <label className="text-xs font-semibold text-slate-500">Projection Period</label>
                     <span className="text-xs font-bold text-secondary">{inputs.projectionYears} years</span>
                   </div>
-                  <input type="range" min="5" max="50" step="5" value={inputs.projectionYears}
+                  <input type="range" min="5" max="50" step="1" value={inputs.projectionYears}
                     onChange={e => update('projectionYears', Number(e.target.value))}
                     className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-500" />
                   <div className="flex justify-between text-[10px] text-slate-400 mt-0.5">
-                    <span>5yr</span><span>25yr</span><span>50yr</span>
+                    <span>5yr</span><span>15yr</span><span>25yr</span><span>35yr</span><span>50yr</span>
                   </div>
                 </div>
               </div>
@@ -345,19 +345,19 @@ export default function WealthProjection() {
             {/* Summary cards */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div className="bg-gradient-to-br from-secondary to-surface-700 rounded-2xl p-4 text-white">
-                <div className="text-[10px] text-white/50 uppercase tracking-wider mb-1">Today</div>
+                <div className="text-[10px] text-white/50 uppercase tracking-wider mb-1">Today Net Worth</div>
                 <div className="text-lg font-bold">{formatAmount(projectionData[0].netWorth)}</div>
               </div>
               <div className="bg-white rounded-2xl border border-slate-200/80 shadow-card p-4">
-                <div className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">In {inputs.projectionYears}yr</div>
+                <div className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Net Worth in {inputs.projectionYears}yr</div>
                 <div className="text-lg font-bold text-secondary">{formatAmount(finalData.netWorth)}</div>
               </div>
               <div className="bg-white rounded-2xl border border-slate-200/80 shadow-card p-4">
-                <div className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Real Value</div>
+                <div className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Real Net Worth</div>
                 <div className="text-lg font-bold text-amber-600">{formatAmount(finalData.netWorthReal)}</div>
               </div>
               <div className="bg-white rounded-2xl border border-slate-200/80 shadow-card p-4">
-                <div className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Growth</div>
+                <div className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Net Worth Growth</div>
                 <div className="text-lg font-bold text-emerald-600">{formatAmount(finalData.totalGrowth)}</div>
               </div>
             </div>
@@ -368,7 +368,7 @@ export default function WealthProjection() {
                 <h3 className="text-sm font-bold text-secondary">Net Worth Projection</h3>
                 <div className="flex items-center gap-4 text-[10px]">
                   <span className="flex items-center gap-1.5">
-                    <span className="w-3 h-0.5 bg-primary rounded-full" /> Nominal
+                    <span className="w-3 h-0.5 bg-primary rounded-full" /> Net Worth
                   </span>
                   <span className="flex items-center gap-1.5">
                     <span className="w-3 h-0.5 bg-amber-500 rounded-full" /> Inflation-adjusted
@@ -453,7 +453,7 @@ export default function WealthProjection() {
                       <th className="text-left py-2">Year</th>
                       <th className="text-left py-2">Age</th>
                       <th className="text-right py-2">Net Worth</th>
-                      <th className="text-right py-2">Real Value</th>
+                      <th className="text-right py-2">Real Net Worth</th>
                       <th className="text-right py-2">Contributed</th>
                       <th className="text-right py-2">Growth</th>
                     </tr>

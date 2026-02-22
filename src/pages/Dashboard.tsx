@@ -141,9 +141,9 @@ export default function Dashboard() {
               </div>
               <div className="flex items-end justify-between">
                 <div>
-                  <div className="text-[10px] text-white/40 mb-0.5">Today</div>
+                  <div className="text-[10px] text-white/40 mb-0.5">Today Net Worth</div>
                   <div className="text-xl font-bold tracking-tight">{formatAmount(totalInvestments)}</div>
-                  <div className="text-[10px] text-white/40 mt-2">In {projYears} years</div>
+                  <div className="text-[10px] text-white/40 mt-2">Net Worth in {projYears} years</div>
                   <div className="text-xl font-bold text-accent tracking-tight">{formatAmount(projectedValue)}</div>
                 </div>
                 <svg viewBox="0 0 100 50" className="w-28 h-14 opacity-60">

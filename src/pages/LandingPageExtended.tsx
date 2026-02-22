@@ -120,13 +120,18 @@ export default function LandingPageExtended() {
               </div>
 
               {/* Trust — honest, minimal */}
-              <div className="flex flex-wrap items-center gap-5 text-sm text-slate-400">
-                {['Free forever tier', 'Bank-level encryption', 'GDPR compliant', 'EU-hosted data'].map((t, i) => (
-                  <span key={i} className="flex items-center gap-1.5">
-                    <svg className="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/></svg>
-                    {t}
-                  </span>
-                ))}
+              <div className="flex flex-wrap items-center gap-4 text-sm text-slate-400">
+                <span className="flex items-center gap-1.5">
+                  <svg className="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/></svg>
+                  Free forever tier
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <svg className="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/></svg>
+                  GDPR compliant
+                </span>
+                <span className="flex items-center gap-1.5 text-slate-500">
+                  🇩🇪 🇺🇸 🇨🇦 🇮🇳 Built for 4 countries
+                </span>
               </div>
             </div>
 
@@ -134,13 +139,18 @@ export default function LandingPageExtended() {
             <div className="relative hidden lg:block">
               {/* iPad mockup */}
               <div className="relative mx-auto" style={{ width: '540px' }}>
-                {/* iPad frame */}
-                <div className="bg-slate-900 rounded-[2rem] p-3 shadow-2xl shadow-slate-900/30 rotate-1 hover:rotate-0 transition-transform duration-500">
+                {/* iPad frame — realistic bezel with camera */}
+                <div className="bg-gradient-to-b from-slate-800 to-slate-900 rounded-[2rem] p-3 shadow-2xl shadow-slate-900/40 rotate-1 hover:rotate-0 transition-transform duration-700">
+                  {/* Camera notch */}
+                  <div className="flex justify-center mb-1">
+                    <div className="w-2 h-2 rounded-full bg-slate-700 ring-1 ring-slate-600" />
+                  </div>
                   <div className="bg-white rounded-[1.4rem] overflow-hidden">
                     {/* Status bar */}
                     <div className="bg-slate-800 px-5 py-1.5 flex items-center justify-between">
                       <span className="text-[9px] text-white/50 font-medium">9:41</span>
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1.5">
+                        <div className="flex gap-0.5">{[1,2,3].map(i => <div key={i} className="w-0.5 h-1.5 bg-white/40 rounded-full" style={{height: `${3+i*2}px`}} />)}</div>
                         <div className="w-3 h-1.5 border border-white/40 rounded-sm"><div className="w-2 h-full bg-emerald-400 rounded-sm" /></div>
                       </div>
                     </div>
@@ -153,18 +163,18 @@ export default function LandingPageExtended() {
                           <div className="w-7 h-7 rounded-lg bg-primary/30 flex items-center justify-center mb-3 mx-auto">
                             <span className="text-[7px] font-bold text-white">mf</span>
                           </div>
-                          {['Dashboard', 'Wealth', 'Invest', 'Goals', 'Tax'].map((_, i) => (
+                          {['📊','📈','💰','🎯','🧮'].map((icon, i) => (
                             <div key={i} className={`w-7 h-7 rounded-lg mx-auto mb-1.5 flex items-center justify-center ${i === 0 ? 'bg-primary/80' : 'bg-white/5'}`}>
-                              <div className={`w-3 h-0.5 rounded-full ${i === 0 ? 'bg-white' : 'bg-white/30'}`} />
+                              <span className="text-[8px]">{icon}</span>
                             </div>
                           ))}
                         </div>
                         {/* Main content */}
                         <div className="flex-1">
-                          {/* Header */}
+                          {/* Header with country flag */}
                           <div className="flex items-center justify-between mb-3">
                             <div>
-                              <div className="text-[8px] text-slate-400">Welcome back</div>
+                              <div className="text-[8px] text-slate-400 flex items-center gap-1">Welcome back <span>🇩🇪</span></div>
                               <div className="text-[11px] font-bold text-slate-800">My Dashboard</div>
                             </div>
                             <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center">
@@ -174,19 +184,20 @@ export default function LandingPageExtended() {
                           {/* Stats row */}
                           <div className="grid grid-cols-3 gap-1.5 mb-3">
                             <div className="bg-gradient-to-br from-slate-800 to-slate-700 rounded-lg p-2 text-white">
-                              <div className="text-[7px] text-white/40">Portfolio</div>
+                              <div className="text-[6px] text-white/40">Today Net Worth</div>
                               <div className="text-[11px] font-bold">€47,230</div>
-                              <div className="text-[7px] text-emerald-400 font-semibold">+12.4%</div>
+                              <div className="text-[6px] text-white/40 mt-0.5">In 10yr</div>
+                              <div className="text-[10px] font-bold text-emerald-400">€142K</div>
                             </div>
                             <div className="bg-white rounded-lg p-2 border border-slate-100">
-                              <div className="text-[7px] text-slate-400">Goals</div>
+                              <div className="text-[6px] text-slate-400">Portfolio</div>
+                              <div className="text-[11px] font-bold text-slate-800">€35,200</div>
+                              <div className="text-[7px] text-emerald-600 font-semibold">+12.4%</div>
+                            </div>
+                            <div className="bg-white rounded-lg p-2 border border-slate-100">
+                              <div className="text-[6px] text-slate-400">Goals</div>
                               <div className="text-[11px] font-bold text-slate-800">€80,000</div>
                               <div className="w-full h-1 bg-slate-100 rounded-full mt-0.5"><div className="w-3/5 h-full bg-blue-500 rounded-full" /></div>
-                            </div>
-                            <div className="bg-white rounded-lg p-2 border border-slate-100">
-                              <div className="text-[7px] text-slate-400">Projection</div>
-                              <div className="text-[11px] font-bold text-primary">€142K</div>
-                              <div className="text-[7px] text-slate-400">in 10yr</div>
                             </div>
                           </div>
                           {/* Donut chart + allocation */}
@@ -218,18 +229,26 @@ export default function LandingPageExtended() {
                 </div>
 
                 {/* iPhone mockup — overlapping bottom-right */}
-                <div className="absolute -bottom-10 -right-8 z-10" style={{ width: '175px' }}>
-                  <div className="bg-slate-900 rounded-[1.8rem] p-2 shadow-2xl shadow-slate-900/40 -rotate-2 hover:rotate-0 transition-transform duration-500">
-                    <div className="bg-white rounded-[1.4rem] overflow-hidden">
-                      {/* Notch */}
-                      <div className="bg-slate-800 pt-2 pb-1 flex justify-center">
-                        <div className="w-12 h-1.5 bg-slate-700 rounded-full" />
+                <div className="absolute -bottom-10 -right-8 z-10" style={{ width: '180px' }}>
+                  <div className="bg-gradient-to-b from-slate-800 to-slate-900 rounded-[2rem] p-2 shadow-2xl shadow-slate-900/50 -rotate-2 hover:rotate-0 transition-transform duration-700">
+                    <div className="bg-white rounded-[1.6rem] overflow-hidden">
+                      {/* Dynamic Island */}
+                      <div className="bg-slate-800 pt-1.5 pb-1 flex justify-center relative">
+                        <div className="w-16 h-4 bg-black rounded-full flex items-center justify-center">
+                          <div className="w-1.5 h-1.5 rounded-full bg-slate-700" />
+                        </div>
+                        <span className="absolute right-3 top-1.5 text-[7px] text-white/40">9:41</span>
                       </div>
-                      {/* Phone content — mobile portfolio */}
-                      <div className="p-3 bg-slate-50" style={{ minHeight: '220px' }}>
-                        {/* Mini donut */}
-                        <div className="flex items-center gap-2 mb-2">
-                          <svg viewBox="0 0 40 40" className="w-10 h-10">
+                      {/* Phone content */}
+                      <div className="p-2.5 bg-slate-50" style={{ minHeight: '235px' }}>
+                        {/* Net worth header with flag */}
+                        <div className="flex items-center gap-1.5 mb-2">
+                          <span className="text-[10px]">🇩🇪</span>
+                          <span className="text-[8px] font-bold text-slate-800">Net Worth</span>
+                        </div>
+                        {/* Mini donut + value */}
+                        <div className="flex items-center gap-2 mb-2.5">
+                          <svg viewBox="0 0 40 40" className="w-11 h-11">
                             <circle cx="20" cy="20" r="14" fill="none" stroke="#0f766e" strokeWidth="5" strokeDasharray="30 88" />
                             <circle cx="20" cy="20" r="14" fill="none" stroke="#2563eb" strokeWidth="5" strokeDasharray="20 88" strokeDashoffset="-30" />
                             <circle cx="20" cy="20" r="14" fill="none" stroke="#f59e0b" strokeWidth="5" strokeDasharray="18 88" strokeDashoffset="-50" />
@@ -237,7 +256,7 @@ export default function LandingPageExtended() {
                             <circle cx="20" cy="20" r="9" fill="white" />
                           </svg>
                           <div>
-                            <div className="text-[10px] font-bold text-slate-800">€47,230</div>
+                            <div className="text-[11px] font-bold text-slate-800">€47,230</div>
                             <div className="text-[7px] text-emerald-600 font-semibold">+€5,230 ↑ 12.4%</div>
                           </div>
                         </div>
@@ -251,11 +270,19 @@ export default function LandingPageExtended() {
                           <div key={i} className="flex items-center justify-between py-1.5 border-b border-slate-100 last:border-0">
                             <div>
                               <div className="text-[8px] font-bold text-slate-800">{item.name}</div>
-                              <div className="text-[7px] text-slate-400">{item.amt}</div>
+                              <div className="text-[6px] text-slate-400">{item.amt}</div>
                             </div>
-                            <span className={`text-[8px] font-bold ${item.up ? 'text-emerald-600' : 'text-red-500'}`}>{item.val}</span>
+                            <span className={`text-[7px] font-bold ${item.up ? 'text-emerald-600' : 'text-red-500'}`}>{item.val}</span>
                           </div>
                         ))}
+                        {/* Bottom nav bar */}
+                        <div className="flex items-center justify-around mt-2 pt-1.5 border-t border-slate-100">
+                          {['📊','📈','💰','⚙️'].map((icon, i) => (
+                            <div key={i} className={`w-6 h-6 rounded-lg flex items-center justify-center ${i === 0 ? 'bg-primary/10' : ''}`}>
+                              <span className="text-[9px]">{icon}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                       {/* Home bar */}
                       <div className="flex justify-center py-1">
@@ -415,7 +442,7 @@ export default function LandingPageExtended() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { step: '01', title: 'Set your country', desc: 'Select your country and currency. Tax rules, language, and defaults adapt automatically.', accent: 'bg-primary' },
+              { step: '01', title: 'Set your country', desc: 'Select 🇩🇪 🇺🇸 🇨🇦 or 🇮🇳 — tax rules, language, and defaults adapt automatically.', accent: 'bg-primary' },
               { step: '02', title: 'Add your portfolio', desc: 'Enter investments, goals, and lifestyle items. Live prices update automatically via market data.', accent: 'bg-blue-600' },
               { step: '03', title: 'See your real numbers', desc: 'Tax-aware projections, FIRE calculations, and scenario modeling — all calibrated to your reality.', accent: 'bg-emerald-600' },
             ].map((s, i) => (
@@ -536,9 +563,12 @@ export default function LandingPageExtended() {
             <span className="text-secondary">Your financial clarity</span>{' '}
             <span className="text-primary">starts here.</span>
           </h2>
-          <p className="text-slate-500 text-lg mb-8">
+          <p className="text-slate-500 text-lg mb-4">
             Join people in Germany, the US, Canada, India, and across Europe who are building wealth with real numbers.
           </p>
+          <div className="flex items-center justify-center gap-3 text-2xl mb-8">
+            <span>🇩🇪</span><span>🇺🇸</span><span>🇨🇦</span><span>🇮🇳</span><span>🇬🇧</span><span>🇨🇭</span>
+          </div>
           <Link to="/signup"
             className="inline-block px-8 py-4 bg-secondary text-white rounded-xl font-semibold text-lg hover:bg-secondary/90 transition-all shadow-lg shadow-secondary/10">
             Create Your Free Account →
@@ -575,7 +605,7 @@ export default function LandingPageExtended() {
             ))}
           </div>
           <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-3">
-            <p className="text-xs text-slate-400">© 2026 myfynzo. Built in Frankfurt, Germany.</p>
+            <p className="text-xs text-slate-400">© 2026 myfynzo. Built in Frankfurt 🇩🇪</p>
             <div className="flex gap-3 text-xs text-slate-400">
               {COUNTRY_PROFILES.map((c, i) => <span key={i}>{c.flag}</span>)}
             </div>
